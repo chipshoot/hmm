@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2015 rel. 4 (x64) (http://www.altova.com) by Dan Guy (Hadrian Manufacturing Inc.) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning" elementFormDefault="qualified" attributeFormDefault="unqualified" vc:minVersion="1.1">
+	<xs:element name="GasLog">
+		<xs:annotation>
+			<xs:documentation>Comment describing your root element</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Date" type="xs:dateTime"/>
+				<xs:element name="Distance" type="DimensionType"/>
+				<xs:element name="Gas" type="VolumeType"/>
+				<xs:element name="Price" type="MonetaryType"/>
+				<xs:element name="Total" type="MonetaryType"/>
+				<xs:element name="Discounts">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Discount" type="DiscountType" minOccurs="0" maxOccurs="unbounded"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="DimensionType">
+		<xs:sequence>
+			<xs:element name="Unit" type="xs:string"/>
+			<xs:element name="Value" type="xs:double"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="VolumeType">
+		<xs:sequence>
+			<xs:element name="Unit" type="xs:string"/>
+			<xs:element name="Value" type="xs:double"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="MonetaryType">
+		<xs:sequence>
+			<xs:element name="Currency" type="xs:string"/>
+			<xs:element name="Value" type="xs:decimal"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DiscountType">
+		<xs:sequence>
+			<xs:element name="Value" type="MonetaryType"/>
+			<xs:element name="Program" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
