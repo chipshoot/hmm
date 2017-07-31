@@ -1,8 +1,9 @@
 ﻿using System;
+using Hmm.Utility.Dal;
 
 namespace DomainEntity.Misc
 {
-    public class HmmNote : Entity
+    public class HmmNote : VersionedEntity
     {
         public string Subject { get; set; }
 

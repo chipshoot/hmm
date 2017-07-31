@@ -5,7 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Hmm.Utility\Hmm.Utility.csproj" />
+    <Folder Include="Dal\" />
+    <Folder Include="Specification\" />
+    <Folder Include="Validation\" />
   </ItemGroup>
 
 </Project>

@@ -1,8 +1,8 @@
-﻿using DomainEntity.Misc;
+﻿using Hmm.Utility.Dal;
 
 namespace DomainEntity.Vehicle
 {
-    public class Automobile : Entity
+    public class Automobile : VersionedEntity
     {
         public string Brand { get; set; }
 

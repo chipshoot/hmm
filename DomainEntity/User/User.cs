@@ -1,4 +1,4 @@
-﻿using DomainEntity.Misc;
+﻿using Hmm.Utility.Dal;
 
 namespace DomainEntity.User
 {
