@@ -9,14 +9,14 @@ namespace DomainEntity.Misc
 
         public string Content { get; set; }
 
-        public int Catalog { get; set; }
+        public NoteCatalog Catalog { get; set; }
 
-        public int Author { get; set; }
+        public User.User Author { get; set; }
+
+        public NoteRender Render { get; set; }
 
         public DateTime CreateDate { get; set; }
 
         public DateTime LastModifiedDate { get; set; }
-
-        public byte[] Version { get; set; }
     }
 }

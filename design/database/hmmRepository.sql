@@ -43,7 +43,7 @@ GO
 CREATE TABLE [dbo].[NoteRenders](
     [ID] [int] IDENTITY(1,1) NOT NULL,
     [Name] [nvarchar](1000) NOT NULL,
-    [NameSpace] NVARCHAR(1000) NOT NULL,
+    [Namespace] NVARCHAR(1000) NOT NULL,
     [Description] [nvarchar](1000) NULL,
 CONSTRAINT [PK_NoteRenders] PRIMARY KEY CLUSTERED 
 (
@@ -145,9 +145,9 @@ CREATE TABLE [dbo].[Notes](
     [ID] [int] IDENTITY(1,1) NOT NULL,
     [Subject] [nvarchar](1000) NOT NULL,
     [Content] XML NOT NULL,
-    [Catalog] INT NOT NULL,
-    [Render] INT NOT NULL,
-    [Author] INT NOT NULL,
+    [CatalogId] INT NOT NULL,
+    [RenderId] INT NOT NULL,
+    [AuthorId] INT NOT NULL,
     [CreateDate] DATETIME NOT NULL,
     [LastModifiedDate] DATETIME NOT NULL,
     [Description] [nvarchar](1000) NULL,
@@ -159,21 +159,21 @@ CONSTRAINT [PK_Notes] PRIMARY KEY CLUSTERED
 ) ON [PRIMARY]
 GO
 
-ALTER TABLE [dbo].[Notes]  WITH CHECK ADD  CONSTRAINT [FK_Notes_NoteCatalogues] FOREIGN KEY([Catalog])
+ALTER TABLE [dbo].[Notes]  WITH CHECK ADD  CONSTRAINT [FK_Notes_NoteCatalogues] FOREIGN KEY([CatalogId])
 REFERENCES [dbo].[NoteCatalogues] ([ID])
 GO
 
 ALTER TABLE [dbo].[Notes] CHECK CONSTRAINT [FK_Notes_NoteCatalogues]
 GO
 
-ALTER TABLE [dbo].[Notes]  WITH CHECK ADD  CONSTRAINT [FK_Notes_NoteRenders] FOREIGN KEY([Render])
+ALTER TABLE [dbo].[Notes]  WITH CHECK ADD  CONSTRAINT [FK_Notes_NoteRenders] FOREIGN KEY([RenderId])
 REFERENCES [dbo].[NoteRenders] ([ID])
 GO
 
 ALTER TABLE [dbo].[Notes] CHECK CONSTRAINT [FK_Notes_NoteRenders]
 GO
 
-ALTER TABLE [dbo].[Notes]  WITH CHECK ADD  CONSTRAINT [FK_Notes_Users] FOREIGN KEY([Author])
+ALTER TABLE [dbo].[Notes]  WITH CHECK ADD  CONSTRAINT [FK_Notes_Users] FOREIGN KEY([AuthorId])
 REFERENCES [dbo].[Users] ([ID])
 GO
 
@@ -182,7 +182,7 @@ GO
 
 CREATE NONCLUSTERED INDEX [IDX_NoteCatalog] ON [dbo].[Notes] 
 (
-	[Catalog] ASC
+	[CatalogId] ASC
 )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
 GO
 

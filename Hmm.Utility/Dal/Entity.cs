@@ -5,6 +5,6 @@
     /// </summary>
     public class Entity : AbstractEntity<int>
     {
-        public string Comment { get; set; }
+        public string Description { get; set; }
     }
 }

@@ -2,6 +2,6 @@
 {
     public class VersionedEntity : Entity
     {
-        public virtual byte[] Version { get; set; }
+        public byte[] Version { get; set; }
     }
 }
