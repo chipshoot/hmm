@@ -1,31 +1,21 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
+﻿using Hmm.Utility.Dal.DataEntity;
 
-namespace Hmm.Utility.Dal
+namespace Hmm.Utility.Dal.DataStore
 {
     /// <summary>
-    /// The <see cref="IGenericRepository{T}"/> interface defines a standard contract that repository
-    /// components should implement.
+    /// The <see cref="IGenericDataStore{T, TIdentity}"/> interface defines a standard contract that repository
+    /// components should implement for CRUD.
     /// </summary>
     /// <typeparam name="T">The entity type we want to managed in the repository</typeparam>
-    public interface IGenericRepository<T> where T : class
+    /// <typeparam name="TIdentity">the type of entity identity</typeparam>
+    public interface IGenericDataStore<T, in TIdentity> where T : AbstractEntity<TIdentity>
     {
         /// <summary>
-        /// Grab all item in a ItemRepository
+        /// Grab item from data store based on its identity
         /// </summary>
         /// <typeparam name="T">The item type we want to find</typeparam>
-        /// <returns>The List of items found in parent</returns>
-        IQueryable<T> FindEntities();
-
-        /// <summary>
-        /// Gets the list of entities that match criteria.
-        /// </summary>
-        /// <param name="query">The query to search the data source.</param>
-        /// <returns>
-        /// The list of entity that match the criteria
-        /// </returns>
-        IQueryable<T> FindEntities(Expression<Func<T, bool>> query);
+        /// <returns>The items found in data store with the identity</returns>
+        T Get(TIdentity id);
 
         /// <summary>
         /// Adds the entity to data source.
@@ -45,10 +35,11 @@ namespace Hmm.Utility.Dal
         /// Deletes the specified entity from data source.
         /// </summary>
         /// <param name="entity">The entity which will be removed.</param>
-        void Delete(T entity);
+        /// <returns>True if delete successfully, otherwise false</returns>
+        bool Delete(T entity);
 
         /// <summary>
-        /// Clear entity from data cache and let system retrieve data again from data source next time from <see cref="FindEntities()"/>.
+        /// Clear entity from data cache and let system retrieve data again from data source next time from <see cref="Get"/>.
         /// Client need this after data source get changed
         /// </summary>
         /// <param name="entity">The entity need to be refreshed</param>

@@ -4,13 +4,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Hmm.Dal.Data
 {
-    public class HmmDataContext : DbContext
+    public class HmmDataContext : DbContext, IHmmDataContext
     {
         public HmmDataContext(DbContextOptions<HmmDataContext> options) : base(options)
         {
         }
 
         public DbSet<HmmNote> Notes { get; set; }
+
         public DbSet<User> Users { get; set; }
 
         public DbSet<NoteRender> Renders { get; set; }

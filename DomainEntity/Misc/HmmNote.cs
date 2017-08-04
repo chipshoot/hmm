@@ -1,5 +1,5 @@
-﻿using System;
-using Hmm.Utility.Dal;
+﻿using Hmm.Utility.Dal.DataEntity;
+using System;
 
 namespace DomainEntity.Misc
 {

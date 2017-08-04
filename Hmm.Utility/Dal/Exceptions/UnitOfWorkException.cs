@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NoteRepository.Common.Utility.Dal.Exceptions
+namespace Hmm.Utility.Dal.Exceptions
 {
     /// <summary>
     /// Class UnitOfWorkException

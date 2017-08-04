@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Hmm.Utility.Dal
+namespace Hmm.Utility.Dal.DataEntity
 {
     /// <summary>
     /// The base interface of all entity in domain

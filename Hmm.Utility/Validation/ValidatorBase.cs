@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Hmm.Utility.Dal;
+using Hmm.Utility.Dal.Query;
 
 namespace Hmm.Utility.Validation
 {
@@ -8,7 +9,7 @@ namespace Hmm.Utility.Validation
     {
         #region constructor
 
-        protected ValidatorBase(ILookupRepository lookupRepo)
+        protected ValidatorBase(IQuery<T> lookupRepo)
         {
             Guard.Against<ArgumentNullException>(lookupRepo == null, "lookupRepo");
             LookupRepo = lookupRepo;
@@ -18,7 +19,7 @@ namespace Hmm.Utility.Validation
 
         #region protected properties
 
-        protected ILookupRepository LookupRepo { get; private set; }
+        protected IQuery<T> LookupRepo { get; private set; }
 
         #endregion protected properties
 

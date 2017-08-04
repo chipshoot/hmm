@@ -1,18 +1,12 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
-using Hmm.Utility.Dal;
+﻿using Hmm.Utility.Dal.DataEntity;
+using Hmm.Utility.Dal.DataStore;
+using System;
 
 namespace Hmm.Dal
 {
-    public class DefaultRepository<T> : IRepository<T> where T : Entity
+    public class DefaultDataStorage<T> : IDataStore<T> where T : Entity
     {
-        public IQueryable<T> FindEntities()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IQueryable<T> FindEntities(Expression<Func<T, bool>> query)
+        public T Get(int id)
         {
             throw new NotImplementedException();
         }
@@ -27,7 +21,7 @@ namespace Hmm.Dal
             throw new NotImplementedException();
         }
 
-        public void Delete(T entity)
+        public bool Delete(T entity)
         {
             throw new NotImplementedException();
         }

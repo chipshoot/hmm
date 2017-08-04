@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NoteRepository.Common.Utility.Dal.Exceptions
+namespace Hmm.Utility.Dal.Exceptions
 {
     /// <summary>
     /// Class RepositoryException is thrown whenever there is any error occurred

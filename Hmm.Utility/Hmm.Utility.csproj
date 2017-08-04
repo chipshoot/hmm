@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Dal\" />
     <Folder Include="Specification\" />
     <Folder Include="Validation\" />
   </ItemGroup>

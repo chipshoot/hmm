@@ -1,4 +1,4 @@
-﻿namespace Hmm.Utility.Dal
+﻿namespace Hmm.Utility.Dal.DataEntity
 {
     /// <summary>
     /// The base class of domain entity who use integer as its identity

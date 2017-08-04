@@ -1,4 +1,4 @@
-﻿namespace Hmm.Utility.Dal
+﻿namespace Hmm.Utility.Dal.DataEntity
 {
     public class VersionedEntity : Entity
     {

@@ -1,4 +1,4 @@
-﻿using Hmm.Utility.Dal;
+﻿using Hmm.Utility.Dal.DataEntity;
 
 namespace DomainEntity.Misc
 {
