@@ -6,6 +6,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Hmm.Dal.Validation;
 using Xunit;
 
 namespace Hmm.Dal.Tests
@@ -54,7 +55,9 @@ namespace Hmm.Dal.Tests
                 var catfound = _catalogs.FirstOrDefault(c => c.Name == q.CatalogName);
                 return catfound;
             });
-            _catalogStorage = new NoteCatalogStorage(lookupMoc.Object, uowmock.Object, queryMock.Object);
+
+            var validator = new NoteCatalogValidator(lookupMoc.Object, queryMock.Object);
+            _catalogStorage = new NoteCatalogStorage(uowmock.Object, validator, lookupMoc.Object);
         }
 
         public void Dispose()
@@ -86,7 +89,7 @@ namespace Hmm.Dal.Tests
         public void CanNotAddAlreadyExistedNoteCatalogToDataSource()
         {
             // Arrange
-            _catalogs.Add(new NoteCatalog
+            _catalogs.AddEntity(new NoteCatalog
             {
                 Id = 1,
                 Name = "GasLog",

@@ -6,6 +6,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Hmm.Dal.Validation;
 using Xunit;
 
 namespace Hmm.Dal.Tests
@@ -54,7 +55,9 @@ namespace Hmm.Dal.Tests
                 var catfound = _renders.FirstOrDefault(c => c.Name == q.RenderName);
                 return catfound;
             });
-            _renderStorage = new NoteRenderStorage(lookupMoc.Object, uowmock.Object, queryMock.Object);
+
+            var validator = new NoteRenderValidator(lookupMoc.Object, queryMock.Object);
+            _renderStorage = new NoteRenderStorage(uowmock.Object, validator, lookupMoc.Object);
         }
 
         public void Dispose()
@@ -87,7 +90,7 @@ namespace Hmm.Dal.Tests
         public void CanNotAddAlreadyExistedNoteRenderToDataSource()
         {
             // Arrange
-            _renders.Add(new NoteRender
+            _renders.AddEntity(new NoteRender
             {
                 Id = 1,
                 Name = "GasLog",

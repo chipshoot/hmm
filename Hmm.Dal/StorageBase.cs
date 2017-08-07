@@ -1,21 +1,25 @@
 ﻿using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.DataEntity;
 using Hmm.Utility.Dal.DataStore;
-using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Validation;
 using System;
+using Hmm.Utility.Dal.Query;
 
 namespace Hmm.Dal
 {
     public abstract class StorageBase<T> : IDataStore<T> where T : Entity
     {
-        protected StorageBase(IEntityLookup lookupRepo, IUnitOfWork uow)
+        protected StorageBase(IUnitOfWork uow, IValidator<T> validator, IEntityLookup lookupRepo)
         {
-            Guard.Against<ArgumentNullException>(lookupRepo == null, nameof(lookupRepo));
             Guard.Against<ArgumentNullException>(uow == null, nameof(uow));
-            LookupRepo = lookupRepo;
+            Guard.Against<ArgumentNullException>(validator == null, nameof(validator));
+            Guard.Against<ArgumentNullException>(lookupRepo == null, nameof(lookupRepo));
             UnitOfWork = uow;
+            Validator = validator;
+            LookupRepo = lookupRepo;
         }
+
+        public IValidator<T> Validator { get; set; }
 
         protected IEntityLookup LookupRepo { get; }
 
@@ -24,10 +28,6 @@ namespace Hmm.Dal
         public abstract T Add(T entity);
 
         public abstract bool Delete(T entity);
-
-        public abstract void Flush();
-
-        public abstract void Refresh(ref T entity);
 
         public abstract T Update(T entity);
     }

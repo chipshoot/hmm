@@ -1,12 +1,13 @@
 ﻿using DomainEntity.Misc;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
+using Hmm.Utility.Validation;
 
 namespace Hmm.Dal
 {
     public class NoteStorage : StorageBase<HmmNote>
     {
-        public NoteStorage(IEntityLookup lookupRepo, IUnitOfWork uow) : base(lookupRepo, uow)
+        public NoteStorage(IUnitOfWork uow, IValidator<HmmNote> validator, IEntityLookup lookupRepo) : base(uow, validator, lookupRepo)
         {
         }
 
@@ -16,16 +17,6 @@ namespace Hmm.Dal
         }
 
         public override bool Delete(HmmNote entity)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override void Flush()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override void Refresh(ref HmmNote entity)
         {
             throw new System.NotImplementedException();
         }

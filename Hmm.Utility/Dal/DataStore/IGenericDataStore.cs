@@ -1,4 +1,5 @@
 ﻿using Hmm.Utility.Dal.DataEntity;
+using Hmm.Utility.Validation;
 
 namespace Hmm.Utility.Dal.DataStore
 {
@@ -10,6 +11,12 @@ namespace Hmm.Utility.Dal.DataStore
     /// <typeparam name="TIdentity">the type of entity identity</typeparam>
     public interface IGenericDataStore<T, in TIdentity> where T : AbstractEntity<TIdentity>
     {
+        /// <summary>
+        /// Get and Set the entity validator which is used for validating entity when insert, update or delete
+        /// entity
+        /// </summary>
+        IValidator<T> Validator { get; set; }
+
         /// <summary>
         /// Adds the entity to data source.
         /// </summary>
@@ -30,17 +37,5 @@ namespace Hmm.Utility.Dal.DataStore
         /// <param name="entity">The entity which will be removed.</param>
         /// <returns>True if delete successfully, otherwise false</returns>
         bool Delete(T entity);
-
-        /// <summary>
-        /// Clear entity from data cache and let system retrieve data again from data source next time from <see cref="Get"/>.
-        /// Client need this after data source get changed
-        /// </summary>
-        /// <param name="entity">The entity need to be refreshed</param>
-        void Refresh(ref T entity);
-
-        /// <summary>
-        /// Flushes the cached data to database.
-        /// </summary>
-        void Flush();
     }
 }

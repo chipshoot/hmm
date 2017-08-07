@@ -2,43 +2,31 @@
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Validation;
-using System;
-using Hmm.Dal.Querys;
 
 namespace Hmm.Dal
 {
     public class NoteCatalogStorage : StorageBase<NoteCatalog>
     {
-        private readonly IQueryHandler<NoteCatalogQueryByName, NoteCatalog> _catalogQuery;
-
-        public NoteCatalogStorage(IEntityLookup lookupRepo, IUnitOfWork uow, IQueryHandler<NoteCatalogQueryByName, NoteCatalog> catalogQuery) : base(lookupRepo, uow)
+        public NoteCatalogStorage(IUnitOfWork uow, IValidator<NoteCatalog> validator, IEntityLookup lookupRepo) : base(uow, validator, lookupRepo)
         {
-            Guard.Against<ArgumentNullException>(catalogQuery == null, nameof(catalogQuery));
-
-            _catalogQuery = catalogQuery;
         }
 
         public override NoteCatalog Add(NoteCatalog entity)
         {
             // find data source to check if the name is unique
-            var savedCat = _catalogQuery.Execute(new NoteCatalogQueryByName { CatalogName = entity.Name });
+            if (!Validator.IsValid(entity, isNewEntity: true))
+            {
+                return null;
+            }
 
-            var newCat = savedCat == null ? UnitOfWork.Add(entity) : null;
+            var newCat = UnitOfWork.Add(entity);
 
             return newCat;
         }
 
         public override NoteCatalog Update(NoteCatalog entity)
         {
-            var savedRec = LookupRepo.GetEntity<NoteCatalog>(entity.Id);
-            if (savedRec == null)
-            {
-                return null;
-            }
-
-            // make sure the note catalog name is unique in database
-            var sameNameCat = _catalogQuery.Execute(new NoteCatalogQueryByName {CatalogName = entity.Name});
-            if (sameNameCat != null && sameNameCat.Id != entity.Id)
+            if (!Validator.IsValid(entity, isNewEntity: false))
             {
                 return null;
             }
@@ -49,24 +37,13 @@ namespace Hmm.Dal
 
         public override bool Delete(NoteCatalog entity)
         {
-            var savedCat = LookupRepo.GetEntity<NoteCatalog>(entity.Id);
-            if (savedCat == null)
+            if (!Validator.IsValid(entity, isNewEntity: false))
             {
                 return false;
             }
 
             UnitOfWork.Delete(entity);
             return true;
-        }
-
-        public override void Refresh(ref NoteCatalog entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Flush()
-        {
-            throw new NotImplementedException();
         }
     }
 }

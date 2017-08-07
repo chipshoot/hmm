@@ -1,38 +1,43 @@
 ﻿using DomainEntity.User;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
+using Hmm.Utility.Validation;
+using System;
 
 namespace Hmm.Dal
 {
     public class UserStorage : StorageBase<User>
     {
-        public UserStorage(IEntityLookup lookupRepo, IUnitOfWork uow) : base(lookupRepo, uow)
+        public UserStorage(IUnitOfWork uow, IValidator<User> validator, IEntityLookup lookupRepo) : base(uow, validator, lookupRepo)
         {
         }
 
         public override User Add(User entity)
         {
-            throw new System.NotImplementedException();
+            if (!Validator.IsValid(entity, isNewEntity: true))
+            {
+                return null;
+            }
+            var newuser = UnitOfWork.Add(entity);
+            return newuser;
         }
 
         public override User Update(User entity)
         {
-            throw new System.NotImplementedException();
+            if (!Validator.IsValid(entity, isNewEntity: false))
+            {
+                return null;
+            }
+
+            UnitOfWork.Update(entity);
+            var updateuser = LookupRepo.GetEntity<User>(entity.Id);
+            return updateuser;
         }
 
         public override bool Delete(User entity)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
-        public override void Refresh(ref User entity)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override void Flush()
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }
