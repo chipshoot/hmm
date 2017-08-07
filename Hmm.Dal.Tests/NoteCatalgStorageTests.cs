@@ -1,4 +1,5 @@
 ﻿using DomainEntity.Misc;
+using Hmm.Dal.Querys;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
 using Moq;
@@ -18,11 +19,18 @@ namespace Hmm.Dal.Tests
         {
             _catalogs = new List<NoteCatalog>();
 
+            var lookupMoc = new Mock<IEntityLookup>();
+            lookupMoc.Setup(lk => lk.GetEntity<NoteCatalog>(It.IsAny<int>())).Returns((int id) =>
+            {
+                var recFound = _catalogs.FirstOrDefault(c => c.Id == id);
+                return recFound;
+            });
+
             var uowmock = new Mock<IUnitOfWork>();
             uowmock.Setup(u => u.Add(It.IsAny<NoteCatalog>())).Returns((NoteCatalog cat) =>
                 {
                     cat.Id = _catalogs.Count + 1;
-                    _catalogs.Add(cat);
+                    _catalogs.AddEntity(cat);
                     return cat;
                 }
             );
@@ -36,7 +44,7 @@ namespace Hmm.Dal.Tests
                 if (orgCat != null)
                 {
                     _catalogs.Remove(orgCat);
-                    _catalogs.Add(cat);
+                    _catalogs.AddEntity(cat);
                 }
             });
 
@@ -46,7 +54,7 @@ namespace Hmm.Dal.Tests
                 var catfound = _catalogs.FirstOrDefault(c => c.Name == q.CatalogName);
                 return catfound;
             });
-            _catalogStorage = new NoteCatalogStorage(uowmock.Object, queryMock.Object);
+            _catalogStorage = new NoteCatalogStorage(lookupMoc.Object, uowmock.Object, queryMock.Object);
         }
 
         public void Dispose()
@@ -71,6 +79,7 @@ namespace Hmm.Dal.Tests
             Assert.NotNull(savedRec);
             Assert.Equal(1, savedRec.Id);
             Assert.Equal(1, cat.Id);
+            Assert.Equal(1, _catalogs.Count);
         }
 
         [Fact]
@@ -96,6 +105,7 @@ namespace Hmm.Dal.Tests
             // Assert
             Assert.Null(savedRec);
             Assert.Equal(0, cat.Id);
+            Assert.Equal(1, _catalogs.Count);
         }
 
         [Fact]
@@ -109,7 +119,8 @@ namespace Hmm.Dal.Tests
                 Description = "testing note"
             };
 
-            _catalogs.Add(catalog);
+            _catalogs.AddEntity(catalog);
+            Assert.Equal(1, _catalogs.Count);
 
             // Act
             var result = _catalogStorage.Delete(catalog);
@@ -130,7 +141,7 @@ namespace Hmm.Dal.Tests
                 Description = "testing note"
             };
 
-            _catalogs.Add(catalog);
+            _catalogs.AddEntity(catalog);
 
             var catalog2 = new NoteCatalog
             {
@@ -150,11 +161,44 @@ namespace Hmm.Dal.Tests
         [Fact]
         public void CannotDeleteCatalogWithNoteAssociated()
         {
-
+            throw new NotImplementedException();
         }
 
         [Fact]
         public void CanUpdateCatalog()
+        {
+            // Arrange - update name
+            var catalog = new NoteCatalog
+            {
+                Id = 1,
+                Name = "GasLog",
+                Description = "testing note"
+            };
+
+            _catalogs.AddEntity(catalog);
+
+            catalog.Name = "GasLog2";
+
+            // Act
+            var result = _catalogStorage.Update(catalog);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("GasLog2", _catalogs[0].Name);
+
+            // Arrange - update description
+            catalog.Description = "new testing note";
+
+            // Act
+            result = _catalogStorage.Update(catalog);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("new testing note", _catalogs[0].Description);
+        }
+
+        [Fact]
+        public void CannotUpdateCatalogForNonExistsCatalog()
         {
             // Arrange
             var catalog = new NoteCatalog
@@ -164,27 +208,54 @@ namespace Hmm.Dal.Tests
                 Description = "testing note"
             };
 
-            _catalogs.Add(catalog);
+            _catalogs.AddEntity(catalog);
 
-            catalog.Name = "GasLog2";
+            var catalog2 = new NoteCatalog
+            {
+                Id = 2,
+                Name = "GasLog2",
+                Description = "testing note"
+            };
 
+            // Act
+            var result = _catalogStorage.Update(catalog2);
+
+            // Assert
+            Assert.Null(result);
+            Assert.Equal(1, _catalogs.Count);
+            Assert.Equal("GasLog", _catalogs[0].Name);
+        }
+
+        [Fact]
+        public void CannotUpdateCatalogWithDuplicatedName()
+        {
+            // Arrange
+            var catalog = new NoteCatalog
+            {
+                Id = 1,
+                Name = "GasLog",
+                Description = "testing note"
+            };
+            _catalogs.AddEntity(catalog);
+
+            var catalog2 = new NoteCatalog
+            {
+                Id = 2,
+                Name = "GasLog2",
+                Description = "testing note2"
+            };
+            _catalogs.AddEntity(catalog2);
+
+            catalog.Name = catalog2.Name;
 
             // Act
             var result = _catalogStorage.Update(catalog);
 
             // Assert
-            Assert.NotNull(result);
-            Assert.Equal("GasLog2", _catalogs[0].Name);
-        }
-
-        [Fact]
-        public void CannotUpdateCatalogForNonExistsCatalog()
-        {
-        }
-
-        [Fact]
-        public void CannotUpdateCatalogWithInvalidName()
-        {
+            Assert.Null(result);
+            Assert.Equal(2, _catalogs.Count);
+            Assert.Equal("GasLog", _catalogs[0].Name);
+            Assert.Equal("GasLog2", _catalogs[1].Name);
         }
     }
 }

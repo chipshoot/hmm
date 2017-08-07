@@ -7,7 +7,7 @@
 
 //namespace Hmm.Dal.Tests
 //{
-//    public class NoteDataStorageTests : IDisposable
+//    public class NoteStorageTests : IDisposable
 //    {
 //        private List<HmmNote> _notes;
 
@@ -15,7 +15,7 @@
 //        //private IConfigurationRoot _configuration;
 //        //private HmmDataContext _dbcontext;
 
-//        public NoteDataStorageTests()
+//        public NoteStorageTests()
 //        {
 //            _notes = new List<HmmNote>();
 

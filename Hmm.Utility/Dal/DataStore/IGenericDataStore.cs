@@ -11,13 +11,6 @@ namespace Hmm.Utility.Dal.DataStore
     public interface IGenericDataStore<T, in TIdentity> where T : AbstractEntity<TIdentity>
     {
         /// <summary>
-        /// Grab item from data store based on its identity
-        /// </summary>
-        /// <typeparam name="T">The item type we want to find</typeparam>
-        /// <returns>The items found in data store with the identity</returns>
-        T Get(TIdentity id);
-
-        /// <summary>
         /// Adds the entity to data source.
         /// </summary>
         /// <param name="entity">the entity which will be added</param>

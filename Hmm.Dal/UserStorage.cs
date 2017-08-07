@@ -1,36 +1,36 @@
-﻿using DomainEntity.Misc;
+﻿using DomainEntity.User;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
 
 namespace Hmm.Dal
 {
-    public class NoteStorage : StorageBase<HmmNote>
+    public class UserStorage : StorageBase<User>
     {
-        public NoteStorage(IEntityLookup lookupRepo, IUnitOfWork uow) : base(lookupRepo, uow)
+        public UserStorage(IEntityLookup lookupRepo, IUnitOfWork uow) : base(lookupRepo, uow)
         {
         }
 
-        public override HmmNote Add(HmmNote entity)
+        public override User Add(User entity)
         {
             throw new System.NotImplementedException();
         }
 
-        public override bool Delete(HmmNote entity)
+        public override User Update(User entity)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override bool Delete(User entity)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void Refresh(ref User entity)
         {
             throw new System.NotImplementedException();
         }
 
         public override void Flush()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override void Refresh(ref HmmNote entity)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override HmmNote Update(HmmNote entity)
         {
             throw new System.NotImplementedException();
         }
