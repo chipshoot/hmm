@@ -1,12 +1,12 @@
 ﻿using DomainEntity.User;
 using Hmm.Dal.Querys;
+using Hmm.Dal.Validation;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
 using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Hmm.Dal.Validation;
 using Xunit;
 
 namespace Hmm.Dal.Tests
@@ -129,160 +129,236 @@ namespace Hmm.Dal.Tests
             Assert.Equal(1, _users.Count);
         }
 
-        //[Fact]
-        //public void CanDeleteNoteRenderFromDataSource()
-        //{
-        //    // Arrange
-        //    var render = new NoteRender
-        //    {
-        //        Id = 1,
-        //        Name = "GasLog",
-        //        Namespace = "Note.GasLog",
-        //        Description = "testing note"
-        //    };
+        [Fact]
+        public void CanDeleteUserFromDataSource()
+        {
+            // Arrange
+            var user = new User
+            {
+                Id = 1,
+                FirstName = "Gas",
+                LastName = "Log",
+                AccountName = "glog",
+                BirthDay = new DateTime(2001, 10, 2),
+                Password = "Password1!",
+                Salt = "passwordSalt",
+                Description = "testing user",
+                IsActivated = true
+            };
 
-        //    _renders.AddEntity(render);
-        //    Assert.Equal(1, _renders.Count);
+            _users.AddEntity(user);
+            Assert.Equal(1, _users.Count);
 
-        //    // Act
-        //    var result = _renderStorage.Delete(render);
+            // Act
+            var result = _userStorage.Delete(user);
 
-        //    // Assert
-        //    Assert.True(result);
-        //    Assert.Equal(0, _renders.Count);
-        //}
+            // Assert
+            Assert.True(result);
+            Assert.Equal(0, _users.Count);
+        }
 
-        //[Fact]
-        //public void CannotDeleteNonExistsNoteRenderFromDataSource()
-        //{
-        //    // Arrange
-        //    var render = new NoteRender
-        //    {
-        //        Id = 1,
-        //        Name = "GasLog",
-        //        Namespace = "Note.GasLog",
-        //        Description = "testing note"
-        //    };
+        [Fact]
+        public void CannotDeleteNonExistsUserFromDataSource()
+        {
+            // Arrange
+            var user = new User
+            {
+                Id = 1,
+                FirstName = "Gas",
+                LastName = "Log",
+                AccountName = "glog",
+                BirthDay = new DateTime(2001, 10, 2),
+                Password = "Password1!",
+                Salt = "passwordSalt",
+                Description = "testing user",
+                IsActivated = true
+            };
 
-        //    _renders.AddEntity(render);
+            _users.AddEntity(user);
 
-        //    var render2 = new NoteRender
-        //    {
-        //        Id = 2,
-        //        Name = "GasLog2",
-        //        Namespace = "Note.GasLog2",
-        //        Description = "testing note"
-        //    };
+            var user2 = new User
+            {
+                Id = 2,
+                FirstName = "Gas2",
+                LastName = "Log2",
+                AccountName = "glog2",
+                BirthDay = new DateTime(2001, 10, 2),
+                Password = "Password1!",
+                Salt = "passwordSalt",
+                Description = "testing user",
+                IsActivated = true
+            };
 
-        //    // Act
-        //    var result = _renderStorage.Delete(render2);
+            // Act
+            var result = _userStorage.Delete(user2);
 
-        //    // Assert
-        //    Assert.False(result);
-        //    Assert.Equal(1, _renders.Count);
-        //}
+            // Assert
+            Assert.False(result);
+            Assert.Equal(1, _users.Count);
+        }
 
-        //[Fact]
-        //public void CannotDeleteNoteRenderWithNoteAssociated()
-        //{
-        //    throw new NotImplementedException();
-        //}
+        [Fact]
+        public void CannotDeleteUserWithNoteAssociated()
+        {
+            throw new NotImplementedException();
+        }
 
-        //[Fact]
-        //public void CanUpdateNoteRender()
-        //{
-        //    // Arrange - update name
-        //    var render = new NoteRender
-        //    {
-        //        Id = 1,
-        //        Name = "GasLog",
-        //        Namespace = "Note.GasLog",
-        //        Description = "testing note"
-        //    };
+        [Fact]
+        public void CanUpdateUser()
+        {
+            // Arrange - update first name
+            var user = new User
+            {
+                Id = 1,
+                FirstName = "Gas",
+                LastName = "Log",
+                AccountName = "glog",
+                BirthDay = new DateTime(2001, 10, 2),
+                Password = "Password1!",
+                Salt = "passwordSalt",
+                Description = "testing user",
+                IsActivated = true
+            };
 
-        //    _renders.AddEntity(render);
+            _users.AddEntity(user);
 
-        //    render.Name = "GasLog2";
+            user.FirstName = "GasLog2";
 
-        //    // Act
-        //    var result = _renderStorage.Update(render);
+            // Act
+            var result = _userStorage.Update(user);
 
-        //    // Assert
-        //    Assert.NotNull(result);
-        //    Assert.Equal("GasLog2", _renders[0].Name);
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("GasLog2", _users[0].FirstName);
 
-        //    // Arrange - update description
-        //    render.Description = "new testing note";
+            // Arrange - update last name
+            user.LastName = "new Last name";
 
-        //    // Act
-        //    result = _renderStorage.Update(render);
+            // Act
+            result = _userStorage.Update(user);
 
-        //    // Assert
-        //    Assert.NotNull(result);
-        //    Assert.Equal("new testing note", _renders[0].Description);
-        //}
+            // Arrange
+            Assert.NotNull(result);
+            Assert.Equal("new Last name", _users[0].LastName);
 
-        //[Fact]
-        //public void CannotUpdateNoteRenderForNonExistsCatalog()
-        //{
-        //    // Arrange
-        //    var render = new NoteRender
-        //    {
-        //        Id = 1,
-        //        Name = "GasLog",
-        //        Namespace = "Note.GasLog",
-        //        Description = "testing note"
-        //    };
+            // Arrange - update birth day
+            var newDay = new DateTime(2000, 5, 1);
+            user.BirthDay = newDay;
 
-        //    _renders.AddEntity(render);
+            // Act
+            result = _userStorage.Update(user);
 
-        //    var render2 = new NoteRender
-        //    {
-        //        Id = 2,
-        //        Name = "GasLog2",
-        //        Namespace = "Note.GasLog",
-        //        Description = "testing note"
-        //    };
+            // Arrange
+            Assert.NotNull(result);
+            Assert.Equal(newDay, _users[0].BirthDay);
 
-        //    // Act
-        //    var result = _renderStorage.Update(render2);
 
-        //    // Assert
-        //    Assert.Null(result);
-        //    Assert.Equal(1, _renders.Count);
-        //    Assert.Equal("GasLog", _renders[0].Name);
-        //}
+            // Arrange - activate status
+            user.IsActivated = false;
 
-        //[Fact]
-        //public void CannotUpdateNoteRenderWithDuplicatedName()
-        //{
-        //    // Arrange
-        //    var render = new NoteRender
-        //    {
-        //        Id = 1,
-        //        Name = "GasLog",
-        //        Description = "testing note"
-        //    };
-        //    _renders.AddEntity(render);
+            // Act
+            result = _userStorage.Update(user);
 
-        //    var render2 = new NoteRender
-        //    {
-        //        Id = 2,
-        //        Name = "GasLog2",
-        //        Description = "testing note2"
-        //    };
-        //    _renders.AddEntity(render2);
+            // Arrange
+            Assert.NotNull(result);
+            Assert.False(_users[0].IsActivated);
 
-        //    render.Name = render2.Name;
+            // Arrange - update description
+            user.Description = "new testing user";
 
-        //    // Act
-        //    var result = _renderStorage.Update(render);
+            // Act
+            result = _userStorage.Update(user);
 
-        //    // Assert
-        //    Assert.Null(result);
-        //    Assert.Equal(2, _renders.Count);
-        //    Assert.Equal("GasLog", _renders[0].Name);
-        //    Assert.Equal("GasLog2", _renders[1].Name);
-        //}
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("new testing user", _users[0].Description);
+        }
+
+        [Fact]
+        public void CannotUpdateForNonExistsUser()
+        {
+            // Arrange
+            var user = new User
+            {
+                Id = 1,
+                FirstName = "Gas",
+                LastName = "Log",
+                AccountName = "glog",
+                BirthDay = new DateTime(2001, 10, 2),
+                Password = "Password1!",
+                Salt = "passwordSalt",
+                Description = "testing user",
+                IsActivated = true
+            };
+
+            _users.AddEntity(user);
+
+            var user2 = new User
+            {
+                Id = 2,
+                FirstName = "Gas2",
+                LastName = "Log2",
+                AccountName = "glog2",
+                BirthDay = new DateTime(2001, 10, 2),
+                Password = "Password1!",
+                Salt = "passwordSalt",
+                Description = "testing user",
+                IsActivated = true
+            };
+
+            // Act
+            var result = _userStorage.Update(user2);
+
+            // Assert
+            Assert.Null(result);
+            Assert.True(_userStorage.Validator.ValidationErrors.Count > 0);
+            Assert.Equal(1, _users.Count);
+            Assert.Equal("Gas", _users[0].FirstName);
+        }
+
+        [Fact]
+        public void CannotUpdateUserWithDuplicatedAccountName()
+        {
+            // Arrange
+            var user = new User
+            {
+                Id = 1,
+                FirstName = "Gas",
+                LastName = "Log",
+                AccountName = "glog",
+                BirthDay = new DateTime(2001, 10, 2),
+                Password = "Password1!",
+                Salt = "passwordSalt",
+                Description = "testing user",
+                IsActivated = true
+            };
+            _users.AddEntity(user);
+
+            var user2 = new User
+            {
+                Id = 2,
+                FirstName = "Gas2",
+                LastName = "Log2",
+                AccountName = "glog2",
+                BirthDay = new DateTime(2001, 10, 2),
+                Password = "Password1!",
+                Salt = "passwordSalt",
+                Description = "testing user",
+                IsActivated = true
+            };
+            _users.AddEntity(user2);
+
+            user.AccountName = user2.AccountName;
+
+            // Act
+            var result = _userStorage.Update(user);
+
+            // Assert
+            Assert.Null(result);
+            Assert.True(_userStorage.Validator.ValidationErrors.Count > 0);
+            Assert.Equal(2, _users.Count);
+            Assert.Equal("glog", _users[0].AccountName);
+            Assert.Equal("glog2", _users[1].AccountName);
+        }
     }
 }

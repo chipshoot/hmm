@@ -36,7 +36,13 @@ namespace Hmm.Dal
 
         public override bool Delete(User entity)
         {
-            throw new NotImplementedException();
+            if (!Validator.IsValid(entity, isNewEntity: false))
+            {
+                return false;
+            }
+
+            UnitOfWork.Delete(entity);
+            return true;
         }
 
     }

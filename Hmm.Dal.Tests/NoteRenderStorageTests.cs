@@ -208,7 +208,7 @@ namespace Hmm.Dal.Tests
         }
 
         [Fact]
-        public void CannotUpdateNoteRenderForNonExistsCatalog()
+        public void CannotUpdateForNonExistsNoteRender()
         {
             // Arrange
             var render = new NoteRender
