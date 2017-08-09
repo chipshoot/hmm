@@ -30,7 +30,7 @@ namespace Hmm.Dal.Tests
             var uowmock = new Mock<IUnitOfWork>();
             uowmock.Setup(u => u.Add(It.IsAny<NoteCatalog>())).Returns((NoteCatalog cat) =>
                 {
-                    cat.Id = _catalogs.Count + 1;
+                    cat.Id = _catalogs.GetNextId();
                     _catalogs.AddEntity(cat);
                     return cat;
                 }

@@ -1,137 +1,141 @@
-﻿using DomainEntity.Misc;
+﻿using Castle.Components.DictionaryAdapter;
+using DomainEntity.Misc;
+using DomainEntity.User;
+using Hmm.Dal.Validation;
+using Hmm.Utility.Dal;
+using Hmm.Utility.Dal.Query;
+using Moq;
 using System;
 using System.Collections.Generic;
-using Moq;
+using System.Linq;
+using System.Xml;
+using Xunit;
 
 namespace Hmm.Dal.Tests
 {
     public class NoteStorageTests : IDisposable
     {
-        private List<HmmNote> _notes;
-
-        private NoteStorage _noteStorage;
-        //        //private IConfigurationRoot _configuration;
-        //        //private HmmDataContext _dbcontext;
+        private readonly List<HmmNote> _notes;
+        private readonly List<User> _authors;
+        private readonly List<NoteCatalog> _cats;
+        private readonly List<NoteRender> _renders;
+        private readonly NoteStorage _noteStorage;
 
         public NoteStorageTests()
         {
-                        _notes = new List<HmmNote>();
+            _notes = new List<HmmNote>();
+            _authors = new List<User>();
+            _cats = new List<NoteCatalog>();
+            _renders = new EditableList<NoteRender>();
 
-            //            noteDbMock.Setup(db => db.Add(It.IsAny<HmmNote>())).Returns((HmmNote n) =>
-            //              {
-            //                  var id = _notes.Count + 1;
-            //                  n.Id = id;
-            //                  _notes.Add(n);
+            // add seed data
+            var user = new User
+            {
+                FirstName = "Jack",
+                LastName = "Fang",
+                AccountName = "jfang",
+                BirthDay = new DateTime(1977, 05, 21),
+                Password = "lucky1",
+                Salt = "passwordSalt",
+                IsActivated = true,
+                Description = "testing user"
+            };
+            _authors.AddEntity(user);
+            var cat = new NoteCatalog
+            {
+                Name = "Gas Log",
+                Description = "Testing catalog"
+            };
+            _cats.AddEntity(cat);
+            var render = new NoteRender
+            {
+                Name = "GasLog",
+                Namespace = "Hmm.Renders",
+                Description = "Testing default note render"
+            };
+            _renders.AddEntity(render);
 
-            //                  return n;
-            //              });
+            // set up infrastructures
+            var uowMock = new Mock<IUnitOfWork>();
+            uowMock.Setup(u => u.Add(It.IsAny<HmmNote>())).Returns((HmmNote note) =>
+            {
+                note.CreateDate = DateTime.Now;
+                note.LastModifiedDate = DateTime.Now;
+                note.Id = _notes.GetNextId();
+                _notes.AddEntity(note);
+                var savedRec = _notes.FirstOrDefault(n => n.Id == note.Id);
+                return savedRec;
+            });
+            uowMock.Setup(u => u.Delete(It.IsAny<HmmNote>())).Callback((HmmNote note) =>
+            {
+                var rec = _notes.FirstOrDefault(n => n.Id == note.Id);
+                if (rec != null)
+                {
+                    _notes.Remove(rec);
+                }
+            });
+            uowMock.Setup(u => u.Update(It.IsAny<HmmNote>())).Callback((HmmNote note) =>
+            {
+                var rec = _notes.FirstOrDefault(n => n.Id == note.Id);
+                if (rec == null)
+                {
+                    return;
+                }
+                rec.Author = note.Author;
+                rec.Catalog = note.Catalog;
+                rec.Render = note.Render;
+                rec.Content = note.Content;
+                rec.Subject = note.Subject;
+                rec.LastModifiedDate = DateTime.Now;
+            });
 
-            //            _noteStorage = noteDbMock.Object;
-            //            //_configuration = new ConfigurationBuilder()
-            //            //    .AddJsonFile("appsettings.json")
-            //            //    .Build();
+            var lookupMock = new Mock<IEntityLookup>();
+            lookupMock.Setup(lk => lk.GetEntity<HmmNote>(It.IsAny<int>())).Returns((int id) =>
+            {
+                var rec = _notes.FirstOrDefault(n => n.Id == id);
+                return rec;
+            });
 
-            //            //var conn = _configuration.GetConnectionString("DefaultConnection");
-            //            //var options = new DbContextOptionsBuilder<HmmDataContext>().UseSqlServer(conn).Options;
-            //            //_dbcontext = new HmmDataContext(options);
-
-            //            //_dbcontext.Database.EnsureCreated();
-            //            //if (_dbcontext.Notes.Any())
-            //            //{
-            //            //    return;
-            //            //}
-
-            //            //var xmldoc = new XmlDocument();
-            //            //xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
-
-            //            //var author = _dbcontext.Users.Any(u => u.FirstName == "Jack")
-            //            //    ? _dbcontext.Users.FirstOrDefault(u => u.FirstName == "Jack")
-            //            //    : new User
-            //            //    {
-            //            //        FirstName = "Jack",
-            //            //        LastName = "Fang",
-            //            //        AccountName = "jfang",
-            //            //        BirthDay = new DateTime(1977, 05, 21),
-            //            //        Password = "lucky1",
-            //            //        Salt = "passwordSalt",
-            //            //        IsActivated = true,
-            //            //        Description = "testing user"
-            //            //    };
-
-            //            //var cat = _dbcontext.Catalogs.Any(c => c.Name == "Gas Log")
-            //            //    ? _dbcontext.Catalogs.FirstOrDefault(c => c.Name == "Gas Log")
-            //            //    : new NoteCatalog
-            //            //    {
-            //            //        Name = "Gas Log",
-            //            //        Description = "Testing catalog"
-            //            //    };
-
-            //            //var render = _dbcontext.Renders.Any(r => r.Name == "GasLog")
-            //            //    ? _dbcontext.Renders.FirstOrDefault(r => r.Name == "GasLog")
-            //            //    : new NoteRender
-            //            //    {
-            //            //        Name = "GasLog",
-            //            //        Namespace = "Hmm.Renders",
-            //            //        Description = "Testing default note render"
-            //            //    };
-
-            //            //var note = new HmmNote
-            //            //{
-            //            //    Author = author,
-            //            //    Catalog = cat,
-            //            //    Description = "testing note",
-            //            //    CreateDate = DateTime.Now,
-            //            //    LastModifiedDate = DateTime.Now,
-            //            //    Subject = "testing note is here",
-            //            //    Render = render,
-            //            //    Content = xmldoc.InnerXml
-            //            //};
-            //            //_dbcontext.Notes.Add(note);
-            //            //_dbcontext.Entry(note.Author).State = note.Author.Id > 0 ? EntityState.Unchanged : EntityState.Added;
-            //            //_dbcontext.Entry(note.Catalog).State = note.Catalog.Id > 0 ? EntityState.Unchanged : EntityState.Added;
-            //            //_dbcontext.Entry(note.Render).State = note.Render.Id > 0 ? EntityState.Unchanged : EntityState.Added;
-            //            //_dbcontext.SaveChanges();
+            var validator = new HmmNoteValidator(lookupMock.Object);
+            _noteStorage = new NoteStorage(uowMock.Object, validator, lookupMock.Object);
         }
 
         public void Dispose()
         {
-            //            //if (!_dbcontext.Notes.Any())
-            //            //{
-            //            //    return;
-            //            //}
-
-            //            //var notes = _dbcontext.Notes;
-            //            //foreach (var note in notes)
-            //            //{
-            //            //    _dbcontext.Notes.Remove(note);
-            //            //}
-
-            //            //_dbcontext.SaveChanges();
             _notes.Clear();
+            _authors.Clear();
+            _renders.Clear();
+            _cats.Clear();
         }
 
-        //        [Fact]
-        //        public void CanAddNoteToRepository()
-        //        {
-        //            // Arrange
-        //            var note = new HmmNote
-        //            {
-        //                Author = author,
-        //                Catalog = cat,
-        //                Description = "testing note",
-        //                CreateDate = DateTime.Now,
-        //                LastModifiedDate = DateTime.Now,
-        //                Subject = "testing note is here",
-        //                Render = render,
-        //                Content = xmldoc.InnerXml
-        //            };
+        [Fact]
+        public void CanAddNoteToRepository()
+        {
+            // Arrange
+            var author = _authors[0];
+            var cat = _cats[0];
+            var render = _renders[0];
+            var xmldoc = new XmlDocument();
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
+            var note = new HmmNote
+            {
+                Author = author,
+                Catalog = cat,
+                Description = "testing note",
+                CreateDate = DateTime.Now,
+                LastModifiedDate = DateTime.Now,
+                Subject = "testing note is here",
+                Render = render,
+                Content = xmldoc.InnerXml
+            };
 
-        //            // Act
-        //            var savedRec = _noteStorage.Add(note);
+            // Act
+            var savedRec = _noteStorage.Add(note);
 
-        //            // Assert
-        //            Assert.NotNull(savedRec);
-        //            Assert.Equal(1, savedRec.Id);
-        //        }
+            // Assert
+            Assert.NotNull(savedRec);
+            Assert.Equal(1, savedRec.Id);
+            Assert.Equal(1, _notes.Count);
+        }
     }
 }

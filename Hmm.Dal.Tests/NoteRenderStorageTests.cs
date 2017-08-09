@@ -1,12 +1,12 @@
 ﻿using DomainEntity.Misc;
 using Hmm.Dal.Querys;
+using Hmm.Dal.Validation;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
 using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Hmm.Dal.Validation;
 using Xunit;
 
 namespace Hmm.Dal.Tests
@@ -30,7 +30,7 @@ namespace Hmm.Dal.Tests
             var uowmock = new Mock<IUnitOfWork>();
             uowmock.Setup(u => u.Add(It.IsAny<NoteRender>())).Returns((NoteRender render) =>
                 {
-                    render.Id = _renders.Count + 1;
+                    render.Id = _renders.GetNextId();
                     _renders.AddEntity(render);
                     return render;
                 }

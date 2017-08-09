@@ -30,7 +30,7 @@ namespace Hmm.Dal.Tests
             var uowmock = new Mock<IUnitOfWork>();
             uowmock.Setup(u => u.Add(It.IsAny<User>())).Returns((User user) =>
                 {
-                    user.Id = _users.Count + 1;
+                    user.Id = _users.GetNextId();
                     _users.AddEntity(user);
                     return user;
                 }
@@ -251,7 +251,6 @@ namespace Hmm.Dal.Tests
             // Arrange
             Assert.NotNull(result);
             Assert.Equal(newDay, _users[0].BirthDay);
-
 
             // Arrange - activate status
             user.IsActivated = false;

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Hmm.Utility.Dal.DataEntity;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -55,6 +56,12 @@ namespace Hmm.Dal.Tests
                 destBase = destBase.GetTypeInfo().BaseType;
                 srcBase = srcBase.GetTypeInfo().BaseType;
             }
+        }
+
+        public static int GetNextId<T>(this IList<T> list) where T : Entity
+        {
+            var curid = list.Count > 0 ? list.Max(n => n.Id) : 0;
+            return curid + 1;
         }
     }
 }

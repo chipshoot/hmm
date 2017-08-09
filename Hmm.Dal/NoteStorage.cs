@@ -13,7 +13,13 @@ namespace Hmm.Dal
 
         public override HmmNote Add(HmmNote entity)
         {
-            throw new System.NotImplementedException();
+            if (!Validator.IsValid(entity, isNewEntity: true))
+            {
+                return null;
+            }
+
+            var newRec = UnitOfWork.Add(entity);
+            return newRec;
         }
 
         public override bool Delete(HmmNote entity)
