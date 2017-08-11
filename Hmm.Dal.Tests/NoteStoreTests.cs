@@ -137,5 +137,66 @@ namespace Hmm.Dal.Tests
             Assert.Equal(1, savedRec.Id);
             Assert.Equal(1, _notes.Count);
         }
+
+        [Fact]
+        public void CanNotAddSameNoteTwiceToRepository()
+        {
+            // Arrange
+            var author = _authors[0];
+            var cat = _cats[0];
+            var render = _renders[0];
+            var xmldoc = new XmlDocument();
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
+            var note = new HmmNote
+            {
+                Author = author,
+                Catalog = cat,
+                Description = "testing note",
+                CreateDate = DateTime.Now,
+                LastModifiedDate = DateTime.Now,
+                Subject = "testing note is here",
+                Render = render,
+                Content = xmldoc.InnerXml
+            };
+
+            // Act
+            var savedRec = _noteStorage.Add(note);
+            var savedRec2 = _noteStorage.Add(note);
+
+            // Assert
+            Assert.NotNull(savedRec);
+            Assert.Equal(1, savedRec.Id);
+            Assert.Equal(1, _notes.Count);
+            Assert.Null(savedRec2);
+        }
+
+        [Fact]
+        public void CanAddNoteWithNonExistRender()
+        {
+            throw new NotImplementedException();
+        }
+        [Fact]
+        public void CannotAddNoteWithNonExistAuthor()
+        {
+            throw new NotImplementedException();
+        }
+
+        [Fact]
+        public void CannotAddNoteWithNonExistCatalog()
+        {
+            throw new NotImplementedException();
+        }
+
+        [Fact]
+        public void CanUpdateNote()
+        {
+            throw new NotImplementedException();
+        }
+
+        [Fact]
+        public void CanDeleteNote()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -6,6 +6,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DomainEntity.User;
 using Hmm.Dal.Validation;
 using Xunit;
 
@@ -14,11 +15,13 @@ namespace Hmm.Dal.Tests
     public class NoteCatalgStorageTests : IDisposable
     {
         private readonly List<NoteCatalog> _catalogs;
+        private readonly List<HmmNote> _notes;
         private readonly NoteCatalogStorage _catalogStorage;
 
         public NoteCatalgStorageTests()
         {
             _catalogs = new List<NoteCatalog>();
+            _notes = new List<HmmNote>();
 
             var lookupMoc = new Mock<IEntityLookup>();
             lookupMoc.Setup(lk => lk.GetEntity<NoteCatalog>(It.IsAny<int>())).Returns((int id) =>
@@ -56,8 +59,20 @@ namespace Hmm.Dal.Tests
                 return catfound;
             });
 
+            var noteQueryMock = new Mock<IQueryHandler<IQuery<IEnumerable<HmmNote>>, IEnumerable<HmmNote>>>();
+            noteQueryMock.Setup(q => q.Execute(It.IsAny<NoteQueryByCatalog>())).Returns((NoteQueryByCatalog query) =>
+            {
+                IEnumerable<HmmNote> notes = new List<HmmNote>();
+                if (query.Catalog.Id > 0)
+                {
+                    notes = _notes.Where(n => n.Catalog.Id == query.Catalog.Id).Select(n => n).AsEnumerable();
+                }
+
+                return notes;
+            });
+
             var validator = new NoteCatalogValidator(lookupMoc.Object, queryMock.Object);
-            _catalogStorage = new NoteCatalogStorage(uowmock.Object, validator, lookupMoc.Object);
+            _catalogStorage = new NoteCatalogStorage(uowmock.Object, validator, lookupMoc.Object, noteQueryMock.Object);
         }
 
         public void Dispose()
@@ -164,7 +179,37 @@ namespace Hmm.Dal.Tests
         [Fact]
         public void CannotDeleteCatalogWithNoteAssociated()
         {
-            throw new NotImplementedException();
+            // Arrange
+            var catalog = new NoteCatalog
+            {
+                Id = 1,
+                Name = "GasLog",
+                Description = "testing note"
+            };
+            _catalogs.AddEntity(catalog);
+
+            var note = new HmmNote
+            {
+                Id = 1,
+                Subject = string.Empty,
+                Content = string.Empty,
+                CreateDate = DateTime.Now,
+                LastModifiedDate = DateTime.Now,
+                Author = new User(),
+                Catalog = _catalogs[0],
+                Render = new NoteRender()
+            };
+            _notes.AddEntity(note);
+            Assert.Equal(1, _catalogs.Count);
+            Assert.Equal(1, _notes.Count);
+
+            // Act
+            var result = _catalogStorage.Delete(catalog);
+
+            // Assert
+            Assert.False(result, "Error: deleted catalog with note attached to it");
+            Assert.Equal(1, _catalogs.Count);
+            Assert.True(_catalogStorage.Validator.ValidationErrors.Count > 0);
         }
 
         [Fact]

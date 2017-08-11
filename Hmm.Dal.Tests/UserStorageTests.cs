@@ -1,4 +1,5 @@
-﻿using DomainEntity.User;
+﻿using DomainEntity.Misc;
+using DomainEntity.User;
 using Hmm.Dal.Querys;
 using Hmm.Dal.Validation;
 using Hmm.Utility.Dal;
@@ -14,11 +15,13 @@ namespace Hmm.Dal.Tests
     public class UserStorageTests : IDisposable
     {
         private readonly List<User> _users;
+        private readonly List<HmmNote> _notes;
         private readonly UserStorage _userStorage;
 
         public UserStorageTests()
         {
             _users = new List<User>();
+            _notes = new List<HmmNote>();
 
             var lookupMoc = new Mock<IEntityLookup>();
             lookupMoc.Setup(lk => lk.GetEntity<User>(It.IsAny<int>())).Returns((int id) =>
@@ -56,8 +59,20 @@ namespace Hmm.Dal.Tests
                 return userfound;
             });
 
+            var noteQueryMock = new Mock<IQueryHandler<IQuery<IEnumerable<HmmNote>>, IEnumerable<HmmNote>>>();
+            noteQueryMock.Setup(q => q.Execute(It.IsAny<NoteQueryByAuthor>())).Returns((NoteQueryByAuthor query) =>
+            {
+                IEnumerable<HmmNote> notes = new List<HmmNote>();
+                if (query.Author.Id > 0)
+                {
+                    notes = _notes.Where(n => n.Author.Id == query.Author.Id).Select(n => n).AsEnumerable();
+                }
+
+                return notes;
+            });
+
             var valiator = new UserValidator(lookupMoc.Object, queryMock.Object);
-            _userStorage = new UserStorage(uowmock.Object, valiator, lookupMoc.Object);
+            _userStorage = new UserStorage(uowmock.Object, valiator, lookupMoc.Object, noteQueryMock.Object);
         }
 
         public void Dispose()
@@ -200,7 +215,43 @@ namespace Hmm.Dal.Tests
         [Fact]
         public void CannotDeleteUserWithNoteAssociated()
         {
-            throw new NotImplementedException();
+            // Arrange
+            var user = new User
+            {
+                Id = 1,
+                FirstName = "Gas",
+                LastName = "Log",
+                AccountName = "glog",
+                BirthDay = new DateTime(2001, 10, 2),
+                Password = "Password1!",
+                Salt = "passwordSalt",
+                Description = "testing user",
+                IsActivated = true
+            };
+            _users.AddEntity(user);
+
+            var note = new HmmNote
+            {
+                Id = 1,
+                Subject = string.Empty,
+                Content = string.Empty,
+                CreateDate = DateTime.Now,
+                LastModifiedDate = DateTime.Now,
+                Author = _users[0],
+                Catalog = new NoteCatalog(),
+                Render = new NoteRender()
+            };
+            _notes.AddEntity(note);
+            Assert.Equal(1, _users.Count);
+            Assert.Equal(1, _notes.Count);
+
+            // Act
+            var result = _userStorage.Delete(user);
+
+            // Assert
+            Assert.False(result, "Error: deleted user with note");
+            Assert.Equal(1, _users.Count);
+            Assert.True(_userStorage.Validator.ValidationErrors.Count > 0);
         }
 
         [Fact]
