@@ -1,13 +1,12 @@
 ﻿using DomainEntity.Misc;
 using DomainEntity.User;
+using Hmm.Dal.Querys;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Validation;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Hmm.Dal.Querys;
 
 namespace Hmm.Dal
 {
@@ -15,7 +14,11 @@ namespace Hmm.Dal
     {
         private readonly IQueryHandler<IQuery<IEnumerable<HmmNote>>, IEnumerable<HmmNote>> _noteQuery;
 
-        public UserStorage(IUnitOfWork uow, IValidator<User> validator, IEntityLookup lookupRepo, IQueryHandler<IQuery<IEnumerable<HmmNote>>, IEnumerable<HmmNote>> noteQuery) : base(uow, validator, lookupRepo)
+        public UserStorage(
+            IUnitOfWork uow,
+            IValidator<User> validator,
+            IEntityLookup lookupRepo,
+            IQueryHandler<IQuery<IEnumerable<HmmNote>>, IEnumerable<HmmNote>> noteQuery) : base(uow, validator, lookupRepo)
         {
             Guard.Against<ArgumentNullException>(noteQuery == null, nameof(noteQuery));
 
@@ -50,7 +53,7 @@ namespace Hmm.Dal
             {
                 return false;
             }
-            var userHasNote = _noteQuery.Execute(new NoteQueryByAuthor {Author = entity}).Any();
+            var userHasNote = _noteQuery.Execute(new NoteQueryByAuthor { Author = entity }).Any();
             if (userHasNote)
             {
                 Validator.ValidationErrors.Add($"Error: The user {entity.Id} still has notes in data source.");

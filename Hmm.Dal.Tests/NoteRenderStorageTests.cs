@@ -1,4 +1,5 @@
 ﻿using DomainEntity.Misc;
+using DomainEntity.User;
 using Hmm.Dal.Querys;
 using Hmm.Dal.Validation;
 using Hmm.Utility.Dal;
@@ -14,11 +15,13 @@ namespace Hmm.Dal.Tests
     public class NoteRenderStorageTests : IDisposable
     {
         private readonly List<NoteRender> _renders;
+        private readonly List<HmmNote> _notes;
         private readonly NoteRenderStorage _renderStorage;
 
         public NoteRenderStorageTests()
         {
             _renders = new List<NoteRender>();
+            _notes = new List<HmmNote>();
 
             var lookupMoc = new Mock<IEntityLookup>();
             lookupMoc.Setup(lk => lk.GetEntity<NoteRender>(It.IsAny<int>())).Returns((int id) =>
@@ -55,9 +58,20 @@ namespace Hmm.Dal.Tests
                 var catfound = _renders.FirstOrDefault(c => c.Name == q.RenderName);
                 return catfound;
             });
+            var noteQueryMock = new Mock<IQueryHandler<IQuery<IEnumerable<HmmNote>>, IEnumerable<HmmNote>>>();
+            noteQueryMock.Setup(q => q.Execute(It.IsAny<NoteQueryByRender>())).Returns((NoteQueryByRender query) =>
+            {
+                IEnumerable<HmmNote> notes = new List<HmmNote>();
+                if (query.Render.Id > 0)
+                {
+                    notes = _notes.Where(n => n.Render.Id == query.Render.Id).Select(n => n).AsEnumerable();
+                }
+
+                return notes;
+            });
 
             var validator = new NoteRenderValidator(lookupMoc.Object, queryMock.Object);
-            _renderStorage = new NoteRenderStorage(uowmock.Object, validator, lookupMoc.Object);
+            _renderStorage = new NoteRenderStorage(uowmock.Object, validator, lookupMoc.Object, noteQueryMock.Object);
         }
 
         public void Dispose()
@@ -170,7 +184,38 @@ namespace Hmm.Dal.Tests
         [Fact]
         public void CannotDeleteNoteRenderWithNoteAssociated()
         {
-            throw new NotImplementedException();
+            // Arrange
+            var catalog = new NoteRender
+            {
+                Id = 1,
+                Name = "GasLog",
+                Namespace = "Note.GasLog",
+                Description = "testing note"
+            };
+            _renders.AddEntity(catalog);
+
+            var note = new HmmNote
+            {
+                Id = 1,
+                Subject = string.Empty,
+                Content = string.Empty,
+                CreateDate = DateTime.Now,
+                LastModifiedDate = DateTime.Now,
+                Author = new User(),
+                Catalog = new NoteCatalog(),
+                Render = _renders[0]
+            };
+            _notes.AddEntity(note);
+            Assert.Equal(1, _renders.Count);
+            Assert.Equal(1, _notes.Count);
+
+            // Act
+            var result = _renderStorage.Delete(catalog);
+
+            // Assert
+            Assert.False(result, "Error: deleted render with note attached to it");
+            Assert.Equal(1, _renders.Count);
+            Assert.True(_renderStorage.Validator.ValidationErrors.Count > 0);
         }
 
         [Fact]
