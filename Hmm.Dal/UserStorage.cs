@@ -7,6 +7,7 @@ using Hmm.Utility.Validation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Hmm.Utility.Misc;
 
 namespace Hmm.Dal
 {
@@ -18,7 +19,8 @@ namespace Hmm.Dal
             IUnitOfWork uow,
             IValidator<User> validator,
             IEntityLookup lookupRepo,
-            IQueryHandler<IQuery<IEnumerable<HmmNote>>, IEnumerable<HmmNote>> noteQuery) : base(uow, validator, lookupRepo)
+            IQueryHandler<IQuery<IEnumerable<HmmNote>>, IEnumerable<HmmNote>> noteQuery,
+            IDateTimeProvider dateTimeProvider) : base(uow, validator, lookupRepo, dateTimeProvider)
         {
             Guard.Against<ArgumentNullException>(noteQuery == null, nameof(noteQuery));
 

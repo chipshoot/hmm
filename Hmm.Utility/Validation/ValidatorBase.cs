@@ -24,6 +24,11 @@ namespace Hmm.Utility.Validation
 
         public List<string> ValidationErrors { get; } = new List<string>();
 
+        public void Reset()
+        {
+            ValidationErrors.Clear();
+        }
+
         public abstract bool IsValid(T entity, bool isNewEntity);
     }
 }

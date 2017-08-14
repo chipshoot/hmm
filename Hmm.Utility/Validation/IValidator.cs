@@ -19,5 +19,10 @@ namespace Hmm.Utility.Validation
         /// <param name="isNewEntity"><c>True</c> if checking a new domain entity before save it to database</param>
         /// <returns><c>True</c> if the domain entity is valid, otherwise <c>False</c> and <see cref="ValidationErrors"/> will be set with validation error</returns>
         bool IsValid(T entity, bool isNewEntity);
+
+        /// <summary>
+        /// Reset the error message of validator
+        /// </summary>
+        void Reset();
     }
 }

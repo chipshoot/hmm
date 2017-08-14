@@ -8,6 +8,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Hmm.Utility.Misc;
 using Xunit;
 
 namespace Hmm.Dal.Tests
@@ -30,6 +31,7 @@ namespace Hmm.Dal.Tests
                 return recFound;
             });
 
+            // set up unit of work
             var uowmock = new Mock<IUnitOfWork>();
             uowmock.Setup(u => u.Add(It.IsAny<User>())).Returns((User user) =>
                 {
@@ -52,6 +54,7 @@ namespace Hmm.Dal.Tests
                 }
             });
 
+            // set up query handler
             var queryMock = new Mock<IQueryHandler<UserQueryByAccount, User>>();
             queryMock.Setup(q => q.Execute(It.IsAny<UserQueryByAccount>())).Returns((UserQueryByAccount q) =>
             {
@@ -71,8 +74,14 @@ namespace Hmm.Dal.Tests
                 return notes;
             });
 
+            // set up user validator
             var valiator = new UserValidator(lookupMoc.Object, queryMock.Object);
-            _userStorage = new UserStorage(uowmock.Object, valiator, lookupMoc.Object, noteQueryMock.Object);
+
+            // setup date time provider
+            var timeProviderMock = new Mock<IDateTimeProvider>();
+            
+            // setup user storage
+            _userStorage = new UserStorage(uowmock.Object, valiator, lookupMoc.Object, noteQueryMock.Object, timeProviderMock.Object);
         }
 
         public void Dispose()

@@ -8,6 +8,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Hmm.Utility.Misc;
 using Xunit;
 
 namespace Hmm.Dal.Tests
@@ -23,6 +24,7 @@ namespace Hmm.Dal.Tests
             _renders = new List<NoteRender>();
             _notes = new List<HmmNote>();
 
+            // set up look up repository
             var lookupMoc = new Mock<IEntityLookup>();
             lookupMoc.Setup(lk => lk.GetEntity<NoteRender>(It.IsAny<int>())).Returns((int id) =>
             {
@@ -30,6 +32,7 @@ namespace Hmm.Dal.Tests
                 return recFound;
             });
 
+            // set up unit of work
             var uowmock = new Mock<IUnitOfWork>();
             uowmock.Setup(u => u.Add(It.IsAny<NoteRender>())).Returns((NoteRender render) =>
                 {
@@ -52,12 +55,15 @@ namespace Hmm.Dal.Tests
                 }
             });
 
+            // set up query handler
             var queryMock = new Mock<IQueryHandler<NoteRenderQueryByName, NoteRender>>();
             queryMock.Setup(q => q.Execute(It.IsAny<NoteRenderQueryByName>())).Returns((NoteRenderQueryByName q) =>
             {
                 var catfound = _renders.FirstOrDefault(c => c.Name == q.RenderName);
                 return catfound;
             });
+
+            // set up note query handler
             var noteQueryMock = new Mock<IQueryHandler<IQuery<IEnumerable<HmmNote>>, IEnumerable<HmmNote>>>();
             noteQueryMock.Setup(q => q.Execute(It.IsAny<NoteQueryByRender>())).Returns((NoteQueryByRender query) =>
             {
@@ -70,8 +76,14 @@ namespace Hmm.Dal.Tests
                 return notes;
             });
 
+            // set up note render validator
             var validator = new NoteRenderValidator(lookupMoc.Object, queryMock.Object);
-            _renderStorage = new NoteRenderStorage(uowmock.Object, validator, lookupMoc.Object, noteQueryMock.Object);
+
+            // set up date time provider
+            var timeProviderMock = new Mock<IDateTimeProvider>();
+
+            // set up render storage
+            _renderStorage = new NoteRenderStorage(uowmock.Object, validator, lookupMoc.Object, noteQueryMock.Object, timeProviderMock.Object);
         }
 
         public void Dispose()

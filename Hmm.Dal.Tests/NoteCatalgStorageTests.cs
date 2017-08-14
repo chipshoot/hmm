@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DomainEntity.User;
 using Hmm.Dal.Validation;
+using Hmm.Utility.Misc;
 using Xunit;
 
 namespace Hmm.Dal.Tests
@@ -23,6 +24,7 @@ namespace Hmm.Dal.Tests
             _catalogs = new List<NoteCatalog>();
             _notes = new List<HmmNote>();
 
+            // set up look up repository
             var lookupMoc = new Mock<IEntityLookup>();
             lookupMoc.Setup(lk => lk.GetEntity<NoteCatalog>(It.IsAny<int>())).Returns((int id) =>
             {
@@ -30,6 +32,7 @@ namespace Hmm.Dal.Tests
                 return recFound;
             });
 
+            // set up unit of work
             var uowmock = new Mock<IUnitOfWork>();
             uowmock.Setup(u => u.Add(It.IsAny<NoteCatalog>())).Returns((NoteCatalog cat) =>
                 {
@@ -52,6 +55,7 @@ namespace Hmm.Dal.Tests
                 }
             });
 
+            // set up query handler
             var queryMock = new Mock<IQueryHandler<NoteCatalogQueryByName, NoteCatalog>>();
             queryMock.Setup(q => q.Execute(It.IsAny<NoteCatalogQueryByName>())).Returns((NoteCatalogQueryByName q) =>
             {
@@ -59,6 +63,7 @@ namespace Hmm.Dal.Tests
                 return catfound;
             });
 
+            // set up note query handler
             var noteQueryMock = new Mock<IQueryHandler<IQuery<IEnumerable<HmmNote>>, IEnumerable<HmmNote>>>();
             noteQueryMock.Setup(q => q.Execute(It.IsAny<NoteQueryByCatalog>())).Returns((NoteQueryByCatalog query) =>
             {
@@ -71,8 +76,14 @@ namespace Hmm.Dal.Tests
                 return notes;
             });
 
+            // set up note catalog validator
             var validator = new NoteCatalogValidator(lookupMoc.Object, queryMock.Object);
-            _catalogStorage = new NoteCatalogStorage(uowmock.Object, validator, lookupMoc.Object, noteQueryMock.Object);
+
+            // set up date time provider
+            var timeProviderMock = new Mock<IDateTimeProvider>();
+
+            // set up catalog repository
+            _catalogStorage = new NoteCatalogStorage(uowmock.Object, validator, lookupMoc.Object, noteQueryMock.Object, timeProviderMock.Object);
         }
 
         public void Dispose()
