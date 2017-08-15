@@ -37,7 +37,18 @@ namespace Hmm.Dal
 
         public override HmmNote Update(HmmNote entity)
         {
-            throw new System.NotImplementedException();
+            Validator.Reset();
+            if (!Validator.IsValid(entity, false))
+            {
+                return null;
+            }
+
+            entity.LastModifiedDate = DateTimeProvider.UtcNow;
+            UnitOfWork.Update(entity);
+
+            var savedRec = LookupRepo.GetEntity<HmmNote>(entity.Id);
+
+            return savedRec;
         }
     }
 }

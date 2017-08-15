@@ -21,7 +21,7 @@ namespace Hmm.Dal.Tests
         private readonly List<NoteCatalog> _cats;
         private readonly List<NoteRender> _renders;
         private readonly NoteStorage _noteStorage;
-        private DateTime _currentDate;
+        private DateTime _currentDate = DateTime.Now;
 
         public NoteStorageTests()
         {
@@ -84,11 +84,9 @@ namespace Hmm.Dal.Tests
                 {
                     return;
                 }
-                rec.Author = note.Author;
-                rec.Catalog = note.Catalog;
-                rec.Render = note.Render;
-                rec.Content = note.Content;
-                rec.Subject = note.Subject;
+
+                _notes.Remove(rec);
+                _notes.AddEntity(note);
             });
 
             // set up look up repository
@@ -113,9 +111,9 @@ namespace Hmm.Dal.Tests
             var validator = new HmmNoteValidator(lookupMock.Object);
 
             // set up date time provider
-            _currentDate = DateTime.Now;
+            //_currentDate = DateTime.Now;
             var timeProviderMock = new Mock<IDateTimeProvider>();
-            timeProviderMock.Setup(t => t.UtcNow).Returns(_currentDate);
+            timeProviderMock.Setup(t => t.UtcNow).Returns(() => _currentDate);
 
             _noteStorage = new NoteStorage(uowMock.Object, validator, lookupMock.Object, timeProviderMock.Object);
         }
@@ -334,7 +332,7 @@ namespace Hmm.Dal.Tests
         }
 
         [Fact]
-        public void CanUpdateNote()
+        public void CanUpdateNoteDescriptioin()
         {
             // Arrange
             var author = _authors[0];
@@ -344,9 +342,10 @@ namespace Hmm.Dal.Tests
             xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
             var note = new HmmNote
             {
+                Id = 1,
                 Author = author,
                 Catalog = cat,
-                Description = "testing note2",
+                Description = "testing note",
                 Subject = "testing note is here",
                 Render = render,
                 Content = xmldoc.InnerXml,
@@ -358,6 +357,7 @@ namespace Hmm.Dal.Tests
             _currentDate = _currentDate.AddDays(1);
 
             // Act
+            note.Description = "testing note2";
             var savedRec = _noteStorage.Update(note);
 
             // Assert
@@ -370,7 +370,166 @@ namespace Hmm.Dal.Tests
         }
 
         [Fact]
+        public void CanUpdateNoteSubject()
+        {
+            // Arrange
+            var author = _authors[0];
+            var cat = _cats[0];
+            var render = _renders[0];
+            var xmldoc = new XmlDocument();
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
+            var note = new HmmNote
+            {
+                Id = 1,
+                Author = author,
+                Catalog = cat,
+                Description = "testing note",
+                Subject = "testing note is here",
+                Render = render,
+                Content = xmldoc.InnerXml,
+                CreateDate = _currentDate,
+                LastModifiedDate = _currentDate
+            };
+            _notes.AddEntity(note);
+            var oldDate = _currentDate;
+            _currentDate = _currentDate.AddDays(1);
+
+            // Act
+            note.Subject = "This is new subject";
+            var savedRec = _noteStorage.Update(note);
+
+            // Assert
+            Assert.NotNull(savedRec);
+            Assert.Equal(1, savedRec.Id);
+            Assert.Equal("This is new subject", savedRec.Subject);
+            Assert.Equal(1, _notes.Count);
+            Assert.Equal(oldDate, savedRec.CreateDate);
+            Assert.Equal(_currentDate, savedRec.LastModifiedDate);
+        }
+
+        [Fact]
+        public void CanUpdateNoteContent()
+        {
+            // Arrange
+            var author = _authors[0];
+            var cat = _cats[0];
+            var render = _renders[0];
+            var xmldoc = new XmlDocument();
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
+            var note = new HmmNote
+            {
+                Id = 1,
+                Author = author,
+                Catalog = cat,
+                Description = "testing note",
+                Subject = "testing note is here",
+                Render = render,
+                Content = xmldoc.InnerXml,
+                CreateDate = _currentDate,
+                LastModifiedDate = _currentDate
+            };
+            _notes.AddEntity(note);
+            var oldDate = _currentDate;
+            _currentDate = _currentDate.AddDays(1);
+
+            // Act
+            var newXml = new XmlDocument();
+            newXml.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><GasLog></GasLog>");
+            note.Content = newXml.InnerXml;
+            var savedRec = _noteStorage.Update(note);
+
+            // Assert
+            Assert.NotNull(savedRec);
+            Assert.Equal(1, savedRec.Id);
+            Assert.Equal(newXml.InnerXml, savedRec.Content);
+            Assert.NotEqual(xmldoc.InnerXml, savedRec.Content);
+            Assert.Equal(1, _notes.Count);
+            Assert.Equal(oldDate, savedRec.CreateDate);
+            Assert.Equal(_currentDate, savedRec.LastModifiedDate);
+        }
+
+        [Fact]
+        public void CanUpdateNoteCatalog()
+        {
+            throw new NotImplementedException();
+        }
+
+        [Fact]
+        public void CannotUpdateNoteCatalogToNonExistsCatalog()
+        {
+            throw new NotImplementedException();
+        }
+
+        [Fact]
+        public void CanUpdateNoteRender()
+        {
+            throw new NotImplementedException();
+        }
+
+        [Fact]
+        public void CannotUpdateNoteRenderToNonExistsRender()
+        {
+            throw new NotImplementedException();
+        }
+
+        [Fact]
+        public void CannotUpdateNoteAuthor()
+        {
+            throw new NotImplementedException();
+        }
+
+        [Fact]
+        public void CannotUpdateNonExitsNote()
+        {
+            // Arrange - non exists id
+            var author = _authors[0];
+            var cat = _cats[0];
+            var render = _renders[0];
+            var xmldoc = new XmlDocument();
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
+            var note = new HmmNote
+            {
+                Id = 1,
+                Author = author,
+                Catalog = cat,
+                Description = "testing note2",
+                Subject = "testing note is here",
+                Render = render,
+                Content = xmldoc.InnerXml,
+                CreateDate = _currentDate,
+                LastModifiedDate = _currentDate
+            };
+            _notes.AddEntity(note);
+
+            // Act
+            note.Id = 2;
+            var savedRec = _noteStorage.Update(note);
+
+            // Assert
+            Assert.Null(savedRec);
+            Assert.Equal(1, _notes.Count);
+            Assert.Equal(1, _noteStorage.Validator.ValidationErrors.Count);
+
+            // Arrange - invalid id
+            note.Id = 0;
+
+            // Act
+            savedRec = _noteStorage.Update(note);
+
+            // Assert
+            Assert.Null(savedRec);
+            Assert.Equal(1, _notes.Count);
+            Assert.Equal(1, _noteStorage.Validator.ValidationErrors.Count);
+        }
+
+        [Fact]
         public void CanDeleteNote()
+        {
+            throw new NotImplementedException();
+        }
+
+        [Fact]
+        public void CannotDeleteNonExistsNote()
         {
             throw new NotImplementedException();
         }

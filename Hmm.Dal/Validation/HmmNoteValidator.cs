@@ -31,6 +31,22 @@ namespace Hmm.Dal.Validation
                 return false;
             }
 
+            if (!isNewEntity)
+            {
+                if (entity.Id <= 0)
+                {
+                    ValidationErrors.Add($"The note get invalid id {entity.Id}");
+                    return false;
+                }
+
+                var rec = LookupRepo.GetEntity<HmmNote>(entity.Id);
+                if (rec == null)
+                {
+                    ValidationErrors.Add($"Cannot find note with id {entity.Id} from data source");
+                    return false;
+                }
+            }
+
             return true;
         }
 
