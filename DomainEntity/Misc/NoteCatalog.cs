@@ -5,5 +5,7 @@ namespace DomainEntity.Misc
     public class NoteCatalog : Entity
     {
         public string Name { get; set; }
+
+        public string Schema { get; set; }
     }
 }

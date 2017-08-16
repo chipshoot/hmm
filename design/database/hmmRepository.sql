@@ -6,6 +6,7 @@ GO
 CREATE TABLE [dbo].[NoteCatalogues](
     [ID] [int] IDENTITY(1,1) NOT NULL,
     [Name] [nvarchar](200) NOT NULL,
+    [Schema] XML NOT NULL,
     [Description] [nvarchar](1000) NULL,
 CONSTRAINT [PK_NoteCatalogues] PRIMARY KEY CLUSTERED 
 (
@@ -218,3 +219,12 @@ CREATE UNIQUE NONCLUSTERED INDEX [IDX_Unique_Note_Tag_Comb] ON [dbo].[NoteTagRef
 	[Tag] ASC
 )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
 GO
+
+/***** Insert seed data *****/
+SET IDENTITY_INSERT dbo.NoteRenders ON
+INSERT INTO dbo.NoteRenders( Id, Name, Namespace, Description ) VALUES(1, N'DefaultNoteRender', N'Hmm.Renders', N'default render of note')
+SET IDENTITY_INSERT dbo.NoteRenders OFF
+
+SET IDENTITY_INSERT dbo.NoteCatalogues ON
+INSERT INTO dbo.NoteCatalogues(Id, Name, [Schema], [Description] ) VALUES ( 1, N'DefaultNoteCatalog', '<?xml version="1.0" encoding="UTF-8" ?><xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning" xmlns:rns="http://schema.hmm.com/2017" targetNamespace="http://schema.hmm.com/2017" elementFormDefault="qualified" attributeFormDefault="unqualified" vc:minVersion="1.1"><xs:element name="HmmNote"><xs:annotation><xs:documentation>The root of all note managed by HMM</xs:documentation></xs:annotation><xs:complexType><xs:sequence><xs:element name="Content" type="xs:string"/></xs:sequence></xs:complexType></xs:element></xs:schema>', N'default note catalog')
+SET IDENTITY_INSERT dbo.NoteCatalogues OFF
