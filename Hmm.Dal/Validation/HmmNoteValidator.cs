@@ -20,15 +20,12 @@ namespace Hmm.Dal.Validation
             }
 
             // make sure note author is exists
-            if (!IsAuthorValid(entity.Author))
+            if (isNewEntity)
             {
-                return false;
-            }
-
-            // make sure catalog is exists
-            if (!IsCatValid(entity.Catalog))
-            {
-                return false;
+                if (!IsAuthorValid(entity.Author))
+                {
+                    return false;
+                }
             }
 
             if (!isNewEntity)
@@ -43,6 +40,14 @@ namespace Hmm.Dal.Validation
                 if (rec == null)
                 {
                     ValidationErrors.Add($"Cannot find note with id {entity.Id} from data source");
+                    return false;
+                }
+
+                // check if user want to update author for note which does not allowed by system
+                var newAuthorId = entity.Author.Id;
+                if(rec.Author.Id != newAuthorId)
+                {
+                    ValidationErrors.Add($"Cannot update note: {entity.Id}'s author. current author id: {rec.Id}, new author id: {newAuthorId}");
                     return false;
                 }
             }
@@ -63,25 +68,6 @@ namespace Hmm.Dal.Validation
             if (savedAuthor == null)
             {
                 ValidationErrors.Add("Error: cannot find author from data source.");
-                return false;
-            }
-
-            return true;
-        }
-
-        private bool IsCatValid(NoteCatalog catalog)
-        {
-            // make sure note catalog is exists
-            if (catalog == null || catalog.Id <= 0)
-            {
-                ValidationErrors.Add("Error: invalid catalog attached to note.");
-                return false;
-            }
-
-            var savedCat = LookupRepo.GetEntity<NoteCatalog>(catalog.Id);
-            if (savedCat == null)
-            {
-                ValidationErrors.Add("Error: cannot find catalog from data source.");
                 return false;
             }
 

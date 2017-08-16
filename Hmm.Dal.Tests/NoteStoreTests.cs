@@ -26,39 +26,65 @@ namespace Hmm.Dal.Tests
         public NoteStorageTests()
         {
             _notes = new List<HmmNote>();
-            _authors = new List<User>();
-            _cats = new List<NoteCatalog>();
-            _renders = new EditableList<NoteRender>();
-
-            // add seed data
-            var user = new User
+            _authors = new List<User>
             {
-                Id = 1,
-                FirstName = "Jack",
-                LastName = "Fang",
-                AccountName = "jfang",
-                BirthDay = new DateTime(1977, 05, 21),
-                Password = "lucky1",
-                Salt = "passwordSalt",
-                IsActivated = true,
-                Description = "testing user"
+                new User
+                {
+                    Id = 1,
+                    FirstName = "Jack",
+                    LastName = "Fang",
+                    AccountName = "jfang",
+                    BirthDay = new DateTime(1977, 05, 21),
+                    Password = "lucky1",
+                    Salt = "passwordSalt",
+                    IsActivated = true,
+                    Description = "testing user"
+                },
+                new User
+                {
+                    Id = 2,
+                    FirstName = "Amy",
+                    LastName = "Wang",
+                    AccountName = "awang",
+                    BirthDay = new DateTime(1977, 05, 21),
+                    Password = "lucky1",
+                    Salt = "passwordSalt",
+                    IsActivated = true,
+                    Description = "testing user"
+                }
             };
-            _authors.AddEntity(user);
-            var cat = new NoteCatalog
+            _cats = new List<NoteCatalog>
             {
-                Id = 1,
-                Name = "Gas Log",
-                Description = "Testing catalog"
+                new NoteCatalog
+                {
+                    Id = 1,
+                    Name = "DefaultNoteCatalog",
+                    Description = "Testing catalog"
+                },
+                new NoteCatalog
+                {
+                    Id = 2,
+                    Name = "Gas Log",
+                    Description = "Testing catalog"
+                }
             };
-            _cats.AddEntity(cat);
-            var render = new NoteRender
+            _renders = new EditableList<NoteRender>
             {
-                Id = 1,
-                Name = "GasLog",
-                Namespace = "Hmm.Renders",
-                Description = "Testing default note render"
+                new NoteRender
+                {
+                    Id = 1,
+                    Name = "DefaultNoteRender",
+                    Namespace = "Hmm.Renders",
+                    Description = "Testing default note render"
+                },
+                new NoteRender
+                {
+                    Id = 2,
+                    Name = "GasLog",
+                    Namespace = "Hmm.Renders",
+                    Description = "Testing default note render"
+                }
             };
-            _renders.AddEntity(render);
 
             // set up unit of work
             var uowMock = new Mock<IUnitOfWork>();
@@ -106,6 +132,11 @@ namespace Hmm.Dal.Tests
                 var rec = _cats.FirstOrDefault(n => n.Id == id);
                 return rec;
             });
+            lookupMock.Setup(lk => lk.GetEntity<NoteRender>(It.IsAny<int>())).Returns((int id) =>
+            {
+                var rec = _renders.FirstOrDefault(n => n.Id == id);
+                return rec;
+            });
 
             // set up note validator
             var validator = new HmmNoteValidator(lookupMock.Object);
@@ -144,6 +175,7 @@ namespace Hmm.Dal.Tests
                 Render = render,
                 Content = xmldoc.InnerXml
             };
+            Assert.Empty(_notes);
 
             // Act
             var savedRec = _noteStorage.Add(note);
@@ -151,9 +183,11 @@ namespace Hmm.Dal.Tests
             // Assert
             Assert.NotNull(savedRec);
             Assert.Equal(1, savedRec.Id);
-            Assert.Equal(1, _notes.Count);
             Assert.Equal(_currentDate, savedRec.CreateDate);
             Assert.Equal(_currentDate, savedRec.LastModifiedDate);
+            Assert.Equal(1, _notes.Count);
+            Assert.Equal(_currentDate, _notes[0].CreateDate);
+            Assert.Equal(_currentDate, _notes[0].LastModifiedDate);
         }
 
         [Fact]
@@ -161,6 +195,7 @@ namespace Hmm.Dal.Tests
         {
             // Arrange
             HmmNote note = null;
+            Assert.Empty(_notes);
 
             // Act
             // ReSharper disable once ExpressionIsAlwaysNull
@@ -169,6 +204,7 @@ namespace Hmm.Dal.Tests
             // Asset
             Assert.Null(result);
             Assert.True(_noteStorage.Validator.ValidationErrors.Count == 1);
+            Assert.Empty(_notes);
         }
 
         [Fact]
@@ -191,6 +227,7 @@ namespace Hmm.Dal.Tests
                 Render = render,
                 Content = xmldoc.InnerXml
             };
+            Assert.Empty(_notes);
 
             // Act
             var savedRec = _noteStorage.Add(note);
@@ -204,9 +241,116 @@ namespace Hmm.Dal.Tests
         }
 
         [Fact]
-        public void CanAddNoteWithNonExistRender()
+        public void CanAddNoteWithNullRenderDefaultRenderApplied()
         {
-            throw new NotImplementedException();
+            // Arrange
+            var author = _authors[0];
+            var cat = _cats[0];
+            var xmldoc = new XmlDocument();
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
+            var note = new HmmNote
+            {
+                Author = author,
+                Catalog = cat,
+                Render = null,
+                Description = "testing note",
+                Subject = "testing note is here",
+                Content = xmldoc.InnerXml
+            };
+            Assert.Empty(_notes);
+
+            // Act
+            var savedRec = _noteStorage.Add(note);
+
+            // Assert
+            Assert.NotNull(savedRec);
+            Assert.Equal(1, savedRec.Id);
+            Assert.NotNull(savedRec.Render);
+            Assert.Equal(_currentDate, savedRec.CreateDate);
+            Assert.Equal(_currentDate, savedRec.LastModifiedDate);
+            Assert.Equal("DefaultNoteRender", savedRec.Render.Name);
+            Assert.Equal(1, _notes.Count);
+            Assert.Equal(_currentDate, _notes[0].CreateDate);
+            Assert.Equal(_currentDate, _notes[0].LastModifiedDate);
+            Assert.Equal("DefaultNoteRender", _notes[0].Render.Name);
+        }
+
+        [Fact]
+        public void CanAddNoteWithNonExistRenderDefaultRenderApplied()
+        {
+            // Arrange
+            var author = _authors[0];
+            var cat = _cats[0];
+            var render = new NoteRender
+            {
+                Id = 200,
+                Name = "Non exists render",
+                Description = "Just for testing"
+            };
+            var xmldoc = new XmlDocument();
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
+            var note = new HmmNote
+            {
+                Author = author,
+                Catalog = cat,
+                Render = render,
+                Description = "testing note",
+                Subject = "testing note is here",
+                Content = xmldoc.InnerXml
+            };
+            Assert.Empty(_notes);
+
+            // Act
+            var savedRec = _noteStorage.Add(note);
+
+            // Assert
+            Assert.NotNull(savedRec);
+            Assert.Equal(1, savedRec.Id);
+            Assert.NotNull(savedRec.Render);
+            Assert.Equal("DefaultNoteRender", savedRec.Render.Name);
+            Assert.Equal(1, _notes.Count);
+            Assert.Equal(_currentDate, savedRec.CreateDate);
+            Assert.Equal(_currentDate, savedRec.LastModifiedDate);
+            Assert.Equal("DefaultNoteRender", _notes[0].Render.Name);
+        }
+
+        [Fact]
+        public void CanAddNoteWithRenderWithInvalidIdDefaultRenderApplied()
+        {
+            // Arrange
+            var author = _authors[0];
+            var cat = _cats[0];
+            var render = new NoteRender
+            {
+                Id = -1,
+                Name = "Non exists render",
+                Description = "Just for testing"
+            };
+            var xmldoc = new XmlDocument();
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
+            var note = new HmmNote
+            {
+                Author = author,
+                Catalog = cat,
+                Render = render,
+                Description = "testing note",
+                Subject = "testing note is here",
+                Content = xmldoc.InnerXml
+            };
+            Assert.Empty(_notes);
+
+            // Act
+            var savedRec = _noteStorage.Add(note);
+
+            // Assert
+            Assert.NotNull(savedRec);
+            Assert.Equal(1, savedRec.Id);
+            Assert.NotNull(savedRec.Render);
+            Assert.Equal("DefaultNoteRender", savedRec.Render.Name);
+            Assert.Equal(1, _notes.Count);
+            Assert.Equal(_currentDate, savedRec.CreateDate);
+            Assert.Equal(_currentDate, savedRec.LastModifiedDate);
+            Assert.Equal("DefaultNoteRender", _notes[0].Render.Name);
         }
 
         [Fact]
@@ -228,13 +372,14 @@ namespace Hmm.Dal.Tests
                 Render = render,
                 Content = xmldoc.InnerXml
             };
+            Assert.Empty(_notes);
 
             // Act
             var savedRec = _noteStorage.Add(note);
 
             // Assert
             Assert.Null(savedRec);
-            Assert.Equal(0, _notes.Count);
+            Assert.Empty(_notes);
             Assert.Equal(1, _noteStorage.Validator.ValidationErrors.Count);
 
             // Arrange - none exists author
@@ -257,7 +402,7 @@ namespace Hmm.Dal.Tests
 
             // Assert
             Assert.Null(savedRec);
-            Assert.Equal(0, _notes.Count);
+            Assert.Empty(_notes);
             Assert.Equal(1, _noteStorage.Validator.ValidationErrors.Count);
 
             // Arrange - author with invalid author id
@@ -269,12 +414,12 @@ namespace Hmm.Dal.Tests
 
             // Assert
             Assert.Null(savedRec);
-            Assert.Equal(0, _notes.Count);
+            Assert.Empty(_notes);
             Assert.Equal(1, _noteStorage.Validator.ValidationErrors.Count);
         }
 
         [Fact]
-        public void CannotAddNoteWithNonExistCatalog()
+        public void CanAddNoteWithNonExistCatalogDefaultCatalogApplied()
         {
             // Arrange - null catalog for note
             var author = _authors[0];
@@ -292,19 +437,21 @@ namespace Hmm.Dal.Tests
                 Render = render,
                 Content = xmldoc.InnerXml
             };
+            Assert.Empty(_notes);
 
             // Act
             var savedRec = _noteStorage.Add(note);
 
             // Assert
-            Assert.Null(savedRec);
-            Assert.Equal(0, _notes.Count);
-            Assert.Equal(1, _noteStorage.Validator.ValidationErrors.Count);
+            Assert.NotNull(savedRec);
+            Assert.Equal(1, _notes.Count);
+            Assert.NotNull(savedRec.Catalog);
+            Assert.Equal("DefaultNoteCatalog", savedRec.Catalog.Name);
 
             // Arrange - none exists catalog
             var cat = new NoteCatalog
             {
-                Id = 2,
+                Id = 200,
                 Name = "Gas Log",
                 Description = "Testing catalog"
             };
@@ -314,9 +461,9 @@ namespace Hmm.Dal.Tests
             savedRec = _noteStorage.Add(note);
 
             // Assert
-            Assert.Null(savedRec);
-            Assert.Equal(0, _notes.Count);
-            Assert.Equal(1, _noteStorage.Validator.ValidationErrors.Count);
+            Assert.NotNull(savedRec);
+            Assert.Equal(2, _notes.Count);
+            Assert.Equal("DefaultNoteCatalog", savedRec.Catalog.Name);
 
             // Arrange - catalog with invalid catalog id
             cat.Id = 0;
@@ -326,9 +473,9 @@ namespace Hmm.Dal.Tests
             savedRec = _noteStorage.Add(note);
 
             // Assert
-            Assert.Null(savedRec);
-            Assert.Equal(0, _notes.Count);
-            Assert.Equal(1, _noteStorage.Validator.ValidationErrors.Count);
+            Assert.NotNull(savedRec);
+            Assert.Equal(3, _notes.Count);
+            Assert.Equal("DefaultNoteCatalog", savedRec.Catalog.Name);
         }
 
         [Fact]
@@ -355,6 +502,7 @@ namespace Hmm.Dal.Tests
             _notes.AddEntity(note);
             var oldDate = _currentDate;
             _currentDate = _currentDate.AddDays(1);
+            Assert.Equal(1, _notes.Count);
 
             // Act
             note.Description = "testing note2";
@@ -367,6 +515,7 @@ namespace Hmm.Dal.Tests
             Assert.Equal(1, _notes.Count);
             Assert.Equal(oldDate, savedRec.CreateDate);
             Assert.Equal(_currentDate, savedRec.LastModifiedDate);
+            Assert.Equal("testing note2", _notes[0].Description);
         }
 
         [Fact]
@@ -393,6 +542,7 @@ namespace Hmm.Dal.Tests
             _notes.AddEntity(note);
             var oldDate = _currentDate;
             _currentDate = _currentDate.AddDays(1);
+            Assert.Equal(1, _notes.Count);
 
             // Act
             note.Subject = "This is new subject";
@@ -402,9 +552,13 @@ namespace Hmm.Dal.Tests
             Assert.NotNull(savedRec);
             Assert.Equal(1, savedRec.Id);
             Assert.Equal("This is new subject", savedRec.Subject);
-            Assert.Equal(1, _notes.Count);
             Assert.Equal(oldDate, savedRec.CreateDate);
             Assert.Equal(_currentDate, savedRec.LastModifiedDate);
+            Assert.Equal(1, _notes.Count);
+            Assert.Equal(1, _notes[0].Id);
+            Assert.Equal("This is new subject", _notes[0].Subject);
+            Assert.Equal(oldDate, _notes[0].CreateDate);
+            Assert.Equal(_currentDate, _notes[0].LastModifiedDate);
         }
 
         [Fact]
@@ -431,6 +585,7 @@ namespace Hmm.Dal.Tests
             _notes.AddEntity(note);
             var oldDate = _currentDate;
             _currentDate = _currentDate.AddDays(1);
+            Assert.Equal(1, _notes.Count);
 
             // Act
             var newXml = new XmlDocument();
@@ -443,39 +598,343 @@ namespace Hmm.Dal.Tests
             Assert.Equal(1, savedRec.Id);
             Assert.Equal(newXml.InnerXml, savedRec.Content);
             Assert.NotEqual(xmldoc.InnerXml, savedRec.Content);
-            Assert.Equal(1, _notes.Count);
             Assert.Equal(oldDate, savedRec.CreateDate);
             Assert.Equal(_currentDate, savedRec.LastModifiedDate);
+
+            Assert.Equal(1, _notes.Count);
+            Assert.Equal(1, _notes[0].Id);
+            Assert.Equal(newXml.InnerXml, _notes[0].Content);
+            Assert.NotEqual(xmldoc.InnerXml, _notes[0].Content);
+            Assert.Equal(oldDate, _notes[0].CreateDate);
+            Assert.Equal(_currentDate, _notes[0].LastModifiedDate);
         }
 
         [Fact]
         public void CanUpdateNoteCatalog()
         {
-            throw new NotImplementedException();
+            // Arrange
+            var author = _authors[0];
+            var render = _renders[0];
+            var catalog = _cats[0];
+            var xmldoc = new XmlDocument();
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
+            var note = new HmmNote
+            {
+                Id = 1,
+                Author = author,
+                Catalog = catalog,
+                Description = "testing note",
+                CreateDate = DateTime.Now,
+                LastModifiedDate = DateTime.Now,
+                Subject = "testing note is here",
+                Render = render,
+                Content = xmldoc.InnerXml
+            };
+            _notes.AddEntity(note);
+            Assert.Equal("DefaultNoteCatalog", _notes[0].Catalog.Name);
+            Assert.Equal(1, _notes.Count);
+
+            // changed the note catalog
+            note.Catalog = _cats[1];
+
+            // Act
+            var savedRec = _noteStorage.Update(note);
+
+            // Assert
+            Assert.NotNull(savedRec);
+            Assert.NotNull(savedRec.Catalog);
+            Assert.Equal("Gas Log", savedRec.Catalog.Name);
+
+            Assert.Equal(1, _notes.Count);
+            Assert.Equal("Gas Log", _notes[0].Catalog.Name);
         }
 
         [Fact]
-        public void CannotUpdateNoteCatalogToNonExistsCatalog()
+        public void CanUpdateNoteCatalogToNullCatalogDefaultCatalogApplied()
         {
-            throw new NotImplementedException();
+            // Arrange - null catalog for note
+            var author = _authors[0];
+            var render = _renders[0];
+            var catalog = _cats[1];
+            var xmldoc = new XmlDocument();
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
+            var note = new HmmNote
+            {
+                Id = 1,
+                Author = author,
+                Catalog = catalog,
+                Description = "testing note",
+                CreateDate = DateTime.Now,
+                LastModifiedDate = DateTime.Now,
+                Subject = "testing note is here",
+                Render = render,
+                Content = xmldoc.InnerXml
+            };
+            _notes.AddEntity(note);
+            Assert.Equal("Gas Log", _notes[0].Catalog.Name);
+
+            // null the catalog
+            note.Catalog = null;
+
+            // Act
+            var savedRec = _noteStorage.Update(note);
+
+            // Assert
+            Assert.NotNull(savedRec);
+            Assert.NotNull(savedRec.Catalog);
+            Assert.Equal("DefaultNoteCatalog", savedRec.Catalog.Name);
+
+            Assert.Equal(1, _notes.Count);
+            Assert.Equal("DefaultNoteCatalog", _notes[0].Catalog.Name);
+        }
+
+        [Fact]
+        public void CanUpdateNoteCatalogToNonExistsCatalogDefaultCatalogApplied()
+        {
+            // Arrange - none exists catalog
+            var author = _authors[0];
+            var render = _renders[0];
+            var catalog = new NoteCatalog
+            {
+                Id = 200,
+                Name = "Gas Log",
+                Description = "Testing catalog"
+            };
+
+            var xmldoc = new XmlDocument();
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
+            var note = new HmmNote
+            {
+                Id = 1,
+                Author = author,
+                Catalog = catalog,
+                Description = "testing note",
+                CreateDate = DateTime.Now,
+                LastModifiedDate = DateTime.Now,
+                Subject = "testing note is here",
+                Render = render,
+                Content = xmldoc.InnerXml
+            };
+            _notes.AddEntity(note);
+            Assert.Equal(1, _notes.Count);
+
+            // Act
+            var savedRec = _noteStorage.Update(note);
+
+            // Assert
+            Assert.NotNull(savedRec);
+            Assert.NotNull(savedRec.Catalog);
+            Assert.Equal("DefaultNoteCatalog", savedRec.Catalog.Name);
+
+            Assert.Equal(1, _notes.Count);
+            Assert.Equal("DefaultNoteCatalog", _notes[0].Catalog.Name);
+        }
+
+        [Fact]
+        public void CanUpdateNoteCatalogToCatalogWithInvalidIdDefaultCatalogApplied()
+        {
+            // Arrange - none exists catalog
+            var author = _authors[0];
+            var render = _renders[0];
+            var catalog = new NoteCatalog
+            {
+                Id = -1,
+                Name = "Gas Log",
+                Description = "Testing catalog"
+            };
+
+            var xmldoc = new XmlDocument();
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
+            var note = new HmmNote
+            {
+                Id = 1,
+                Author = author,
+                Catalog = catalog,
+                Description = "testing note",
+                CreateDate = DateTime.Now,
+                LastModifiedDate = DateTime.Now,
+                Subject = "testing note is here",
+                Render = render,
+                Content = xmldoc.InnerXml
+            };
+            _notes.AddEntity(note);
+
+            // Act
+            var savedRec = _noteStorage.Update(note);
+
+            // Assert
+            Assert.NotNull(savedRec);
+            Assert.NotNull(savedRec.Catalog);
+            Assert.Equal("DefaultNoteCatalog", savedRec.Catalog.Name);
+
+            Assert.Equal(1, _notes.Count);
+            Assert.Equal("DefaultNoteCatalog", _notes[0].Catalog.Name);
         }
 
         [Fact]
         public void CanUpdateNoteRender()
         {
-            throw new NotImplementedException();
+            // Arrange
+            var author = _authors[0];
+            var render = _renders[0];
+            var catalog = _cats[0];
+            var xmldoc = new XmlDocument();
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
+            var note = new HmmNote
+            {
+                Id = 1,
+                Author = author,
+                Catalog = catalog,
+                Description = "testing note",
+                CreateDate = DateTime.Now,
+                LastModifiedDate = DateTime.Now,
+                Subject = "testing note is here",
+                Render = render,
+                Content = xmldoc.InnerXml
+            };
+            _notes.AddEntity(note);
+            Assert.Equal("DefaultNoteRender", _notes[0].Render.Name);
+            Assert.Equal(1, _notes.Count);
+
+            // change the note render
+            note.Render = _renders[1];
+
+            // Act
+            var savedRec = _noteStorage.Update(note);
+
+            // Assert
+            Assert.NotNull(savedRec);
+            Assert.NotNull(savedRec.Render);
+            Assert.Equal("GasLog", savedRec.Render.Name);
+
+            Assert.Equal(1, _notes.Count);
+            Assert.Equal("GasLog", _notes[0].Render.Name);
         }
 
         [Fact]
-        public void CannotUpdateNoteRenderToNonExistsRender()
+        public void CanUpdateNoteRenderToNnullRenderDefaultRenderApplied()
         {
-            throw new NotImplementedException();
+            // Arrange
+            var author = _authors[0];
+            var render = _renders[1];
+            var catalog = _cats[0];
+            var xmldoc = new XmlDocument();
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
+            var note = new HmmNote
+            {
+                Id = 1,
+                Author = author,
+                Catalog = catalog,
+                Render = render,
+                Description = "testing note",
+                CreateDate = DateTime.Now,
+                LastModifiedDate = DateTime.Now,
+                Subject = "testing note is here",
+                Content = xmldoc.InnerXml
+            };
+            _notes.AddEntity(note);
+            Assert.Equal("GasLog", _notes[0].Render.Name);
+            Assert.Equal(1, _notes.Count);
+
+            // change the note render
+            note.Render = null;
+
+            // Act
+            var savedRec = _noteStorage.Update(note);
+
+            // Assert
+            Assert.NotNull(savedRec);
+            Assert.NotNull(savedRec.Render);
+            Assert.Equal("DefaultNoteRender", savedRec.Render.Name);
+
+            Assert.Equal(1, _notes.Count);
+            Assert.Equal("DefaultNoteRender", _notes[0].Render.Name);
+        }
+
+        [Fact]
+        public void CanUpdateNoteRenderToNonExistsRenderDefaultRenderApplied()
+        {
+            // Arrange
+            var author = _authors[0];
+            var render = _renders[1];
+            var catalog = _cats[0];
+            var xmldoc = new XmlDocument();
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
+            var note = new HmmNote
+            {
+                Id = 1,
+                Author = author,
+                Catalog = catalog,
+                Render = render,
+                Description = "testing note",
+                CreateDate = DateTime.Now,
+                LastModifiedDate = DateTime.Now,
+                Subject = "testing note is here",
+                Content = xmldoc.InnerXml
+            };
+            _notes.AddEntity(note);
+            Assert.Equal("GasLog", _notes[0].Render.Name);
+            Assert.Equal(1, _notes.Count);
+
+            // change the note render
+            var newRender = new NoteRender
+            {
+                Id = 200,
+                Name = "Not exists render",
+                Description = "Just for testing"
+            };
+            note.Render = newRender;
+
+            // Act
+            var savedRec = _noteStorage.Update(note);
+
+            // Assert
+            Assert.NotNull(savedRec);
+            Assert.NotNull(savedRec.Render);
+            Assert.Equal("DefaultNoteRender", savedRec.Render.Name);
+
+            Assert.Equal(1, _notes.Count);
+            Assert.Equal("DefaultNoteRender", _notes[0].Render.Name);
         }
 
         [Fact]
         public void CannotUpdateNoteAuthor()
         {
-            throw new NotImplementedException();
+            // Arrange
+            var author = _authors[0];
+            var render = _renders[1];
+            var catalog = _cats[0];
+            var xmldoc = new XmlDocument();
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
+            var note = new HmmNote
+            {
+                Id = 1,
+                Author = author,
+                Catalog = catalog,
+                Render = render,
+                Description = "testing note",
+                CreateDate = DateTime.Now,
+                LastModifiedDate = DateTime.Now,
+                Subject = "testing note is here",
+                Content = xmldoc.InnerXml
+            };
+            _notes.AddEntity(note);
+            Assert.Equal("jfang", _notes[0].Author.AccountName);
+            Assert.Equal(1, _notes.Count);
+
+            // change the note render
+            var newUser = _authors[1];
+            note.Author = newUser;
+
+            // Act
+            var savedRec = _noteStorage.Update(note);
+
+            // Assert
+            Assert.Null(savedRec);
+            Assert.Equal(1, _noteStorage.Validator.ValidationErrors.Count);
+
+            Assert.Equal(1, _notes.Count);
+            Assert.Equal("jfang", _notes[0].Author.AccountName);
         }
 
         [Fact]
