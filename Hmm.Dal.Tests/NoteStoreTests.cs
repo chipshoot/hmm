@@ -385,7 +385,7 @@ namespace Hmm.Dal.Tests
             // Arrange - none exists author
             var author = new User
             {
-                Id = 2,
+                Id = 3,
                 FirstName = "Amy",
                 LastName = "Wang",
                 AccountName = "jfang",
