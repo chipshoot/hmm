@@ -11,7 +11,7 @@ namespace DomainEntity.Vehicle
 
         public decimal Price { get; set; }
 
-        public List<decimal> Discounts { get; set; }
+        public List<Discount> Discounts { get; set; }
 
         public string GasStation { get; set; }
     }

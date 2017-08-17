@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="MeasureUnit\" />
     <Folder Include="Specification\" />
     <Folder Include="Validation\" />
   </ItemGroup>
