@@ -44,7 +44,14 @@ namespace Hmm.Dal
 
         public override bool Delete(HmmNote entity)
         {
-            throw new System.NotImplementedException();
+            Validator.Reset();
+            if (!Validator.IsValid(entity, isNewEntity: false))
+            {
+                return false;
+            }
+
+            UnitOfWork.Delete(entity);
+            return true;
         }
 
         public override HmmNote Update(HmmNote entity)
