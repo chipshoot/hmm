@@ -1,13 +1,14 @@
 ﻿using DomainEntity.Misc;
+using Hmm.Utility.MeasureUnit;
 using System.Collections.Generic;
 
 namespace DomainEntity.Vehicle
 {
     public class GasLog : HmmNote
     {
-        public float Distance { get; set; }
+        public Dimension Distance { get; set; }
 
-        public float Gas { get; set; }
+        public Volume Gas { get; set; }
 
         public decimal Price { get; set; }
 
