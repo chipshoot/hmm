@@ -1,6 +1,7 @@
 ﻿using DomainEntity.Misc;
 using Hmm.Utility.MeasureUnit;
 using System.Collections.Generic;
+using Hmm.Utility.Currency;
 
 namespace DomainEntity.Vehicle
 {
@@ -10,7 +11,7 @@ namespace DomainEntity.Vehicle
 
         public Volume Gas { get; set; }
 
-        public decimal Price { get; set; }
+        public Money Price { get; set; }
 
         public List<Discount> Discounts { get; set; }
 
