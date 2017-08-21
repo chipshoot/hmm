@@ -68,7 +68,7 @@ namespace Hmm.Dal.Tests
                     Description = "Testing catalog"
                 }
             };
-            _renders = new EditableList<NoteRender>
+            _renders = new List<NoteRender>
             {
                 new NoteRender
                 {

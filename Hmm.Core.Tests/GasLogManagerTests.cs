@@ -8,7 +8,7 @@ namespace Hmm.Core.Tests
 {
     public class GasLogManagerTests
     {
-        private IGasLogManager _mananger;
+        private GasLogManager _mananger;
         private IDataStore<GasLog> _datasource;
 
         [Fact]
