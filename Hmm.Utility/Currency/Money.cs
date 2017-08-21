@@ -33,7 +33,7 @@ using System.Globalization;
 
 namespace Hmm.Utility.Currency
 {
-    public class Money : IComparable<Money>, IEquatable<Money>, IComparable
+    public class Money : IComparable<Money>, IEquatable<Money>, IComparable, ICloneable
     {
         #region private fields
 
@@ -85,13 +85,7 @@ namespace Hmm.Utility.Currency
         /// of the associated currency using MidpointRounding.AwayFromZero.
         /// </summary>
         /// <returns>A decimal with the _amount rounded to the significant number of decimal digits.</returns>
-        public decimal Amount
-        {
-            get
-            {
-                return Decimal.Round((Decimal)_amount, DecimalDigits, MidpointRounding.AwayFromZero);
-            }
-        }
+        public decimal Amount => decimal.Round((decimal)_amount, DecimalDigits, MidpointRounding.AwayFromZero);
 
         public string CurrencyCode => "CAD";
 
@@ -114,23 +108,14 @@ namespace Hmm.Utility.Currency
         /// Represents the ISO code for the currency
         /// </summary>
         /// <returns>An Int16 with the ISO code for the current currency</returns>
-        public Int16 ISOCode
-        {
-            get { return (Int16)_currencyCode; }
-        }
+        public int IsoCode => (int)_currencyCode;
 
         /// <summary>
         /// Truncates the _amount to the number of significant decimal digits
         /// of the associated currency.
         /// </summary>
         /// <returns>A decimal with the _amount truncated to the significant number of decimal digits.</returns>
-        public decimal TruncatedAmount
-        {
-            get
-            {
-                return (decimal)((long)Math.Truncate(_amount * DecimalDigits)) / DecimalDigits;
-            }
-        }
+        public decimal TruncatedAmount => (decimal)((long)Math.Truncate(_amount * DecimalDigits)) / DecimalDigits;
 
         #endregion Public Properties
 
@@ -239,7 +224,8 @@ namespace Hmm.Utility.Currency
 
         public override bool Equals(object obj)
         {
-            return (obj is Money) && Equals((Money)obj);
+            var money = obj as Money;
+            return (money != null) && Equals(money);
         }
 
         public bool Equals(Money other)
@@ -393,19 +379,14 @@ namespace Hmm.Utility.Currency
             return results;
         }
 
-        public Money Clone()
+        public object Clone()
         {
             return new Money(_amount, _currencyCode);
         }
 
-        public Money Convert(CurrencyCodeType toCurrency, double rate)
-        {
-            return new Money(_amount * rate, toCurrency);
-        }
-
         public Money Copy()
         {
-            return new Money(Amount, _currencyCode);
+            return (Money)Clone();
         }
 
         #endregion Functions

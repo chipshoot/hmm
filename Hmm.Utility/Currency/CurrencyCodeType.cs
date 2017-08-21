@@ -1,3 +1,5 @@
+using Hmm.Utility.StringEnumeration;
+
 namespace Hmm.Utility.Currency
 
 {
@@ -7,11 +9,22 @@ namespace Hmm.Utility.Currency
     /// </summary>
     public enum CurrencyCodeType
     {
+        [StringValue("None")]
         None = 0,
+
+        [StringValue("United Arab Emirates dirham")]
         Aed = 784,
+
+        [StringValue("Afghan afghani")]
         Afn = 971,
+
+        [StringValue("Albanian lek")]
         All = 8,
+
+        [StringValue("Armenian dram")]
         Amd = 51,
+
+
         Ars = 32,
         Aud = 36,
         Azn = 944,
@@ -24,9 +37,13 @@ namespace Hmm.Utility.Currency
         Brl = 986,
         Byr = 974,
         Bzd = 84,
+
+        [StringValue("Canadian dollar")]
         Cad = 124,
         Chf = 756,
         Clp = 152,
+
+        [StringValue("Chinese yuan")]
         Cny = 156,
         Cop = 170,
         Crc = 188,
@@ -40,6 +57,8 @@ namespace Hmm.Utility.Currency
         Gbp = 826,
         Gel = 981,
         Gtq = 320,
+
+        [StringValue("Hong Kong dollar")]
         Hkd = 344,
         Hnl = 340,
         Hrk = 191,
@@ -99,7 +118,10 @@ namespace Hmm.Utility.Currency
         Ttd = 780,
         Twd = 901,
         Uah = 980,
+
+        [StringValue("United States dollar")]
         Usd = 840,
+
         Uyu = 858,
         Uzs = 860,
         Vef = 937,
