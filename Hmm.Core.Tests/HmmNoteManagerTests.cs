@@ -211,8 +211,7 @@ namespace Hmm.Core.Tests
                 Content = null
             };
             var xmldoc = new XmlDocument();
-            xmldoc.LoadXml(
-                "<?xml version=\"1.0\" encoding=\"UTF-16\" ?><HmmNote xmlns=\"http://schema.hmm.com/2017\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://schema.hmm.com/2017 NotebaseSchema.xsd\"><Content></Content></HmmNote>");
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"UTF-16\" ?><note xmlns=\"http://schema.hmm.com/2017\"><content></content></note>");
 
             // Act
             var newNote = _manager.Create(note);
