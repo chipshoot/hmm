@@ -174,7 +174,7 @@ namespace Hmm.Core.Tests
             };
             var xmldoc = new XmlDocument();
             xmldoc.LoadXml(
-                "<?xml version=\"1.0\" encoding=\"UTF-16\" ?><HmmNote xmlns=\"http://schema.hmm.com/2017\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://schema.hmm.com/2017 NotebaseSchema.xsd\"><Content>Test content</Content></HmmNote>");
+                "<?xml version=\"1.0\" encoding=\"UTF-16\" ?><note xmlns=\"http://schema.hmm.com/2017\"><content>Test content</content></note>");
 
             // Act
             var newNote = _manager.Create(note);
@@ -242,8 +242,7 @@ namespace Hmm.Core.Tests
                 Content = "Testing content with < and >"
             };
             var xmldoc = new XmlDocument();
-            xmldoc.LoadXml(
-                "<?xml version=\"1.0\" encoding=\"UTF-16\" ?><HmmNote xmlns=\"http://schema.hmm.com/2017\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://schema.hmm.com/2017 NotebaseSchema.xsd\"><Content>Testing content with &lt; and &gt;</Content></HmmNote>");
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"UTF-16\" ?><note xmlns=\"http://schema.hmm.com/2017\"><content>Testing content with &lt; and &gt;</content></note>");
 
             // Act
             var newNote = _manager.Create(note);
@@ -264,7 +263,7 @@ namespace Hmm.Core.Tests
         }
 
         [Fact]
-        public void CanSearchNote()
+        public void CanSearchNoteById()
         {
             throw new NotImplementedException();
         }

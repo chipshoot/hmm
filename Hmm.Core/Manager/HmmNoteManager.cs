@@ -32,10 +32,11 @@ namespace Hmm.Core.Manager
         private XmlDocument GetNoteContent(string content)
         {
             var xmldoc = new XmlDocument();
-            xmldoc.LoadXml(
-                "<?xml version=\"1.0\" encoding=\"UTF-16\" ?><HmmNote xmlns=\"http://schema.hmm.com/2017\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://schema.hmm.com/2017 NotebaseSchema.xsd\"><Content></Content></HmmNote>");
-
-            var contNode = xmldoc.SelectNodes("/HmmNote/Content");
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"UTF-16\" ?><note><content></content></note>");
+            xmldoc.DocumentElement.SetAttribute("xmlns", "http://schema.hmm.com/2017");
+            var ns = new XmlNamespaceManager(xmldoc.NameTable);
+            ns.AddNamespace("", "http://schema.hmm.com/2017");
+            var contNode = xmldoc.SelectNodes("/note/content", ns);
             if (contNode != null)
             {
                 contNode[0].InnerText = content;
