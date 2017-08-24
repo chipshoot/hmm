@@ -1,11 +1,14 @@
 ﻿using DomainEntity.Misc;
+using System.Xml;
 
 namespace Hmm.Contract
 {
-    public interface IHmmNoteManager
+    public interface IHmmNoteManager<T> where T : HmmNote
     {
-        HmmNote Create(HmmNote note);
+        T Create(T note);
 
-        HmmNote Update(HmmNote note);
+        T Update(T note);
+
+        XmlDocument GetNoteContent(T note);
     }
 }

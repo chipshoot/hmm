@@ -1,7 +1,7 @@
 ﻿using DomainEntity.Misc;
+using Hmm.Utility.Currency;
 using Hmm.Utility.MeasureUnit;
 using System.Collections.Generic;
-using Hmm.Utility.Currency;
 
 namespace DomainEntity.Vehicle
 {
@@ -10,6 +10,7 @@ namespace DomainEntity.Vehicle
         public GasLog()
         {
             // set catalog and render for gas log
+            Subject = "GasLog";
         }
 
         public Dimension Distance { get; set; }

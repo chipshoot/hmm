@@ -1,9 +1,14 @@
-﻿using Hmm.Utility.Dal.DataEntity;
+﻿using DomainEntity.Misc;
 
 namespace DomainEntity.Vehicle
 {
-    public class Automobile : VersionedEntity
+    public class Automobile : HmmNote
     {
+        public Automobile()
+        {
+            Subject = "Automobile";
+        }
+
         public string Brand { get; set; }
 
         public string Maker { get; set; }

@@ -7,7 +7,7 @@ using System.Xml;
 
 namespace Hmm.Core.Manager
 {
-    public class HmmNoteManager : IHmmNoteManager
+    public class HmmNoteManager : IHmmNoteManager<HmmNote>
     {
         #region private fields
 
@@ -23,7 +23,7 @@ namespace Hmm.Core.Manager
 
         public HmmNote Create(HmmNote note)
         {
-            var xmlContent = GetNoteContent(note.Content);
+            var xmlContent = GetNoteContent(note);
             note.Content = xmlContent.InnerXml;
             var ret = _noteStorage.Add(note);
             return ret;
@@ -31,15 +31,17 @@ namespace Hmm.Core.Manager
 
         public HmmNote Update(HmmNote note)
         {
-            var xmlContent = GetNoteContent(note.Content);
+            var xmlContent = GetNoteContent(note);
             note.Content = xmlContent.InnerXml;
             var ret = _noteStorage.Update(note);
-             
+
             return ret;
         }
-        private XmlDocument GetNoteContent(string content)
+
+        public virtual XmlDocument GetNoteContent(HmmNote note)
         {
             var xmldoc = new XmlDocument();
+            var content = note.Content;
             xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"UTF-16\" ?><note><content></content></note>");
             xmldoc.DocumentElement.SetAttribute("xmlns", "http://schema.hmm.com/2017");
             var ns = new XmlNamespaceManager(xmldoc.NameTable);
