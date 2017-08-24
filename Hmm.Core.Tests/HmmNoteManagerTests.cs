@@ -22,7 +22,7 @@ namespace Hmm.Core.Tests
         private readonly List<NoteCatalog> _cats;
         private readonly List<NoteRender> _renders;
         private readonly List<User> _authors;
-        private readonly DateTime _currentDate;
+        private DateTime _currentDate;
         private readonly IHmmNoteManager _manager;
 
         public HmmNoteManagerTests()
@@ -258,7 +258,46 @@ namespace Hmm.Core.Tests
         [Fact]
         public void CanUpdateNote()
         {
-            throw new NotImplementedException();
+            // Arrange - note with null content
+            var user = _authors[0];
+            var cat = _cats[0];
+            var render = _renders[0];
+            var xmldoc = new XmlDocument();
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"UTF-16\" ?><note xmlns=\"http://schema.hmm.com/2017\"><content>Testing content with &lt; and &gt;</content></note>");
+            var note = new HmmNote
+            {
+                Id = 1,
+                Author = user,
+                Catalog = cat,
+                Render = render,
+                Subject = "Testing note",
+                Content = xmldoc.InnerXml,
+                CreateDate = _currentDate,
+                LastModifiedDate = _currentDate
+            };
+            _notes.AddEntity(note);
+            Assert.Equal(1, _notes.Count);
+
+            // Act
+            note.Subject = "new note subject";
+            note.Content = "This is new note content";
+            var oldDate = _currentDate;
+            _currentDate = DateTime.Now.AddDays(1);
+            var newNote = _manager.Update(note);
+
+            // Assert
+            Assert.NotNull(newNote);
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"UTF-16\" ?><note xmlns=\"http://schema.hmm.com/2017\"><content>This is new note content</content></note>");
+            Assert.Equal<string>(xmldoc.InnerXml, newNote.Content);
+            Assert.Equal("new note subject", newNote.Subject);
+            Assert.Equal(oldDate, newNote.CreateDate);
+            Assert.Equal(_currentDate, newNote.LastModifiedDate);
+
+            Assert.Equal(1, _notes.Count);
+            Assert.Equal("new note subject", _notes[0].Subject);
+            Assert.Equal<string>(xmldoc.InnerXml, _notes[0].Content);
+            Assert.Equal(oldDate, _notes[0].CreateDate);
+            Assert.Equal(_currentDate, _notes[0].LastModifiedDate);
         }
 
         [Fact]

@@ -29,6 +29,14 @@ namespace Hmm.Core.Manager
             return ret;
         }
 
+        public HmmNote Update(HmmNote note)
+        {
+            var xmlContent = GetNoteContent(note.Content);
+            note.Content = xmlContent.InnerXml;
+            var ret = _noteStorage.Update(note);
+             
+            return ret;
+        }
         private XmlDocument GetNoteContent(string content)
         {
             var xmldoc = new XmlDocument();
