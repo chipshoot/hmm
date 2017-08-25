@@ -7,16 +7,16 @@ using Hmm.Utility.Validation;
 
 namespace Hmm.Dal.Storages
 {
-    public class GasLogStorage : NoteStorage
+    public class GasLogStorage : NoteStorage<GasLog>
     {
         public GasLogStorage(IUnitOfWork uow,
-            IValidator<HmmNote> validator,
+            IValidator<GasLog> validator,
             IEntityLookup lookupRepo,
             IDateTimeProvider dateTimeProvider) : base(uow, validator, lookupRepo, dateTimeProvider)
         {
         }
 
-        public override HmmNote Add(HmmNote entity)
+        public override GasLog Add(GasLog entity)
         {
             Guard.TypeOf<GasLog>(entity, "invalid type of entity, gaslog needed");
             return base.Add(entity);

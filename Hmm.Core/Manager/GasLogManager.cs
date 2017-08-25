@@ -1,31 +1,22 @@
-﻿using System.Xml;
-using DomainEntity.Misc;
-using DomainEntity.Vehicle;
+﻿using DomainEntity.Vehicle;
 using Hmm.Contract.GasLogMan;
 using Hmm.Utility.Dal.DataStore;
+using System.Xml;
 
 namespace Hmm.Core.Manager
 {
-    public class GasLogManager : HmmNoteManager, IGasLogManager
+    public class GasLogManager : HmmNoteManager<GasLog>, IGasLogManager
     {
-        public GasLogManager(IDataStore<HmmNote> storage) : base(storage)
+        public GasLogManager(IDataStore<GasLog> storage) : base(storage)
         {
         }
 
-        public GasLog Create(GasLog note)
+        public override XmlDocument GetNoteContent(GasLog note)
         {
-            throw new System.NotImplementedException();
-        }
+            note.Content =
+                $"<gaslog><gas>{note.Gas.TotalLiter}</gas><price>{note.Price.Amount}</price><gasStation>{note.GasStation}</gasStation></gaslog>";
 
-        public GasLog Update(GasLog note)
-        {
-            throw new System.NotImplementedException();
+            return base.GetNoteContent(note);
         }
-
-        public virtual XmlDocument GetNoteContent(GasLog note)
-        {
-            throw new System.NotImplementedException();
-        }
-
     }
 }

@@ -1,5 +1,4 @@
-﻿using Castle.Components.DictionaryAdapter;
-using DomainEntity.Misc;
+﻿using DomainEntity.Misc;
 using DomainEntity.User;
 using Hmm.Dal.Validation;
 using Hmm.Utility.Dal;
@@ -20,7 +19,7 @@ namespace Hmm.Dal.Tests
         private readonly List<User> _authors;
         private readonly List<NoteCatalog> _cats;
         private readonly List<NoteRender> _renders;
-        private readonly NoteStorage _noteStorage;
+        private readonly NoteStorage<HmmNote> _noteStorage;
         private DateTime _currentDate = DateTime.Now;
 
         public NoteStorageTests()
@@ -146,7 +145,7 @@ namespace Hmm.Dal.Tests
             var timeProviderMock = new Mock<IDateTimeProvider>();
             timeProviderMock.Setup(t => t.UtcNow).Returns(() => _currentDate);
 
-            _noteStorage = new NoteStorage(uowMock.Object, validator, lookupMock.Object, timeProviderMock.Object);
+            _noteStorage = new NoteStorage<HmmNote>(uowMock.Object, validator, lookupMock.Object, timeProviderMock.Object);
         }
 
         public void Dispose()

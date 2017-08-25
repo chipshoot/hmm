@@ -2,7 +2,6 @@
 using DomainEntity.User;
 using Hmm.Contract;
 using Hmm.Core.Manager;
-using Hmm.Dal;
 using Hmm.Dal.Validation;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
@@ -12,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
+using Hmm.Dal;
 using Xunit;
 
 namespace Hmm.Core.Tests
@@ -23,7 +23,7 @@ namespace Hmm.Core.Tests
         private readonly List<NoteRender> _renders;
         private readonly List<User> _authors;
         private DateTime _currentDate;
-        private readonly IHmmNoteManager _manager;
+        private readonly IHmmNoteManager<HmmNote> _manager;
 
         public HmmNoteManagerTests()
         {
@@ -148,8 +148,8 @@ namespace Hmm.Core.Tests
             var timeProviderMock = new Mock<IDateTimeProvider>();
             timeProviderMock.Setup(t => t.UtcNow).Returns(() => _currentDate);
 
-            var noteStorage = new NoteStorage(uowMock.Object, validator, lookupMock.Object, timeProviderMock.Object);
-            _manager = new HmmNoteManager(noteStorage);
+            var noteStorage = new NoteStorage<HmmNote>(uowMock.Object, validator, lookupMock.Object, timeProviderMock.Object);
+            _manager = new HmmNoteManager<HmmNote>(noteStorage);
         }
 
         public void Dispose()

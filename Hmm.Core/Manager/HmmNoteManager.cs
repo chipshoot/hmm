@@ -7,21 +7,21 @@ using System.Xml;
 
 namespace Hmm.Core.Manager
 {
-    public class HmmNoteManager : IHmmNoteManager<HmmNote>
+    public class HmmNoteManager<T> : IHmmNoteManager<T> where T:HmmNote
     {
         #region private fields
 
-        private readonly IDataStore<HmmNote> _noteStorage;
+        private readonly IDataStore<T> _noteStorage;
 
         #endregion private fields
 
-        public HmmNoteManager(IDataStore<HmmNote> storage)
+        public HmmNoteManager(IDataStore<T> storage)
         {
             Guard.Against<ArgumentNullException>(storage == null, nameof(storage));
             _noteStorage = storage;
         }
 
-        public HmmNote Create(HmmNote note)
+        public virtual T Create(T note)
         {
             var xmlContent = GetNoteContent(note);
             note.Content = xmlContent.InnerXml;
@@ -29,7 +29,7 @@ namespace Hmm.Core.Manager
             return ret;
         }
 
-        public HmmNote Update(HmmNote note)
+        public virtual T Update(T note)
         {
             var xmlContent = GetNoteContent(note);
             note.Content = xmlContent.InnerXml;
@@ -38,7 +38,7 @@ namespace Hmm.Core.Manager
             return ret;
         }
 
-        public virtual XmlDocument GetNoteContent(HmmNote note)
+        public virtual XmlDocument GetNoteContent(T note)
         {
             var xmldoc = new XmlDocument();
             var content = note.Content;

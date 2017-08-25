@@ -8,19 +8,19 @@ using Hmm.Utility.Validation;
 
 namespace Hmm.Dal
 {
-    public class NoteStorage : StorageBase<HmmNote>
+    public class NoteStorage<T> : StorageBase<T> where T: HmmNote
     {
         private const int DefaultPropId = 1;
 
         public NoteStorage(
             IUnitOfWork uow,
-            IValidator<HmmNote> validator,
+            IValidator<T> validator,
             IEntityLookup lookupRepo,
             IDateTimeProvider dateTimeProvider) : base(uow, validator, lookupRepo, dateTimeProvider)
         {
         }
 
-        public override HmmNote Add(HmmNote entity)
+        public override T Add(T entity)
         {
             Validator.Reset();
             if (!Validator.IsValid(entity, isNewEntity: true))
@@ -42,7 +42,7 @@ namespace Hmm.Dal
             return newRec;
         }
 
-        public override bool Delete(HmmNote entity)
+        public override bool Delete(T entity)
         {
             Validator.Reset();
             if (!Validator.IsValid(entity, isNewEntity: false))
@@ -54,7 +54,7 @@ namespace Hmm.Dal
             return true;
         }
 
-        public override HmmNote Update(HmmNote entity)
+        public override T Update(T entity)
         {
             Validator.Reset();
             if (!Validator.IsValid(entity, false))
@@ -73,12 +73,12 @@ namespace Hmm.Dal
             entity.LastModifiedDate = DateTimeProvider.UtcNow;
             UnitOfWork.Update(entity);
 
-            var savedRec = LookupRepo.GetEntity<HmmNote>(entity.Id);
+            var savedRec = LookupRepo.GetEntity<T>(entity.Id);
 
             return savedRec;
         }
 
-        private T PropertyChecking<T>(T property) where T : Entity
+        private TP PropertyChecking<TP>(TP property) where TP : Entity
         {
             var defaultNeeded = false;
             if (property == null)
@@ -89,7 +89,7 @@ namespace Hmm.Dal
             {
                 defaultNeeded = true;
             }
-            else if (LookupRepo.GetEntity<T>(property.Id) == null)
+            else if (LookupRepo.GetEntity<TP>(property.Id) == null)
             {
                 defaultNeeded = true;
             }
@@ -99,7 +99,7 @@ namespace Hmm.Dal
                 return property;
             }
 
-            var defaultProp = LookupRepo.GetEntity<T>(DefaultPropId);
+            var defaultProp = LookupRepo.GetEntity<TP>(DefaultPropId);
             return defaultProp;
         }
     }
