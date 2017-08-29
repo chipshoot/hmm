@@ -38,11 +38,11 @@ namespace Hmm.Core.Manager
             return ret;
         }
 
-        public virtual XmlDocument GetNoteContent(T note)
+        public virtual XmlDocument GetNoteContent(T note, INoteSerializer serializer)
         {
             var xmldoc = new XmlDocument();
             var content = note.Content;
-            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"UTF-16\" ?><note><content></content></note>");
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\" ?><note><content></content></note>");
             xmldoc.DocumentElement.SetAttribute("xmlns", "http://schema.hmm.com/2017");
             var ns = new XmlNamespaceManager(xmldoc.NameTable);
             ns.AddNamespace("", "http://schema.hmm.com/2017");

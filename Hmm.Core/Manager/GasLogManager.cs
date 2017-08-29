@@ -13,6 +13,11 @@ namespace Hmm.Core.Manager
 
         public override XmlDocument GetNoteContent(GasLog note)
         {
+            var xml = new XmlDocument();
+            xml.LoadXml("<gaslog/>");
+            var elm = xml.CreateElement("gas");
+            elm.InnerXml = 
+
             note.Content =
                 $"<gaslog><gas>{note.Gas.TotalLiter}</gas><price>{note.Price.Amount}</price><gasStation>{note.GasStation}</gasStation></gaslog>";
 

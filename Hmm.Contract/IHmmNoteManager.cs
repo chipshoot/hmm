@@ -9,6 +9,6 @@ namespace Hmm.Contract
 
         T Update(T note);
 
-        XmlDocument GetNoteContent(T note);
+        XmlDocument GetNoteContent(T note, INoteSerializer serializer);
     }
 }
