@@ -38,7 +38,7 @@ namespace Hmm.Core.Manager
             return ret;
         }
 
-        public virtual XmlDocument GetNoteContent(T note, INoteSerializer serializer)
+        public virtual XmlDocument GetNoteContent(T note, INoteSerializer serializer = null)
         {
             var xmldoc = new XmlDocument();
             var content = note.Content;
