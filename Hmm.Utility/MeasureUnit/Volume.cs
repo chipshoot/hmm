@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Xml;
 
 namespace Hmm.Utility.MeasureUnit
 {
@@ -9,7 +10,7 @@ namespace Hmm.Utility.MeasureUnit
     /// Help class to help convert between ml and ounce
     /// <remarks>
     /// The value of dimension internally saved as ml/1000 and can be convert to liter, cubicMeter, ounce and gallon
-    /// The default volum unit is <see cref="VolumeUnit.Liter" /> so when we new a
+    /// The default volume unit is <see cref="VolumeUnit.Liter" /> so when we new a
     /// volume object then we are setting the internal unit to ml and the value will adjusted
     /// by unit parameter of constructor.
     /// you can also get a <see cref="Volume" /> object from five static method, e.g.
@@ -31,7 +32,7 @@ namespace Hmm.Utility.MeasureUnit
     /// </remarks>
     /// </summary>
     [ImmutableObject(true)]
-    public struct Volume : IComparable<Volume>
+    public struct Volume : IComparable<Volume>, IMeasureSerializable
     {
         private const string ErrorMsg = "No volume object found";
 
@@ -485,5 +486,18 @@ namespace Hmm.Utility.MeasureUnit
         }
 
         #endregion private methods
+
+        public XmlDocument Measure2Xml()
+        {
+            var xml = new XmlDocument();
+            var str = $"<volume><value>{Value}</value><unit>{Unit}</unit></volume>";
+            xml.LoadXml(str);
+            return xml;
+        }
+
+        public void Xml2Measure(XmlDocument xmlcontent)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

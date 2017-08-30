@@ -1,5 +1,4 @@
 ﻿using DomainEntity.Misc;
-using System.Xml;
 
 namespace Hmm.Contract
 {
@@ -8,7 +7,5 @@ namespace Hmm.Contract
         T Create(T note);
 
         T Update(T note);
-
-        XmlDocument GetNoteContent(T note, INoteSerializer serializer);
     }
 }

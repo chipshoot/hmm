@@ -7,7 +7,7 @@ using System.Xml;
 
 namespace Hmm.Core.Manager
 {
-    public class HmmNoteManager<T> : IHmmNoteManager<T> where T:HmmNote
+    public class HmmNoteManager<T> : IHmmNoteManager<T> where T : HmmNote
     {
         #region private fields
 
@@ -38,7 +38,7 @@ namespace Hmm.Core.Manager
             return ret;
         }
 
-        public virtual XmlDocument GetNoteContent(T note, INoteSerializer serializer = null)
+        protected virtual XmlDocument GetNoteContent(T note, bool isXmlConent = false)
         {
             var xmldoc = new XmlDocument();
             var content = note.Content;
@@ -49,7 +49,14 @@ namespace Hmm.Core.Manager
             var contNode = xmldoc.SelectNodes("/note/content", ns);
             if (contNode != null)
             {
-                contNode[0].InnerText = content;
+                if (isXmlConent)
+                {
+                    contNode[0].InnerXml = content;
+                }
+                else
+                {
+                    contNode[0].InnerText = content;
+                }
             }
 
             return xmldoc;

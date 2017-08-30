@@ -29,6 +29,11 @@ namespace Hmm.Utility.MeasureUnit
         /// <summary>
         /// The meter unit
         /// </summary>
-        Metre
+        Metre,
+
+        /// <summary>
+        /// The kilometer unit
+        /// </summary>
+        Kilometre
     }
 }

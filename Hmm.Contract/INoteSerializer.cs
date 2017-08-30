@@ -1,7 +1,9 @@
-﻿namespace Hmm.Contract
+﻿using System.Xml;
+
+namespace Hmm.Contract
 {
     public interface INoteSerializer
     {
-        string GetSerializationString<T>(T entity);
+        XmlDocument GetSerializationXml<T>(T entity);
     }
 }

@@ -11,17 +11,27 @@ namespace Hmm.Core.Manager
         {
         }
 
-        public override XmlDocument GetNoteContent(GasLog note)
+        protected override XmlDocument GetNoteContent(GasLog note, bool isXmlContent = false)
         {
             var xml = new XmlDocument();
             xml.LoadXml("<gaslog/>");
-            var elm = xml.CreateElement("gas");
-            elm.InnerXml = 
+            var root = xml.DocumentElement;
 
-            note.Content =
-                $"<gaslog><gas>{note.Gas.TotalLiter}</gas><price>{note.Price.Amount}</price><gasStation>{note.GasStation}</gasStation></gaslog>";
+            var gas = xml.CreateElement("gas");
+            gas.InnerXml = note.Gas.Measure2Xml().InnerXml;
+            root.AppendChild(gas);
 
-            return base.GetNoteContent(note);
+            var dst = xml.CreateElement("distance");
+            dst.InnerXml = note.Distance.Measure2Xml().InnerXml;
+            root.AppendChild(dst);
+
+            var station = xml.CreateElement("gasStation");
+            station.InnerText = note.GasStation;
+            root.AppendChild(station);
+
+            note.Content = xml.InnerXml;
+
+            return base.GetNoteContent(note, true);
         }
     }
 }

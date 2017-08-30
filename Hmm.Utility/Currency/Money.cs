@@ -33,7 +33,7 @@ using System.Globalization;
 
 namespace Hmm.Utility.Currency
 {
-    public class Money : IComparable<Money>, IEquatable<Money>, IComparable, ICloneable
+    public class Money : IComparable<Money>, IEquatable<Money>, ICloneable
     {
         #region private fields
 

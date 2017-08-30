@@ -173,7 +173,7 @@ namespace Hmm.Core.Tests
                 GasStation = "Costco",
                 Gas = Volume.FromLiter(40),
                 Price = new Money(40.0),
-                Distance = Dimension.FromMillimetre(300)
+                Distance = Dimension.FromKilometre(300)
             };
 
             // Act

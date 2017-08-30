@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Xml;
 
 namespace Hmm.Utility.MeasureUnit
 {
@@ -32,7 +33,7 @@ namespace Hmm.Utility.MeasureUnit
     /// </remarks>
     /// </summary>
     [ImmutableObject(true)]
-    public struct Dimension : IComparable<Dimension>
+    public struct Dimension : IComparable<Dimension>, IMeasureSerializable
     {
         #region private fields
 
@@ -99,6 +100,9 @@ namespace Hmm.Utility.MeasureUnit
                     case DimensionUnit.Metre:
                         return TotalMetre;
 
+                    case DimensionUnit.Kilometre:
+                        return TotalKilometre;
+
                     case DimensionUnit.Inch:
                         return TotalInch;
 
@@ -132,6 +136,8 @@ namespace Hmm.Utility.MeasureUnit
 
         public double TotalMetre => Math.Round(_value / 100000.0, Fractional);
 
+        public double TotalKilometre => Math.Round(_value / 100000000.0, Fractional);
+
         public double TotalInch => Math.Round(_value / InternalUnitPerInch, Fractional);
 
         public double TotalFeet => Math.Round((_value / InternalUnitPerInch) / 12.0, Fractional);
@@ -153,6 +159,11 @@ namespace Hmm.Utility.MeasureUnit
         public static Dimension FromMetre(double value)
         {
             return new Dimension(value, DimensionUnit.Metre);
+        }
+
+        public static Dimension FromKilometre(double value)
+        {
+            return new Dimension(value, DimensionUnit.Kilometre);
         }
 
         public static Dimension FromInch(double value)
@@ -404,6 +415,9 @@ namespace Hmm.Utility.MeasureUnit
                 case DimensionUnit.Metre:
                     return (long)Math.Round(value * 100000.0, 0);
 
+                case DimensionUnit.Kilometre:
+                    return (long)Math.Round(value * 100000000.0, 0);
+
                 case DimensionUnit.Inch:
                     return (long)Math.Round(value * InternalUnitPerInch, 0);
 
@@ -416,5 +430,18 @@ namespace Hmm.Utility.MeasureUnit
         }
 
         #endregion private methods
+
+        public XmlDocument Measure2Xml()
+        {
+            var xml = new XmlDocument();
+            var str = $"<dimension><value>{Value}</value><unit>{Unit}</unit></dimension>";
+            xml.LoadXml(str);
+            return xml;
+        }
+
+        public void Xml2Measure(XmlDocument xmlcontent)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
