@@ -179,7 +179,7 @@ namespace Hmm.Utility.MeasureUnit
 
         public static Dimension Max(params Dimension[] items)
         {
-            if (items.Count() == 0)
+            if (items.Length == 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(items), ErrorMsg);
             }
@@ -191,7 +191,7 @@ namespace Hmm.Utility.MeasureUnit
 
         public static Dimension Min(params Dimension[] items)
         {
-            if (items.Count() == 0)
+            if (!items.Any())
             {
                 throw new ArgumentOutOfRangeException(nameof(items), ErrorMsg);
             }
