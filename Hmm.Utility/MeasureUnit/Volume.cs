@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Xml;
+using Hmm.Utility.Misc;
 
 namespace Hmm.Utility.MeasureUnit
 {
@@ -32,7 +33,7 @@ namespace Hmm.Utility.MeasureUnit
     /// </remarks>
     /// </summary>
     [ImmutableObject(true)]
-    public struct Volume : IComparable<Volume>, IMeasureSerializable
+    public struct Volume : IComparable<Volume>, IHmmSerializable
     {
         private const string ErrorMsg = "No volume object found";
 

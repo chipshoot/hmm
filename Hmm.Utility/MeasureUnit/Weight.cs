@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Hmm.Utility.Misc;
+using System;
 using System.ComponentModel;
 using System.Globalization;
+using System.Xml;
 
 namespace Hmm.Utility.MeasureUnit
 {
@@ -18,7 +20,7 @@ namespace Hmm.Utility.MeasureUnit
     /// </remarks>
     /// </summary>
     [ImmutableObject(true)]
-    public struct Weight : IEquatable<Weight>, IComparable<Weight>
+    public struct Weight : IEquatable<Weight>, IComparable<Weight>, IHmmSerializable
     {
         #region private fields
 
@@ -270,5 +272,22 @@ namespace Hmm.Utility.MeasureUnit
         }
 
         #endregion override public methods of System.ValueType
+
+        #region implementation of interface IHmmSerializable
+
+        public XmlDocument Measure2Xml()
+        {
+            var xml = new XmlDocument();
+            var str = $"<weight><value>{Value}</value><unit>{Unit}</unit></weight>";
+            xml.LoadXml(str);
+            return xml;
+        }
+
+        public void Xml2Measure(XmlDocument xmlcontent)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion implementation of interface IHmmSerializable
     }
 }

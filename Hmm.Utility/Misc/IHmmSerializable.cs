@@ -1,8 +1,8 @@
 ﻿using System.Xml;
 
-namespace Hmm.Utility.MeasureUnit
+namespace Hmm.Utility.Misc
 {
-    public interface IMeasureSerializable
+    public interface IHmmSerializable
     {
         XmlDocument Measure2Xml();
 

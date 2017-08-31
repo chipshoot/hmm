@@ -1,51 +1,45 @@
-﻿/*
- * This Money class gives you the ability to work with money of multiple currencies
- * as if it were numbers.
- * It looks and behaves like a decimal.
- * Super light: Only a 64bit double and 16bit int are used to persist an instance.
- * Super fast: Access to the internal double value for fast calculations.
- * Currency codes are used to get everything from the MS localization classes.
- * All lookups happen from a singleton dictionary.
- * Formatting and significant digits are automatically handled.
- * An allocation function also allows even distribution of Money.
- *
- * References:
- * Martin Fowler patterns
- * Making Money with C# : http://www.lindelauf.com/?p=17
- * http://www.codeproject.com/Articles/28244/A-Money-type-for-the-CLR?msg=3679755
- * A few other articles on the web around representing money types
- * http://en.wikipedia.org/wiki/ISO_4217
- * http://www.currency-iso.org/iso_index/iso_tables/iso_tables_a1.htm
- *
- * Important!
- * Although the .Amount property wraps the class as Decimal, this Money class uses double to store the Money value internally.
- * Only 15 decimal digits of accuracy are guaranteed! (16 if the first digit is smaller than 9)
- * It should be fairly simple to replace the internal double with a decimal if this is not sufficient and performance is not an issue.
- * Decimal operations are MUCH slower than double (average of 15x)
- * http://stackoverflow.com/questions/366852/c-sharp-decimal-datatype-performance
- * Use the .InternalAmount property to get to the double member.
- * All the Money comparison operators use the Decimal wrapper with significant digits for the currency.
- * All the Money arithmetic (+-/*) operators use the internal double value.
- */
-
+﻿using Hmm.Utility.Misc;
+using Hmm.Utility.Validation;
 using System;
 using System.Globalization;
+using System.Xml;
 
 namespace Hmm.Utility.Currency
 {
-    public class Money : IComparable<Money>, IEquatable<Money>, ICloneable
+    /// <Summary>
+    /// This Money class gives you the ability to work with money of multiple currencies
+    /// as if it were numbers.
+    /// It looks and behaves like a decimal.
+    /// Super light: Only a 64bit double and 16bit int are used to persist an instance.
+    /// Super fast: Access to the internal double value for fast calculations.
+    /// Currency codes are used to get everything from the MS localization classes.
+    /// All lookups happen from a singleton dictionary.
+    /// Formatting and significant digits are automatically handled.
+    /// An allocation function also allows even distribution of Money.
+    /// References:
+    /// Martin Fowler patterns
+    /// Making Money with C# : http://www.lindelauf.com/?p=17
+    /// http://www.codeproject.com/Articles/28244/A-Money-type-for-the-CLR?msg=3679755
+    /// A few other articles on the web around representing money types
+    /// http://en.wikipedia.org/wiki/ISO_4217
+    /// http://www.currency-iso.org/iso_index/iso_tables/iso_tables_a1.htm
+    /// Important!
+    /// Although the .Amount property wraps the class as Decimal, this Money class uses double to store the Money value internally.
+    /// Only 15 decimal digits of accuracy are guaranteed! (16 if the first digit is smaller than 9)
+    /// It should be fairly simple to replace the internal double with a decimal if this is not sufficient and performance is not an issue.
+    /// Decimal operations are MUCH slower than double (average of 15x)
+    /// http://stackoverflow.com/questions/366852/c-sharp-decimal-datatype-performance
+    /// Use the .InternalAmount property to get to the double member.
+    /// All the Money comparison operators use the Decimal wrapper with significant digits for the currency.
+    /// All the Money arithmetic (+-/*) operators use the internal double value.
+    /// </Summary>
+    public class Money : IComparable<Money>, IEquatable<Money>, ICloneable, IHmmSerializable
     {
-        #region private fields
-
         private const int DecimalDigits = 2;
 
         private double _amount;
 
         private readonly CurrencyCodeType _currencyCode;
-
-        #endregion private fields
-
-        #region Constructors
 
         public Money() : this(0d)
         {
@@ -64,10 +58,6 @@ namespace Hmm.Utility.Currency
             _amount = amount;
             _currencyCode = currencyCode;
         }
-
-        #endregion Constructors
-
-        #region Public Properties
 
         public static bool AllowImplicitConversion { get; set; }
 
@@ -116,10 +106,6 @@ namespace Hmm.Utility.Currency
         /// </summary>
         /// <returns>A decimal with the _amount truncated to the significant number of decimal digits.</returns>
         public decimal TruncatedAmount => (decimal)((long)Math.Truncate(_amount * DecimalDigits)) / DecimalDigits;
-
-        #endregion Public Properties
-
-        #region Money Operators
 
         public static Money operator -(Money first, Money second)
         {
@@ -204,10 +190,7 @@ namespace Hmm.Utility.Currency
                 return 1;
             }
 
-            if (!(obj is Money))
-            {
-                throw new ArgumentException("Argument must be Money");
-            }
+            Guard.TypeOf<Money>(obj, "Argument must be Money");
 
             return CompareTo((Money)obj);
         }
@@ -243,10 +226,6 @@ namespace Hmm.Utility.Currency
             return Amount.GetHashCode() ^ _currencyCode.GetHashCode();
         }
 
-        #endregion Money Operators
-
-        #region Cast Operators
-
         public static implicit operator Money(decimal amount)
         {
             return new Money(amount, LocalCurrencyCode);
@@ -266,7 +245,7 @@ namespace Hmm.Utility.Currency
         {
             if (money == null)
             {
-                throw new ArgumentNullException("money");
+                throw new ArgumentNullException(nameof(money));
             }
 
             return new Money(money._amount - value, money._currencyCode);
@@ -291,7 +270,7 @@ namespace Hmm.Utility.Currency
         {
             if (money == null)
             {
-                throw new ArgumentNullException("money");
+                throw new ArgumentNullException(nameof(money));
             }
 
             return new Money(money._amount * value, money._currencyCode);
@@ -306,7 +285,7 @@ namespace Hmm.Utility.Currency
         {
             if (money == null)
             {
-                throw new ArgumentNullException("money");
+                throw new ArgumentNullException(nameof(money));
             }
 
             return new Money(money._amount / value, money._currencyCode);
@@ -321,7 +300,7 @@ namespace Hmm.Utility.Currency
         {
             if (money == null)
             {
-                throw new ArgumentNullException("money");
+                throw new ArgumentNullException(nameof(money));
             }
 
             return new Money(money._amount + value, money._currencyCode);
@@ -346,10 +325,6 @@ namespace Hmm.Utility.Currency
 
             return (money.Amount == (decimal)value);
         }
-
-        #endregion Cast Operators
-
-        #region Functions
 
         /// <summary>
         /// Evenly distributes the _amount over n parts, resolving remainders that occur due to rounding
@@ -384,15 +359,6 @@ namespace Hmm.Utility.Currency
             return new Money(_amount, _currencyCode);
         }
 
-        public Money Copy()
-        {
-            return (Money)Clone();
-        }
-
-        #endregion Functions
-
-        #region private methods
-
         private static void CheckCurrencyType(Money first, Money second, string operation)
         {
             if (first.CurrencyCode != second.CurrencyCode)
@@ -401,6 +367,17 @@ namespace Hmm.Utility.Currency
             }
         }
 
-        #endregion private methods
+        public XmlDocument Measure2Xml()
+        {
+            var xml = new XmlDocument();
+            var str = $"<money><value>{InternalAmount}</value><code>{CurrencyCode}</code></money>";
+            xml.LoadXml(str);
+            return xml;
+        }
+
+        public void Xml2Measure(XmlDocument xmlcontent)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

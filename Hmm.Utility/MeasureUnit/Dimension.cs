@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Xml;
+using Hmm.Utility.Misc;
 
 namespace Hmm.Utility.MeasureUnit
 {
@@ -33,7 +34,7 @@ namespace Hmm.Utility.MeasureUnit
     /// </remarks>
     /// </summary>
     [ImmutableObject(true)]
-    public struct Dimension : IComparable<Dimension>, IMeasureSerializable
+    public struct Dimension : IComparable<Dimension>, IHmmSerializable
     {
         #region private fields
 
