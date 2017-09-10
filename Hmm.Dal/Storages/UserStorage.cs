@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Hmm.Utility.Misc;
 
-namespace Hmm.Dal
+namespace Hmm.Dal.Storages
 {
     public class UserStorage : StorageBase<User>
     {

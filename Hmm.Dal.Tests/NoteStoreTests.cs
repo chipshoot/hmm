@@ -1,5 +1,6 @@
 ﻿using DomainEntity.Misc;
 using DomainEntity.User;
+using Hmm.Dal.Storages;
 using Hmm.Dal.Validation;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;

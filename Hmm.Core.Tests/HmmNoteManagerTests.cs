@@ -2,6 +2,7 @@
 using DomainEntity.User;
 using Hmm.Contract;
 using Hmm.Core.Manager;
+using Hmm.Dal.Storages;
 using Hmm.Dal.Validation;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
@@ -11,7 +12,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
-using Hmm.Dal;
 using Xunit;
 
 namespace Hmm.Core.Tests

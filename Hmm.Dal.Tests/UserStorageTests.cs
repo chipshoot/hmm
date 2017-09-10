@@ -1,14 +1,15 @@
 ﻿using DomainEntity.Misc;
 using DomainEntity.User;
 using Hmm.Dal.Querys;
+using Hmm.Dal.Storages;
 using Hmm.Dal.Validation;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
+using Hmm.Utility.Misc;
 using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Hmm.Utility.Misc;
 using Xunit;
 
 namespace Hmm.Dal.Tests
@@ -79,7 +80,7 @@ namespace Hmm.Dal.Tests
 
             // setup date time provider
             var timeProviderMock = new Mock<IDateTimeProvider>();
-            
+
             // setup user storage
             _userStorage = new UserStorage(uowmock.Object, valiator, lookupMoc.Object, noteQueryMock.Object, timeProviderMock.Object);
         }

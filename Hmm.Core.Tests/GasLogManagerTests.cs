@@ -2,8 +2,9 @@
 using DomainEntity.User;
 using DomainEntity.Vehicle;
 using Hmm.Core.Manager;
-using Hmm.Dal;
+using Hmm.Dal.Storages;
 using Hmm.Dal.Validation;
+using Hmm.Utility.Currency;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.MeasureUnit;
@@ -12,7 +13,6 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Hmm.Utility.Currency;
 using Xunit;
 
 namespace Hmm.Core.Tests

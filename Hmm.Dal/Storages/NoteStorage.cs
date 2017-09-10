@@ -6,7 +6,7 @@ using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 
-namespace Hmm.Dal
+namespace Hmm.Dal.Storages
 {
     public class NoteStorage<T> : StorageBase<T> where T: HmmNote
     {

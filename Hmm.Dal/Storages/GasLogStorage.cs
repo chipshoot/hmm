@@ -1,5 +1,4 @@
-﻿using DomainEntity.Misc;
-using DomainEntity.Vehicle;
+﻿using DomainEntity.Vehicle;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;

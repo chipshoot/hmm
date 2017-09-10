@@ -1,6 +1,4 @@
-﻿using DomainEntity.Vehicle;
-
-namespace Hmm.Contract.GasLogMan
+﻿namespace Hmm.Contract.GasLogMan
 {
     public interface IGasLogManager
     {

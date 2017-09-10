@@ -6,7 +6,7 @@ using System;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
 
-namespace Hmm.Dal
+namespace Hmm.Dal.Storages
 {
     public abstract class StorageBase<T> : IDataStore<T> where T : Entity
     {
