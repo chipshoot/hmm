@@ -3,10 +3,11 @@ using Hmm.Utility.Validation;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using Hmm.Api.Areas.Gaslog.Models;
 
 namespace Hmm.Api.Areas.Gaslog.Controllers
 {
-    [Route("api/gaslog")]
+    [Route("api/gaslogs")]
     public class GaslogController : Controller
     {
         private readonly IGasLogManager _gaslogManager;
@@ -18,13 +19,6 @@ namespace Hmm.Api.Areas.Gaslog.Controllers
             _gaslogManager = gaslogManager;
         }
 
-        // GET api/gaslog
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
         // GET api/gaslog/5
         [HttpGet("{id}")]
         public string Get(int id)
@@ -34,7 +28,7 @@ namespace Hmm.Api.Areas.Gaslog.Controllers
 
         // POST api/gaslog
         [HttpPost]
-        public void Post([FromBody]string gaslog)
+        public void Post([FromBody] ApiGaslog gaslog)
         {
         }
 

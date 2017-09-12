@@ -8,6 +8,7 @@ namespace Hmm.Dal.Data
     {
         public HmmDataContext(DbContextOptions<HmmDataContext> options) : base(options)
         {
+
         }
 
         public DbSet<HmmNote> Notes { get; set; }
