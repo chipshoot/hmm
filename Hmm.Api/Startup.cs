@@ -1,5 +1,16 @@
-﻿using Hmm.Api.Models;
+﻿using System.Collections.Generic;
+using AutoMapper;
+using DomainEntity.Misc;
+using DomainEntity.User;
+using Hmm.Api.Models;
+using Hmm.Contract;
+using Hmm.Core.Manager;
 using Hmm.Dal.Data;
+using Hmm.Dal.Validation;
+using Hmm.Utility.Dal;
+using Hmm.Utility.Dal.Query;
+using Hmm.Utility.Misc;
+using Hmm.Utility.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -20,8 +31,17 @@ namespace Hmm.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<HmmDataContext>(opt => opt.UseInMemoryDatabase("HmmRepo"));
+            var connstr = Configuration.GetConnectionString("DefaultConnection");
+            services.AddDbContext<HmmDataContext>(opt => opt.UseSqlServer(connstr));
+            services.AddScoped<IUnitOfWork, EfUnitOfWork>();
+            services.AddSingleton<IDateTimeProvider, DateTimeAdapter>();
+            services.AddScoped<IValidator<User>, UserValidator>();
+            services.AddScoped<IQueryHandler<IQuery<IEnumerable<HmmNote>>, IEnumerable<> <HmmNote>>, >();
+            services.AddScoped<IQuery<HmmNote>,  >
+            services.AddScoped<IEntityLookup, EntityLookup>();
+            services.AddScoped<IUserManager, UserManager>();
             services.AddMvc();
+            services.AddAutoMapper();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

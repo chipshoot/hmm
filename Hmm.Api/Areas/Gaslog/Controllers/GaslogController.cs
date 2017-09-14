@@ -1,9 +1,8 @@
-﻿using Hmm.Contract.GasLogMan;
+﻿using Hmm.Api.Areas.Gaslog.Models;
+using Hmm.Contract.GasLogMan;
 using Hmm.Utility.Validation;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using Hmm.Api.Areas.Gaslog.Models;
 
 namespace Hmm.Api.Areas.Gaslog.Controllers
 {
@@ -19,26 +18,26 @@ namespace Hmm.Api.Areas.Gaslog.Controllers
             _gaslogManager = gaslogManager;
         }
 
-        // GET api/gaslog/5
+        // GET api/gaslogs/5
         [HttpGet("{id}")]
         public string Get(int id)
         {
             return "value";
         }
 
-        // POST api/gaslog
+        // POST api/gaslogs
         [HttpPost]
         public void Post([FromBody] ApiGaslog gaslog)
         {
         }
 
-        // PUT api/gaslog/5
+        // PUT api/gaslogs/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody]string gaslog)
         {
         }
 
-        // DELETE api/gaslog/5
+        // DELETE api/gaslogs/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
