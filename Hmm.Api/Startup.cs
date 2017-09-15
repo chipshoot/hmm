@@ -6,6 +6,7 @@ using Hmm.Api.Models;
 using Hmm.Contract;
 using Hmm.Core.Manager;
 using Hmm.Dal.Data;
+using Hmm.Dal.Querys;
 using Hmm.Dal.Validation;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
@@ -36,9 +37,7 @@ namespace Hmm.Api
             services.AddScoped<IUnitOfWork, EfUnitOfWork>();
             services.AddSingleton<IDateTimeProvider, DateTimeAdapter>();
             services.AddScoped<IValidator<User>, UserValidator>();
-            services.AddScoped<IQueryHandler<IQuery<IEnumerable<HmmNote>>, IEnumerable<> <HmmNote>>, >();
-            services.AddScoped<IQuery<HmmNote>,  >
-            services.AddScoped<IEntityLookup, EntityLookup>();
+            services.AddScoped<IEntityLookup, EfEntityLookup>();
             services.AddScoped<IUserManager, UserManager>();
             services.AddMvc();
             services.AddAutoMapper();
