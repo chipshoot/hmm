@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using AutoMapper;
-using DomainEntity.Misc;
+﻿using AutoMapper;
 using DomainEntity.User;
-using Hmm.Api.Models;
 using Hmm.Contract;
 using Hmm.Core.Manager;
 using Hmm.Dal.Data;
