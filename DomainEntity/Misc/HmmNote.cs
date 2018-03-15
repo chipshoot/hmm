@@ -13,8 +13,6 @@ namespace DomainEntity.Misc
 
         public User.User Author { get; set; }
 
-        public NoteRender Render { get; set; }
-
         public DateTime CreateDate { get; set; }
 
         public DateTime LastModifiedDate { get; set; }
