@@ -163,12 +163,10 @@ namespace Hmm.Core.Tests
             // Arrange
             var user = _authors[0];
             var cat = _cats[0];
-            var render = _renders[0];
             var note = new HmmNote
             {
                 Author = user,
                 Catalog = cat,
-                Render = render,
                 Subject = "Testing note",
                 Content = "Test content"
             };
@@ -201,12 +199,10 @@ namespace Hmm.Core.Tests
             // Arrange - note with null content
             var user = _authors[0];
             var cat = _cats[0];
-            var render = _renders[0];
             var note = new HmmNote
             {
                 Author = user,
                 Catalog = cat,
-                Render = render,
                 Subject = "Testing note",
                 Content = null
             };
@@ -231,12 +227,10 @@ namespace Hmm.Core.Tests
             // Arrange - note with null content
             var user = _authors[0];
             var cat = _cats[0];
-            var render = _renders[0];
             var note = new HmmNote
             {
                 Author = user,
                 Catalog = cat,
-                Render = render,
                 Subject = "Testing note",
                 Content = "Testing content with < and >"
             };
@@ -261,7 +255,6 @@ namespace Hmm.Core.Tests
             // Arrange - note with null content
             var user = _authors[0];
             var cat = _cats[0];
-            var render = _renders[0];
             var xmldoc = new XmlDocument();
             xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"UTF-16\" ?><note xmlns=\"http://schema.hmm.com/2017\"><content>Testing content with &lt; and &gt;</content></note>");
             var note = new HmmNote
@@ -269,7 +262,6 @@ namespace Hmm.Core.Tests
                 Id = 1,
                 Author = user,
                 Catalog = cat,
-                Render = render,
                 Subject = "Testing note",
                 Content = xmldoc.InnerXml,
                 CreateDate = _currentDate,

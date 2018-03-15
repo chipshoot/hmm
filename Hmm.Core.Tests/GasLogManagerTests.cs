@@ -164,12 +164,10 @@ namespace Hmm.Core.Tests
             // Arrange
             var user = _authors[0];
             var cat = _cats[1];
-            var render = _renders[0];
             var gaslog = new GasLog
             {
                 Author = user,
                 Catalog = cat,
-                Render = render,
                 GasStation = "Costco",
                 Gas = Volume.FromLiter(40),
                 Price = new Money(40.0),

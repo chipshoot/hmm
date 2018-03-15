@@ -33,8 +33,8 @@ namespace Hmm.Dal.Storages
             entity.Catalog = catalog ?? throw new DataSourceException("Cannot find default note catalog.");
 
             // check if need apply default catalog
-            var render = PropertyChecking(entity.Render);
-            entity.Render = render ?? throw new DataSourceException("Cannot find default note render.");
+            var render = PropertyChecking(entity.Catalog.Render);
+            entity.Catalog.Render = render ?? throw new DataSourceException("Cannot find default note render.");
 
             entity.CreateDate = DateTimeProvider.UtcNow;
             entity.LastModifiedDate = DateTimeProvider.UtcNow;
@@ -67,8 +67,8 @@ namespace Hmm.Dal.Storages
             entity.Catalog = catalog ?? throw new DataSourceException("Cannot find default note catalog.");
 
             // check if need apply default render
-            var render = PropertyChecking(entity.Render);
-            entity.Render = render ?? throw new DataSourceException("Cannot find default note render.");
+            var render = PropertyChecking(entity.Catalog.Render);
+            entity.Catalog.Render = render ?? throw new DataSourceException("Cannot find default note render.");
 
             entity.LastModifiedDate = DateTimeProvider.UtcNow;
             UnitOfWork.Update(entity);

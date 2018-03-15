@@ -163,7 +163,6 @@ namespace Hmm.Dal.Tests
             // Arrange
             var author = _authors[0];
             var cat = _cats[0];
-            var render = _renders[0];
             var xmldoc = new XmlDocument();
             xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
             var note = new HmmNote
@@ -172,7 +171,6 @@ namespace Hmm.Dal.Tests
                 Catalog = cat,
                 Description = "testing note",
                 Subject = "testing note is here",
-                Render = render,
                 Content = xmldoc.InnerXml
             };
             Assert.Empty(_notes);
@@ -213,7 +211,6 @@ namespace Hmm.Dal.Tests
             // Arrange
             var author = _authors[0];
             var cat = _cats[0];
-            var render = _renders[0];
             var xmldoc = new XmlDocument();
             xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
             var note = new HmmNote
@@ -224,7 +221,6 @@ namespace Hmm.Dal.Tests
                 CreateDate = DateTime.Now,
                 LastModifiedDate = DateTime.Now,
                 Subject = "testing note is here",
-                Render = render,
                 Content = xmldoc.InnerXml
             };
             Assert.Empty(_notes);
@@ -252,7 +248,6 @@ namespace Hmm.Dal.Tests
             {
                 Author = author,
                 Catalog = cat,
-                Render = null,
                 Description = "testing note",
                 Subject = "testing note is here",
                 Content = xmldoc.InnerXml
@@ -265,14 +260,11 @@ namespace Hmm.Dal.Tests
             // Assert
             Assert.NotNull(savedRec);
             Assert.Equal(1, savedRec.Id);
-            Assert.NotNull(savedRec.Render);
             Assert.Equal(_currentDate, savedRec.CreateDate);
             Assert.Equal(_currentDate, savedRec.LastModifiedDate);
-            Assert.Equal("DefaultNoteRender", savedRec.Render.Name);
             Assert.Equal(1, _notes.Count);
             Assert.Equal(_currentDate, _notes[0].CreateDate);
             Assert.Equal(_currentDate, _notes[0].LastModifiedDate);
-            Assert.Equal("DefaultNoteRender", _notes[0].Render.Name);
         }
 
         [Fact]
@@ -281,19 +273,12 @@ namespace Hmm.Dal.Tests
             // Arrange
             var author = _authors[0];
             var cat = _cats[0];
-            var render = new NoteRender
-            {
-                Id = 200,
-                Name = "Non exists render",
-                Description = "Just for testing"
-            };
             var xmldoc = new XmlDocument();
             xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
             var note = new HmmNote
             {
                 Author = author,
                 Catalog = cat,
-                Render = render,
                 Description = "testing note",
                 Subject = "testing note is here",
                 Content = xmldoc.InnerXml
@@ -306,12 +291,9 @@ namespace Hmm.Dal.Tests
             // Assert
             Assert.NotNull(savedRec);
             Assert.Equal(1, savedRec.Id);
-            Assert.NotNull(savedRec.Render);
-            Assert.Equal("DefaultNoteRender", savedRec.Render.Name);
             Assert.Equal(1, _notes.Count);
             Assert.Equal(_currentDate, savedRec.CreateDate);
             Assert.Equal(_currentDate, savedRec.LastModifiedDate);
-            Assert.Equal("DefaultNoteRender", _notes[0].Render.Name);
         }
 
         [Fact]
@@ -320,19 +302,12 @@ namespace Hmm.Dal.Tests
             // Arrange
             var author = _authors[0];
             var cat = _cats[0];
-            var render = new NoteRender
-            {
-                Id = -1,
-                Name = "Non exists render",
-                Description = "Just for testing"
-            };
             var xmldoc = new XmlDocument();
             xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
             var note = new HmmNote
             {
                 Author = author,
                 Catalog = cat,
-                Render = render,
                 Description = "testing note",
                 Subject = "testing note is here",
                 Content = xmldoc.InnerXml
@@ -345,12 +320,9 @@ namespace Hmm.Dal.Tests
             // Assert
             Assert.NotNull(savedRec);
             Assert.Equal(1, savedRec.Id);
-            Assert.NotNull(savedRec.Render);
-            Assert.Equal("DefaultNoteRender", savedRec.Render.Name);
             Assert.Equal(1, _notes.Count);
             Assert.Equal(_currentDate, savedRec.CreateDate);
             Assert.Equal(_currentDate, savedRec.LastModifiedDate);
-            Assert.Equal("DefaultNoteRender", _notes[0].Render.Name);
         }
 
         [Fact]
@@ -358,7 +330,6 @@ namespace Hmm.Dal.Tests
         {
             // Arrange - null author for note
             var cat = _cats[0];
-            var render = _renders[0];
             var xmldoc = new XmlDocument();
             xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
             var note = new HmmNote
@@ -369,7 +340,6 @@ namespace Hmm.Dal.Tests
                 CreateDate = DateTime.Now,
                 LastModifiedDate = DateTime.Now,
                 Subject = "testing note is here",
-                Render = render,
                 Content = xmldoc.InnerXml
             };
             Assert.Empty(_notes);
@@ -423,7 +393,6 @@ namespace Hmm.Dal.Tests
         {
             // Arrange - null catalog for note
             var author = _authors[0];
-            var render = _renders[0];
             var xmldoc = new XmlDocument();
             xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
             var note = new HmmNote
@@ -434,7 +403,6 @@ namespace Hmm.Dal.Tests
                 CreateDate = DateTime.Now,
                 LastModifiedDate = DateTime.Now,
                 Subject = "testing note is here",
-                Render = render,
                 Content = xmldoc.InnerXml
             };
             Assert.Empty(_notes);
@@ -484,7 +452,6 @@ namespace Hmm.Dal.Tests
             // Arrange
             var author = _authors[0];
             var cat = _cats[0];
-            var render = _renders[0];
             var xmldoc = new XmlDocument();
             xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
             var note = new HmmNote
@@ -494,7 +461,6 @@ namespace Hmm.Dal.Tests
                 Catalog = cat,
                 Description = "testing note",
                 Subject = "testing note is here",
-                Render = render,
                 Content = xmldoc.InnerXml,
                 CreateDate = _currentDate,
                 LastModifiedDate = _currentDate
@@ -524,7 +490,6 @@ namespace Hmm.Dal.Tests
             // Arrange
             var author = _authors[0];
             var cat = _cats[0];
-            var render = _renders[0];
             var xmldoc = new XmlDocument();
             xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
             var note = new HmmNote
@@ -534,7 +499,6 @@ namespace Hmm.Dal.Tests
                 Catalog = cat,
                 Description = "testing note",
                 Subject = "testing note is here",
-                Render = render,
                 Content = xmldoc.InnerXml,
                 CreateDate = _currentDate,
                 LastModifiedDate = _currentDate
@@ -567,7 +531,6 @@ namespace Hmm.Dal.Tests
             // Arrange
             var author = _authors[0];
             var cat = _cats[0];
-            var render = _renders[0];
             var xmldoc = new XmlDocument();
             xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
             var note = new HmmNote
@@ -577,7 +540,6 @@ namespace Hmm.Dal.Tests
                 Catalog = cat,
                 Description = "testing note",
                 Subject = "testing note is here",
-                Render = render,
                 Content = xmldoc.InnerXml,
                 CreateDate = _currentDate,
                 LastModifiedDate = _currentDate
@@ -614,7 +576,6 @@ namespace Hmm.Dal.Tests
         {
             // Arrange
             var author = _authors[0];
-            var render = _renders[0];
             var catalog = _cats[0];
             var xmldoc = new XmlDocument();
             xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
@@ -627,7 +588,6 @@ namespace Hmm.Dal.Tests
                 CreateDate = DateTime.Now,
                 LastModifiedDate = DateTime.Now,
                 Subject = "testing note is here",
-                Render = render,
                 Content = xmldoc.InnerXml
             };
             _notes.AddEntity(note);
@@ -654,7 +614,6 @@ namespace Hmm.Dal.Tests
         {
             // Arrange - null catalog for note
             var author = _authors[0];
-            var render = _renders[0];
             var catalog = _cats[1];
             var xmldoc = new XmlDocument();
             xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
@@ -667,7 +626,6 @@ namespace Hmm.Dal.Tests
                 CreateDate = DateTime.Now,
                 LastModifiedDate = DateTime.Now,
                 Subject = "testing note is here",
-                Render = render,
                 Content = xmldoc.InnerXml
             };
             _notes.AddEntity(note);
@@ -693,7 +651,6 @@ namespace Hmm.Dal.Tests
         {
             // Arrange - none exists catalog
             var author = _authors[0];
-            var render = _renders[0];
             var catalog = new NoteCatalog
             {
                 Id = 200,
@@ -712,7 +669,6 @@ namespace Hmm.Dal.Tests
                 CreateDate = DateTime.Now,
                 LastModifiedDate = DateTime.Now,
                 Subject = "testing note is here",
-                Render = render,
                 Content = xmldoc.InnerXml
             };
             _notes.AddEntity(note);
@@ -735,7 +691,6 @@ namespace Hmm.Dal.Tests
         {
             // Arrange - none exists catalog
             var author = _authors[0];
-            var render = _renders[0];
             var catalog = new NoteCatalog
             {
                 Id = -1,
@@ -754,7 +709,6 @@ namespace Hmm.Dal.Tests
                 CreateDate = DateTime.Now,
                 LastModifiedDate = DateTime.Now,
                 Subject = "testing note is here",
-                Render = render,
                 Content = xmldoc.InnerXml
             };
             _notes.AddEntity(note);
@@ -771,138 +725,12 @@ namespace Hmm.Dal.Tests
             Assert.Equal("DefaultNoteCatalog", _notes[0].Catalog.Name);
         }
 
-        [Fact]
-        public void CanUpdateNoteRender()
-        {
-            // Arrange
-            var author = _authors[0];
-            var render = _renders[0];
-            var catalog = _cats[0];
-            var xmldoc = new XmlDocument();
-            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
-            var note = new HmmNote
-            {
-                Id = 1,
-                Author = author,
-                Catalog = catalog,
-                Description = "testing note",
-                CreateDate = DateTime.Now,
-                LastModifiedDate = DateTime.Now,
-                Subject = "testing note is here",
-                Render = render,
-                Content = xmldoc.InnerXml
-            };
-            _notes.AddEntity(note);
-            Assert.Equal("DefaultNoteRender", _notes[0].Render.Name);
-            Assert.Equal(1, _notes.Count);
-
-            // change the note render
-            note.Render = _renders[1];
-
-            // Act
-            var savedRec = _noteStorage.Update(note);
-
-            // Assert
-            Assert.NotNull(savedRec);
-            Assert.NotNull(savedRec.Render);
-            Assert.Equal("GasLog", savedRec.Render.Name);
-
-            Assert.Equal(1, _notes.Count);
-            Assert.Equal("GasLog", _notes[0].Render.Name);
-        }
-
-        [Fact]
-        public void CanUpdateNoteRenderToNnullRenderDefaultRenderApplied()
-        {
-            // Arrange
-            var author = _authors[0];
-            var render = _renders[1];
-            var catalog = _cats[0];
-            var xmldoc = new XmlDocument();
-            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
-            var note = new HmmNote
-            {
-                Id = 1,
-                Author = author,
-                Catalog = catalog,
-                Render = render,
-                Description = "testing note",
-                CreateDate = DateTime.Now,
-                LastModifiedDate = DateTime.Now,
-                Subject = "testing note is here",
-                Content = xmldoc.InnerXml
-            };
-            _notes.AddEntity(note);
-            Assert.Equal("GasLog", _notes[0].Render.Name);
-            Assert.Equal(1, _notes.Count);
-
-            // change the note render
-            note.Render = null;
-
-            // Act
-            var savedRec = _noteStorage.Update(note);
-
-            // Assert
-            Assert.NotNull(savedRec);
-            Assert.NotNull(savedRec.Render);
-            Assert.Equal("DefaultNoteRender", savedRec.Render.Name);
-
-            Assert.Equal(1, _notes.Count);
-            Assert.Equal("DefaultNoteRender", _notes[0].Render.Name);
-        }
-
-        [Fact]
-        public void CanUpdateNoteRenderToNonExistsRenderDefaultRenderApplied()
-        {
-            // Arrange
-            var author = _authors[0];
-            var render = _renders[1];
-            var catalog = _cats[0];
-            var xmldoc = new XmlDocument();
-            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
-            var note = new HmmNote
-            {
-                Id = 1,
-                Author = author,
-                Catalog = catalog,
-                Render = render,
-                Description = "testing note",
-                CreateDate = DateTime.Now,
-                LastModifiedDate = DateTime.Now,
-                Subject = "testing note is here",
-                Content = xmldoc.InnerXml
-            };
-            _notes.AddEntity(note);
-            Assert.Equal("GasLog", _notes[0].Render.Name);
-            Assert.Equal(1, _notes.Count);
-
-            // change the note render
-            var newRender = new NoteRender
-            {
-                Id = 200,
-                Name = "Not exists render",
-                Description = "Just for testing"
-            };
-            note.Render = newRender;
-
-            // Act
-            var savedRec = _noteStorage.Update(note);
-
-            // Assert
-            Assert.NotNull(savedRec);
-            Assert.NotNull(savedRec.Render);
-            Assert.Equal("DefaultNoteRender", savedRec.Render.Name);
-
-            Assert.Equal(1, _notes.Count);
-            Assert.Equal("DefaultNoteRender", _notes[0].Render.Name);
-        }
 
         [Fact]
         public void CannotUpdateNoteAuthor()
         {
             // Arrange
             var author = _authors[0];
-            var render = _renders[1];
             var catalog = _cats[0];
             var xmldoc = new XmlDocument();
             xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
@@ -911,7 +739,6 @@ namespace Hmm.Dal.Tests
                 Id = 1,
                 Author = author,
                 Catalog = catalog,
-                Render = render,
                 Description = "testing note",
                 CreateDate = DateTime.Now,
                 LastModifiedDate = DateTime.Now,
@@ -943,7 +770,6 @@ namespace Hmm.Dal.Tests
             // Arrange - non exists id
             var author = _authors[0];
             var cat = _cats[0];
-            var render = _renders[0];
             var xmldoc = new XmlDocument();
             xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
             var note = new HmmNote
@@ -953,7 +779,6 @@ namespace Hmm.Dal.Tests
                 Catalog = cat,
                 Description = "testing note2",
                 Subject = "testing note is here",
-                Render = render,
                 Content = xmldoc.InnerXml,
                 CreateDate = _currentDate,
                 LastModifiedDate = _currentDate
@@ -987,7 +812,6 @@ namespace Hmm.Dal.Tests
             // Arrange
             var author = _authors[0];
             var cat = _cats[0];
-            var render = _renders[0];
             var xmldoc = new XmlDocument();
             xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
             var note = new HmmNote
@@ -997,7 +821,6 @@ namespace Hmm.Dal.Tests
                 Catalog = cat,
                 Description = "testing note",
                 Subject = "testing note is here",
-                Render = render,
                 Content = xmldoc.InnerXml,
                 CreateDate = _currentDate,
                 LastModifiedDate = _currentDate
@@ -1019,7 +842,6 @@ namespace Hmm.Dal.Tests
             // Arrange
             var author = _authors[0];
             var cat = _cats[0];
-            var render = _renders[0];
             var xmldoc = new XmlDocument();
             xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
             var note = new HmmNote
@@ -1029,7 +851,6 @@ namespace Hmm.Dal.Tests
                 Catalog = cat,
                 Description = "testing note",
                 Subject = "testing note is here",
-                Render = render,
                 Content = xmldoc.InnerXml,
                 CreateDate = _currentDate,
                 LastModifiedDate = _currentDate

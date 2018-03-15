@@ -71,7 +71,7 @@ namespace Hmm.Dal.Tests
                 IEnumerable<HmmNote> notes = new List<HmmNote>();
                 if (query.Render.Id > 0)
                 {
-                    notes = _notes.Where(n => n.Render.Id == query.Render.Id).Select(n => n).AsEnumerable();
+                    notes = _notes.Where(n => n.Catalog.Render.Id == query.Render.Id).Select(n => n).AsEnumerable();
                 }
 
                 return notes;
@@ -216,7 +216,6 @@ namespace Hmm.Dal.Tests
                 LastModifiedDate = DateTime.Now,
                 Author = new User(),
                 Catalog = new NoteCatalog(),
-                Render = _renders[0]
             };
             _notes.AddEntity(note);
             Assert.Equal(1, _renders.Count);

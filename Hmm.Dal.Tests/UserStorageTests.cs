@@ -249,7 +249,6 @@ namespace Hmm.Dal.Tests
                 LastModifiedDate = DateTime.Now,
                 Author = _users[0],
                 Catalog = new NoteCatalog(),
-                Render = new NoteRender()
             };
             _notes.AddEntity(note);
             Assert.Equal(1, _users.Count);
