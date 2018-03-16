@@ -110,7 +110,7 @@ namespace Hmm.Dal.Tests
             Assert.NotNull(savedRec);
             Assert.Equal(1, savedRec.Id);
             Assert.Equal(1, render.Id);
-            Assert.Equal(1, _renders.Count);
+            Assert.Single(_renders);
         }
 
         [Fact]
@@ -138,7 +138,7 @@ namespace Hmm.Dal.Tests
             // Assert
             Assert.Null(savedRec);
             Assert.Equal(0, render.Id);
-            Assert.Equal(1, _renders.Count);
+            Assert.Single(_renders);
         }
 
         [Fact]
@@ -154,14 +154,14 @@ namespace Hmm.Dal.Tests
             };
 
             _renders.AddEntity(render);
-            Assert.Equal(1, _renders.Count);
+            Assert.Single(_renders);
 
             // Act
             var result = _renderStorage.Delete(render);
 
             // Assert
             Assert.True(result);
-            Assert.Equal(0, _renders.Count);
+            Assert.Empty(_renders);
         }
 
         [Fact]
@@ -191,7 +191,7 @@ namespace Hmm.Dal.Tests
 
             // Assert
             Assert.False(result);
-            Assert.Equal(1, _renders.Count);
+            Assert.Single(_renders);
         }
 
         [Fact]
@@ -218,15 +218,15 @@ namespace Hmm.Dal.Tests
                 Catalog = new NoteCatalog(),
             };
             _notes.AddEntity(note);
-            Assert.Equal(1, _renders.Count);
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_renders);
+            Assert.Single(_notes);
 
             // Act
             var result = _renderStorage.Delete(catalog);
 
             // Assert
             Assert.False(result, "Error: deleted render with note attached to it");
-            Assert.Equal(1, _renders.Count);
+            Assert.Single(_renders);
             Assert.True(_renderStorage.Validator.ValidationErrors.Count > 0);
         }
 
@@ -291,7 +291,7 @@ namespace Hmm.Dal.Tests
 
             // Assert
             Assert.Null(result);
-            Assert.Equal(1, _renders.Count);
+            Assert.Single(_renders);
             Assert.Equal("GasLog", _renders[0].Name);
         }
 

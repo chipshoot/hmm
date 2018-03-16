@@ -10,6 +10,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Hmm.Utility.TestHelp;
 using Xunit;
 
 namespace Hmm.Dal.Tests
@@ -26,35 +27,54 @@ namespace Hmm.Dal.Tests
             _notes = new List<HmmNote>();
 
             // set up look up repository
-            var lookupMoc = new Mock<IEntityLookup>();
-            lookupMoc.Setup(lk => lk.GetEntity<NoteCatalog>(It.IsAny<int>())).Returns((int id) =>
+            IEntityLookup Lkp()
             {
-                var recFound = _catalogs.FirstOrDefault(c => c.Id == id);
-                return recFound;
-            });
+                var lookupMoc = new Mock<IEntityLookup>();
+                lookupMoc.Setup(lk => lk.GetEntity<NoteCatalog>(It.IsAny<int>())).Returns((int id) =>
+                {
+                    var recFound = _catalogs.FirstOrDefault(c => c.Id == id);
+                    return recFound;
+                });
+
+                return lookupMoc.Object;
+            }
 
             // set up unit of work
-            var uowmock = new Mock<IUnitOfWork>();
-            uowmock.Setup(u => u.Add(It.IsAny<NoteCatalog>())).Returns((NoteCatalog cat) =>
-                {
-                    cat.Id = _catalogs.GetNextId();
-                    _catalogs.AddEntity(cat);
-                    return cat;
-                }
-            );
-            uowmock.Setup(u => u.Delete(It.IsAny<NoteCatalog>())).Callback((NoteCatalog cat) =>
+            IUnitOfWork Uowp()
             {
-                _catalogs.Remove(cat);
-            });
-            uowmock.Setup(u => u.Update(It.IsAny<NoteCatalog>())).Callback((NoteCatalog cat) =>
-            {
-                var orgCat = _catalogs.FirstOrDefault(c => c.Id == cat.Id);
-                if (orgCat != null)
+                var uowmock = new Mock<IUnitOfWork>();
+                uowmock.Setup(u => u.Add(It.IsAny<NoteCatalog>())).Returns((NoteCatalog cat) =>
+                    {
+                        cat.Id = _catalogs.GetNextId();
+                        _catalogs.AddEntity(cat);
+                        return cat;
+                    }
+                );
+                uowmock.Setup(u => u.Delete(It.IsAny<NoteCatalog>())).Callback((NoteCatalog cat) =>
                 {
-                    _catalogs.Remove(orgCat);
-                    _catalogs.AddEntity(cat);
-                }
-            });
+                    _catalogs.Remove(cat);
+                });
+                uowmock.Setup(u => u.Update(It.IsAny<NoteCatalog>())).Callback((NoteCatalog cat) =>
+                {
+                    var orgCat = _catalogs.FirstOrDefault(c => c.Id == cat.Id);
+                    if (orgCat != null)
+                    {
+                        _catalogs.Remove(orgCat);
+                        _catalogs.AddEntity(cat);
+                    }
+                });
+
+                return uowmock.Object;
+            }
+
+            // set up date time provider
+            IDateTimeProvider Dtp()
+            {
+                var timeProviderMock = new Mock<IDateTimeProvider>();
+                return timeProviderMock.Object;
+            }
+
+            var dsp = new DataSourceProvider(Lkp, Uowp, Dtp);
 
             // set up query handler
             var queryMock = new Mock<IQueryHandler<NoteCatalogQueryByName, NoteCatalog>>();
@@ -77,14 +97,13 @@ namespace Hmm.Dal.Tests
                 return notes;
             });
 
-            // set up note catalog validator
-            var validator = new NoteCatalogValidator(lookupMoc.Object, queryMock.Object);
 
-            // set up date time provider
-            var timeProviderMock = new Mock<IDateTimeProvider>();
+            // set up note catalog validator
+            var validator = new NoteCatalogValidator(dsp.Lookup, queryMock.Object);
+
 
             // set up catalog repository
-            _catalogStorage = new NoteCatalogStorage(uowmock.Object, validator, lookupMoc.Object, noteQueryMock.Object, timeProviderMock.Object);
+            _catalogStorage = new NoteCatalogStorage(dsp.UnitOfWork, validator, dsp.Lookup, noteQueryMock.Object, dsp.DateTimeAdapter);
         }
 
         public void Dispose()
@@ -109,7 +128,7 @@ namespace Hmm.Dal.Tests
             Assert.NotNull(savedRec);
             Assert.Equal(1, savedRec.Id);
             Assert.Equal(1, cat.Id);
-            Assert.Equal(1, _catalogs.Count);
+            Assert.Single(_catalogs);
         }
 
         [Fact]
@@ -135,7 +154,7 @@ namespace Hmm.Dal.Tests
             // Assert
             Assert.Null(savedRec);
             Assert.Equal(0, cat.Id);
-            Assert.Equal(1, _catalogs.Count);
+            Assert.Single(_catalogs);
         }
 
         [Fact]
@@ -150,14 +169,14 @@ namespace Hmm.Dal.Tests
             };
 
             _catalogs.AddEntity(catalog);
-            Assert.Equal(1, _catalogs.Count);
+            Assert.Single(_catalogs);
 
             // Act
             var result = _catalogStorage.Delete(catalog);
 
             // Assert
             Assert.True(result);
-            Assert.Equal(0, _catalogs.Count);
+            Assert.Empty(_catalogs);
         }
 
         [Fact]
@@ -185,7 +204,7 @@ namespace Hmm.Dal.Tests
 
             // Assert
             Assert.False(result);
-            Assert.Equal(1, _catalogs.Count);
+            Assert.Single(_catalogs);
         }
 
         [Fact]
@@ -211,15 +230,15 @@ namespace Hmm.Dal.Tests
                 Catalog = _catalogs[0],
             };
             _notes.AddEntity(note);
-            Assert.Equal(1, _catalogs.Count);
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_catalogs);
+            Assert.Single(_notes);
 
             // Act
             var result = _catalogStorage.Delete(catalog);
 
             // Assert
             Assert.False(result, "Error: deleted catalog with note attached to it");
-            Assert.Equal(1, _catalogs.Count);
+            Assert.Single(_catalogs);
             Assert.True(_catalogStorage.Validator.ValidationErrors.Count > 0);
         }
 
@@ -281,7 +300,7 @@ namespace Hmm.Dal.Tests
 
             // Assert
             Assert.Null(result);
-            Assert.Equal(1, _catalogs.Count);
+            Assert.Single(_catalogs);
             Assert.Equal("GasLog", _catalogs[0].Name);
         }
 

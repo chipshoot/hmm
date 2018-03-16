@@ -5,6 +5,7 @@ using Hmm.Dal.Validation;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
+using Hmm.Utility.TestHelp;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -16,12 +17,14 @@ namespace Hmm.Dal.Tests
 {
     public class NoteStorageTests : IDisposable
     {
+        private const bool UseMoc = true;
         private readonly List<HmmNote> _notes;
         private readonly List<User> _authors;
         private readonly List<NoteCatalog> _cats;
         private readonly List<NoteRender> _renders;
         private readonly NoteStorage<HmmNote> _noteStorage;
         private DateTime _currentDate = DateTime.Now;
+        private IDataSourceProvider _dsp;
 
         public NoteStorageTests()
         {
@@ -86,67 +89,102 @@ namespace Hmm.Dal.Tests
                 }
             };
 
-            // set up unit of work
-            var uowMock = new Mock<IUnitOfWork>();
-            uowMock.Setup(u => u.Add(It.IsAny<HmmNote>())).Returns((HmmNote note) =>
-            {
-                note.Id = _notes.GetNextId();
-                _notes.AddEntity(note);
-                var savedRec = _notes.FirstOrDefault(n => n.Id == note.Id);
-                return savedRec;
-            });
-            uowMock.Setup(u => u.Delete(It.IsAny<HmmNote>())).Callback((HmmNote note) =>
-            {
-                var rec = _notes.FirstOrDefault(n => n.Id == note.Id);
-                if (rec != null)
-                {
-                    _notes.Remove(rec);
-                }
-            });
-            uowMock.Setup(u => u.Update(It.IsAny<HmmNote>())).Callback((HmmNote note) =>
-            {
-                var rec = _notes.FirstOrDefault(n => n.Id == note.Id);
-                if (rec == null)
-                {
-                    return;
-                }
-
-                _notes.Remove(rec);
-                _notes.AddEntity(note);
-            });
-
-            // set up look up repository
-            var lookupMock = new Mock<IEntityLookup>();
-            lookupMock.Setup(lk => lk.GetEntity<HmmNote>(It.IsAny<int>())).Returns((int id) =>
-            {
-                var rec = _notes.FirstOrDefault(n => n.Id == id);
-                return rec;
-            });
-            lookupMock.Setup(lk => lk.GetEntity<User>(It.IsAny<int>())).Returns((int id) =>
-            {
-                var rec = _authors.FirstOrDefault(n => n.Id == id);
-                return rec;
-            });
-            lookupMock.Setup(lk => lk.GetEntity<NoteCatalog>(It.IsAny<int>())).Returns((int id) =>
-            {
-                var rec = _cats.FirstOrDefault(n => n.Id == id);
-                return rec;
-            });
-            lookupMock.Setup(lk => lk.GetEntity<NoteRender>(It.IsAny<int>())).Returns((int id) =>
-            {
-                var rec = _renders.FirstOrDefault(n => n.Id == id);
-                return rec;
-            });
+            _dsp = UseMoc ? GetMockDataSource() : GetDatabase();
 
             // set up note validator
-            var validator = new HmmNoteValidator(lookupMock.Object);
+            var validator = new HmmNoteValidator(_dsp.Lookup);
+
+            _noteStorage = new NoteStorage<HmmNote>(_dsp.UnitOfWork, validator, _dsp.Lookup, _dsp.DateTimeAdapter);
+        }
+
+        private IDataSourceProvider GetMockDataSource()
+        {
+            // set up unit of work
+            IUnitOfWork Uowp()
+            {
+                var uowMock = new Mock<IUnitOfWork>();
+                uowMock.Setup(u => u.Add(It.IsAny<HmmNote>()))
+                    .Returns((HmmNote note) =>
+                    {
+                        note.Id = _notes.GetNextId();
+                        _notes.AddEntity(note);
+                        var savedRec = _notes.FirstOrDefault(n => n.Id == note.Id);
+                        return savedRec;
+                    });
+                uowMock.Setup(u => u.Delete(It.IsAny<HmmNote>()))
+                    .Callback((HmmNote note) =>
+                    {
+                        var rec = _notes.FirstOrDefault(n => n.Id == note.Id);
+                        if (rec != null)
+                        {
+                            _notes.Remove(rec);
+                        }
+                    });
+                uowMock.Setup(u => u.Update(It.IsAny<HmmNote>()))
+                    .Callback((HmmNote note) =>
+                    {
+                        var rec = _notes.FirstOrDefault(n => n.Id == note.Id);
+                        if (rec == null)
+                        {
+                            return;
+                        }
+
+                        _notes.Remove(rec);
+                        _notes.AddEntity(note);
+                    });
+
+                return uowMock.Object;
+            }
+
+            // set up look up repository
+            IEntityLookup Lkp()
+            {
+                var lookupMock = new Mock<IEntityLookup>();
+                lookupMock.Setup(lk => lk.GetEntity<HmmNote>(It.IsAny<int>()))
+                    .Returns((int id) =>
+                    {
+                        var rec = _notes.FirstOrDefault(n => n.Id == id);
+                        return rec;
+                    });
+                lookupMock.Setup(lk => lk.GetEntity<User>(It.IsAny<int>()))
+                    .Returns((int id) =>
+                    {
+                        var rec = _authors.FirstOrDefault(n => n.Id == id);
+                        return rec;
+                    });
+                lookupMock.Setup(lk => lk.GetEntity<NoteCatalog>(It.IsAny<int>()))
+                    .Returns((int id) =>
+                    {
+                        var rec = _cats.FirstOrDefault(n => n.Id == id);
+                        return rec;
+                    });
+                lookupMock.Setup(lk => lk.GetEntity<NoteRender>(It.IsAny<int>()))
+                    .Returns((int id) =>
+                    {
+                        var rec = _renders.FirstOrDefault(n => n.Id == id);
+                        return rec;
+                    });
+
+                return lookupMock.Object;
+            }
 
             // set up date time provider
-            //_currentDate = DateTime.Now;
-            var timeProviderMock = new Mock<IDateTimeProvider>();
-            timeProviderMock.Setup(t => t.UtcNow).Returns(() => _currentDate);
+            IDateTimeProvider Dtp()
+            {
+                //_currentDate = DateTime.Now;
+                var timeProviderMock = new Mock<IDateTimeProvider>();
+                timeProviderMock.Setup(t => t.UtcNow).Returns(() => _currentDate);
+                return timeProviderMock.Object;
+            }
 
-            _noteStorage = new NoteStorage<HmmNote>(uowMock.Object, validator, lookupMock.Object, timeProviderMock.Object);
+            var dsp = new DataSourceProvider(Lkp, Uowp, Dtp);
+
+            return dsp;
+        }
+
+        private IDataSourceProvider GetDatabase()
+        {
+            return null;
         }
 
         public void Dispose()
@@ -183,7 +221,7 @@ namespace Hmm.Dal.Tests
             Assert.Equal(1, savedRec.Id);
             Assert.Equal(_currentDate, savedRec.CreateDate);
             Assert.Equal(_currentDate, savedRec.LastModifiedDate);
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
             Assert.Equal(_currentDate, _notes[0].CreateDate);
             Assert.Equal(_currentDate, _notes[0].LastModifiedDate);
         }
@@ -232,7 +270,7 @@ namespace Hmm.Dal.Tests
             // Assert
             Assert.NotNull(savedRec);
             Assert.Equal(1, savedRec.Id);
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
             Assert.Null(savedRec2);
         }
 
@@ -262,7 +300,7 @@ namespace Hmm.Dal.Tests
             Assert.Equal(1, savedRec.Id);
             Assert.Equal(_currentDate, savedRec.CreateDate);
             Assert.Equal(_currentDate, savedRec.LastModifiedDate);
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
             Assert.Equal(_currentDate, _notes[0].CreateDate);
             Assert.Equal(_currentDate, _notes[0].LastModifiedDate);
         }
@@ -291,7 +329,7 @@ namespace Hmm.Dal.Tests
             // Assert
             Assert.NotNull(savedRec);
             Assert.Equal(1, savedRec.Id);
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
             Assert.Equal(_currentDate, savedRec.CreateDate);
             Assert.Equal(_currentDate, savedRec.LastModifiedDate);
         }
@@ -320,7 +358,7 @@ namespace Hmm.Dal.Tests
             // Assert
             Assert.NotNull(savedRec);
             Assert.Equal(1, savedRec.Id);
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
             Assert.Equal(_currentDate, savedRec.CreateDate);
             Assert.Equal(_currentDate, savedRec.LastModifiedDate);
         }
@@ -350,7 +388,7 @@ namespace Hmm.Dal.Tests
             // Assert
             Assert.Null(savedRec);
             Assert.Empty(_notes);
-            Assert.Equal(1, _noteStorage.Validator.ValidationErrors.Count);
+            Assert.Single(_noteStorage.Validator.ValidationErrors);
 
             // Arrange - none exists author
             var author = new User
@@ -373,7 +411,7 @@ namespace Hmm.Dal.Tests
             // Assert
             Assert.Null(savedRec);
             Assert.Empty(_notes);
-            Assert.Equal(1, _noteStorage.Validator.ValidationErrors.Count);
+            Assert.Single(_noteStorage.Validator.ValidationErrors);
 
             // Arrange - author with invalid author id
             author.Id = 0;
@@ -385,7 +423,7 @@ namespace Hmm.Dal.Tests
             // Assert
             Assert.Null(savedRec);
             Assert.Empty(_notes);
-            Assert.Equal(1, _noteStorage.Validator.ValidationErrors.Count);
+            Assert.Single(_noteStorage.Validator.ValidationErrors);
         }
 
         [Fact]
@@ -412,7 +450,7 @@ namespace Hmm.Dal.Tests
 
             // Assert
             Assert.NotNull(savedRec);
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
             Assert.NotNull(savedRec.Catalog);
             Assert.Equal("DefaultNoteCatalog", savedRec.Catalog.Name);
 
@@ -468,7 +506,7 @@ namespace Hmm.Dal.Tests
             _notes.AddEntity(note);
             var oldDate = _currentDate;
             _currentDate = _currentDate.AddDays(1);
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
 
             // Act
             note.Description = "testing note2";
@@ -478,7 +516,7 @@ namespace Hmm.Dal.Tests
             Assert.NotNull(savedRec);
             Assert.Equal(1, savedRec.Id);
             Assert.Equal("testing note2", savedRec.Description);
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
             Assert.Equal(oldDate, savedRec.CreateDate);
             Assert.Equal(_currentDate, savedRec.LastModifiedDate);
             Assert.Equal("testing note2", _notes[0].Description);
@@ -506,7 +544,7 @@ namespace Hmm.Dal.Tests
             _notes.AddEntity(note);
             var oldDate = _currentDate;
             _currentDate = _currentDate.AddDays(1);
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
 
             // Act
             note.Subject = "This is new subject";
@@ -518,7 +556,7 @@ namespace Hmm.Dal.Tests
             Assert.Equal("This is new subject", savedRec.Subject);
             Assert.Equal(oldDate, savedRec.CreateDate);
             Assert.Equal(_currentDate, savedRec.LastModifiedDate);
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
             Assert.Equal(1, _notes[0].Id);
             Assert.Equal("This is new subject", _notes[0].Subject);
             Assert.Equal(oldDate, _notes[0].CreateDate);
@@ -547,7 +585,7 @@ namespace Hmm.Dal.Tests
             _notes.AddEntity(note);
             var oldDate = _currentDate;
             _currentDate = _currentDate.AddDays(1);
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
 
             // Act
             var newXml = new XmlDocument();
@@ -563,7 +601,7 @@ namespace Hmm.Dal.Tests
             Assert.Equal(oldDate, savedRec.CreateDate);
             Assert.Equal(_currentDate, savedRec.LastModifiedDate);
 
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
             Assert.Equal(1, _notes[0].Id);
             Assert.Equal(newXml.InnerXml, _notes[0].Content);
             Assert.NotEqual(xmldoc.InnerXml, _notes[0].Content);
@@ -592,7 +630,7 @@ namespace Hmm.Dal.Tests
             };
             _notes.AddEntity(note);
             Assert.Equal("DefaultNoteCatalog", _notes[0].Catalog.Name);
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
 
             // changed the note catalog
             note.Catalog = _cats[1];
@@ -605,7 +643,7 @@ namespace Hmm.Dal.Tests
             Assert.NotNull(savedRec.Catalog);
             Assert.Equal("Gas Log", savedRec.Catalog.Name);
 
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
             Assert.Equal("Gas Log", _notes[0].Catalog.Name);
         }
 
@@ -642,7 +680,7 @@ namespace Hmm.Dal.Tests
             Assert.NotNull(savedRec.Catalog);
             Assert.Equal("DefaultNoteCatalog", savedRec.Catalog.Name);
 
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
             Assert.Equal("DefaultNoteCatalog", _notes[0].Catalog.Name);
         }
 
@@ -672,7 +710,7 @@ namespace Hmm.Dal.Tests
                 Content = xmldoc.InnerXml
             };
             _notes.AddEntity(note);
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
 
             // Act
             var savedRec = _noteStorage.Update(note);
@@ -682,7 +720,7 @@ namespace Hmm.Dal.Tests
             Assert.NotNull(savedRec.Catalog);
             Assert.Equal("DefaultNoteCatalog", savedRec.Catalog.Name);
 
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
             Assert.Equal("DefaultNoteCatalog", _notes[0].Catalog.Name);
         }
 
@@ -721,10 +759,9 @@ namespace Hmm.Dal.Tests
             Assert.NotNull(savedRec.Catalog);
             Assert.Equal("DefaultNoteCatalog", savedRec.Catalog.Name);
 
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
             Assert.Equal("DefaultNoteCatalog", _notes[0].Catalog.Name);
         }
-
 
         [Fact]
         public void CannotUpdateNoteAuthor()
@@ -747,7 +784,7 @@ namespace Hmm.Dal.Tests
             };
             _notes.AddEntity(note);
             Assert.Equal("jfang", _notes[0].Author.AccountName);
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
 
             // change the note render
             var newUser = _authors[1];
@@ -758,9 +795,9 @@ namespace Hmm.Dal.Tests
 
             // Assert
             Assert.Null(savedRec);
-            Assert.Equal(1, _noteStorage.Validator.ValidationErrors.Count);
+            Assert.Single(_noteStorage.Validator.ValidationErrors);
 
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
             Assert.Equal("jfang", _notes[0].Author.AccountName);
         }
 
@@ -791,8 +828,8 @@ namespace Hmm.Dal.Tests
 
             // Assert
             Assert.Null(savedRec);
-            Assert.Equal(1, _notes.Count);
-            Assert.Equal(1, _noteStorage.Validator.ValidationErrors.Count);
+            Assert.Single(_notes);
+            Assert.Single(_noteStorage.Validator.ValidationErrors);
 
             // Arrange - invalid id
             note.Id = 0;
@@ -802,8 +839,8 @@ namespace Hmm.Dal.Tests
 
             // Assert
             Assert.Null(savedRec);
-            Assert.Equal(1, _notes.Count);
-            Assert.Equal(1, _noteStorage.Validator.ValidationErrors.Count);
+            Assert.Single(_notes);
+            Assert.Single(_noteStorage.Validator.ValidationErrors);
         }
 
         [Fact]
@@ -826,7 +863,7 @@ namespace Hmm.Dal.Tests
                 LastModifiedDate = _currentDate
             };
             _notes.AddEntity(note);
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
 
             // Act
             var result = _noteStorage.Delete(note);
@@ -856,7 +893,7 @@ namespace Hmm.Dal.Tests
                 LastModifiedDate = _currentDate
             };
             _notes.AddEntity(note);
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
 
             // change the note id to create a new note
             note.Id = 2;
@@ -867,7 +904,7 @@ namespace Hmm.Dal.Tests
 
             // Assert
             Assert.False(result);
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
             Assert.NotEmpty(_noteStorage.Validator.ValidationErrors);
         }
     }

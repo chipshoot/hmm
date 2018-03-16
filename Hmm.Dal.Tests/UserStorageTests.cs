@@ -113,7 +113,7 @@ namespace Hmm.Dal.Tests
             Assert.NotNull(savedRec);
             Assert.Equal(1, savedRec.Id);
             Assert.Equal(1, user.Id);
-            Assert.Equal(1, _users.Count);
+            Assert.Single(_users);
         }
 
         [Fact]
@@ -151,7 +151,7 @@ namespace Hmm.Dal.Tests
             // Assert
             Assert.Null(savedRec);
             Assert.Equal(0, user.Id);
-            Assert.Equal(1, _users.Count);
+            Assert.Single(_users);
         }
 
         [Fact]
@@ -172,14 +172,14 @@ namespace Hmm.Dal.Tests
             };
 
             _users.AddEntity(user);
-            Assert.Equal(1, _users.Count);
+            Assert.Single(_users);
 
             // Act
             var result = _userStorage.Delete(user);
 
             // Assert
             Assert.True(result);
-            Assert.Equal(0, _users.Count);
+            Assert.Empty(_users);
         }
 
         [Fact]
@@ -219,7 +219,7 @@ namespace Hmm.Dal.Tests
 
             // Assert
             Assert.False(result);
-            Assert.Equal(1, _users.Count);
+            Assert.Single(_users);
         }
 
         [Fact]
@@ -251,15 +251,15 @@ namespace Hmm.Dal.Tests
                 Catalog = new NoteCatalog(),
             };
             _notes.AddEntity(note);
-            Assert.Equal(1, _users.Count);
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_users);
+            Assert.Single(_notes);
 
             // Act
             var result = _userStorage.Delete(user);
 
             // Assert
             Assert.False(result, "Error: deleted user with note");
-            Assert.Equal(1, _users.Count);
+            Assert.Single(_users);
             Assert.True(_userStorage.Validator.ValidationErrors.Count > 0);
         }
 
@@ -371,7 +371,7 @@ namespace Hmm.Dal.Tests
             // Assert
             Assert.Null(result);
             Assert.True(_userStorage.Validator.ValidationErrors.Count > 0);
-            Assert.Equal(1, _users.Count);
+            Assert.Single(_users);
             Assert.Equal("Gas", _users[0].FirstName);
         }
 
