@@ -1,4 +1,5 @@
 ﻿using DomainEntity.User;
+using Hmm.Utility.Misc;
 
 namespace Hmm.Contract
 {
@@ -21,6 +22,6 @@ namespace Hmm.Contract
         ///  null </returns>
         User Update(User userInfo);
 
-        string ErrorMessage { get; }
+        ProcessingResult ErrorMessage { get; }
     }
 }
