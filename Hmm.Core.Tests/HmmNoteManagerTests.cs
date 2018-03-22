@@ -149,7 +149,8 @@ namespace Hmm.Core.Tests
             timeProviderMock.Setup(t => t.UtcNow).Returns(() => _currentDate);
 
             var noteStorage = new NoteStorage<HmmNote>(uowMock.Object, validator, lookupMock.Object, timeProviderMock.Object);
-            _manager = new HmmNoteManager<HmmNote>(noteStorage);
+            var lkmoc = new Mock<IEntityLookup>();
+            _manager = new HmmNoteManager<HmmNote>(noteStorage, lkmoc.Object);
         }
 
         public void Dispose()

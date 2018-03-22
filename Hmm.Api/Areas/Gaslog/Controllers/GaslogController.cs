@@ -20,9 +20,9 @@ namespace Hmm.Api.Areas.Gaslog.Controllers
 
         // GET api/gaslogs/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public ApiGaslog Get(int id)
         {
-            return "value";
+            return new ApiGaslog();
         }
 
         // POST api/gaslogs

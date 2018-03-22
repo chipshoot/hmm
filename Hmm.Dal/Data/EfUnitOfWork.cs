@@ -40,12 +40,18 @@ namespace Hmm.Dal.Data
         {
             if (_dbcontext is DbContext context)
             {
+                context.Remove(entity);
+                context.SaveChanges();
             }
         }
 
         public void Update<T>(T entity) where T : class
         {
-            throw new System.NotImplementedException();
+            if (_dbcontext is DbContext context)
+            {
+                context.Update(entity);
+                context.SaveChanges();
+            }
         }
 
         public IGenericTransaction BeginTransaction()
