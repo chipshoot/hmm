@@ -4,6 +4,7 @@ using Hmm.Utility.Dal.DataStore;
 using Hmm.Utility.Validation;
 using System;
 using System.Xml;
+using Hmm.Utility.Misc;
 
 namespace Hmm.Core.Manager
 {
@@ -37,6 +38,8 @@ namespace Hmm.Core.Manager
 
             return ret;
         }
+
+        public ProcessingResult ErrorMessage { get; } = new ProcessingResult();
 
         protected virtual XmlDocument GetNoteContent(T note, bool isXmlConent = false)
         {

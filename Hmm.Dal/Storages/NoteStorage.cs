@@ -1,17 +1,14 @@
 ﻿using DomainEntity.Misc;
 using Hmm.Dal.Data;
 using Hmm.Utility.Dal;
-using Hmm.Utility.Dal.DataEntity;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 
 namespace Hmm.Dal.Storages
 {
-    public class NoteStorage<T> : StorageBase<T> where T: HmmNote
+    public class NoteStorage<T> : StorageBase<T> where T : HmmNote
     {
-        private const int DefaultPropId = 1;
-
         public NoteStorage(
             IUnitOfWork uow,
             IValidator<T> validator,
@@ -66,41 +63,12 @@ namespace Hmm.Dal.Storages
             var catalog = PropertyChecking(entity.Catalog);
             entity.Catalog = catalog ?? throw new DataSourceException("Cannot find default note catalog.");
 
-            // check if need apply default render
-            var render = PropertyChecking(entity.Catalog.Render);
-            entity.Catalog.Render = render ?? throw new DataSourceException("Cannot find default note render.");
-
             entity.LastModifiedDate = DateTimeProvider.UtcNow;
             UnitOfWork.Update(entity);
 
             var savedRec = LookupRepo.GetEntity<T>(entity.Id);
 
             return savedRec;
-        }
-
-        private TP PropertyChecking<TP>(TP property) where TP : Entity
-        {
-            var defaultNeeded = false;
-            if (property == null)
-            {
-                defaultNeeded = true;
-            }
-            else if (property.Id <= 0)
-            {
-                defaultNeeded = true;
-            }
-            else if (LookupRepo.GetEntity<TP>(property.Id) == null)
-            {
-                defaultNeeded = true;
-            }
-
-            if (!defaultNeeded)
-            {
-                return property;
-            }
-
-            var defaultProp = LookupRepo.GetEntity<TP>(DefaultPropId);
-            return defaultProp;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using DomainEntity.Misc;
+using Hmm.Utility.Misc;
 
 namespace Hmm.Contract
 {
@@ -7,5 +8,7 @@ namespace Hmm.Contract
         T Create(T note);
 
         T Update(T note);
+
+        ProcessingResult ErrorMessage { get; }
     }
 }

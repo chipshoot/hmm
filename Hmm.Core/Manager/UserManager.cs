@@ -4,6 +4,7 @@ using Hmm.Dal.Storages;
 using Hmm.Utility.Encrypt;
 using Hmm.Utility.Validation;
 using System;
+using Hmm.Utility.Misc;
 
 namespace Hmm.Core.Manager
 {
@@ -35,7 +36,8 @@ namespace Hmm.Core.Manager
             }
             catch (Exception ex)
             {
-                ErrorMessage = ex.Message;
+                ErrorMessage.Success = false;
+                ErrorMessage.MessageList.Add(ex.Message);
                 return null;
             }
         }
@@ -45,6 +47,6 @@ namespace Hmm.Core.Manager
             throw new System.NotImplementedException();
         }
 
-        public string ErrorMessage { get; private set; }
+        public ProcessingResult ErrorMessage { get; } = new ProcessingResult();
     }
 }

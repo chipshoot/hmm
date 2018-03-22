@@ -13,6 +13,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Hmm.Core.Manager.GasLogMan;
 using Xunit;
 
 namespace Hmm.Core.Tests

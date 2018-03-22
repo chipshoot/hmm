@@ -1,12 +1,13 @@
 ﻿using DomainEntity.Misc;
+using Hmm.Dal.Data;
 using Hmm.Dal.Querys;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
+using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Hmm.Utility.Misc;
 
 namespace Hmm.Dal.Storages
 {
@@ -45,6 +46,10 @@ namespace Hmm.Dal.Storages
             {
                 return null;
             }
+
+            // check if need apply default render
+            var render = PropertyChecking(entity.Render);
+            entity.Render = render ?? throw new DataSourceException("Cannot find default note render.");
 
             UnitOfWork.Update(entity);
             return LookupRepo.GetEntity<NoteCatalog>(entity.Id);

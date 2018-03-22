@@ -1,9 +1,9 @@
-﻿using DomainEntity.Vehicle;
+﻿using System.Xml;
+using DomainEntity.Vehicle;
 using Hmm.Contract.GasLogMan;
 using Hmm.Utility.Dal.DataStore;
-using System.Xml;
 
-namespace Hmm.Core.Manager
+namespace Hmm.Core.Manager.GasLogMan
 {
     public class GasLogManager : HmmNoteManager<GasLog>, IGasLogManager
     {
