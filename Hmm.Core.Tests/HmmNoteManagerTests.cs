@@ -173,7 +173,7 @@ namespace Hmm.Core.Tests
             };
             var xmldoc = new XmlDocument();
             xmldoc.LoadXml(
-                "<?xml version=\"1.0\" encoding=\"UTF-16\" ?><note xmlns=\"http://schema.hmm.com/2017\"><content>Test content</content></note>");
+                "<?xml version=\"1.0\" encoding=\"utf-16\" ?><note xmlns=\"http://schema.hmm.com/2017\"><content>Test content</content></note>");
 
             // Act
             var newNote = _manager.Create(note);
@@ -186,7 +186,7 @@ namespace Hmm.Core.Tests
             Assert.Equal(_currentDate, newNote.CreateDate);
             Assert.Equal(_currentDate, newNote.LastModifiedDate);
 
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
             Assert.Equal(1, _notes[0].Id);
             Assert.Equal("Testing note", _notes[0].Subject);
             Assert.Equal(xmldoc.InnerXml, _notes[0].Content);
@@ -208,7 +208,7 @@ namespace Hmm.Core.Tests
                 Content = null
             };
             var xmldoc = new XmlDocument();
-            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"UTF-16\" ?><note xmlns=\"http://schema.hmm.com/2017\"><content></content></note>");
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\" ?><note xmlns=\"http://schema.hmm.com/2017\"><content></content></note>");
 
             // Act
             var newNote = _manager.Create(note);
@@ -216,10 +216,10 @@ namespace Hmm.Core.Tests
             // Assert
             Assert.NotNull(newNote);
 
-            Assert.Equal<string>(xmldoc.InnerXml, newNote.Content);
+            Assert.Equal(xmldoc.InnerXml, newNote.Content);
 
-            Assert.Equal(1, _notes.Count);
-            Assert.Equal<string>(xmldoc.InnerXml, _notes[0].Content);
+            Assert.Single(_notes);
+            Assert.Equal(xmldoc.InnerXml, _notes[0].Content);
         }
 
         [Fact]
@@ -236,7 +236,7 @@ namespace Hmm.Core.Tests
                 Content = "Testing content with < and >"
             };
             var xmldoc = new XmlDocument();
-            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"UTF-16\" ?><note xmlns=\"http://schema.hmm.com/2017\"><content>Testing content with &lt; and &gt;</content></note>");
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\" ?><note xmlns=\"http://schema.hmm.com/2017\"><content>Testing content with &lt; and &gt;</content></note>");
 
             // Act
             var newNote = _manager.Create(note);
@@ -244,10 +244,10 @@ namespace Hmm.Core.Tests
             // Assert
             Assert.NotNull(newNote);
 
-            Assert.Equal<string>(xmldoc.InnerXml, newNote.Content);
+            Assert.Equal(xmldoc.InnerXml, newNote.Content);
 
-            Assert.Equal(1, _notes.Count);
-            Assert.Equal<string>(xmldoc.InnerXml, _notes[0].Content);
+            Assert.Single(_notes);
+            Assert.Equal(xmldoc.InnerXml, _notes[0].Content);
         }
 
         [Fact]
@@ -257,7 +257,7 @@ namespace Hmm.Core.Tests
             var user = _authors[0];
             var cat = _cats[0];
             var xmldoc = new XmlDocument();
-            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"UTF-16\" ?><note xmlns=\"http://schema.hmm.com/2017\"><content>Testing content with &lt; and &gt;</content></note>");
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\" ?><note xmlns=\"http://schema.hmm.com/2017\"><content>Testing content with &lt; and &gt;</content></note>");
             var note = new HmmNote
             {
                 Id = 1,
@@ -269,7 +269,7 @@ namespace Hmm.Core.Tests
                 LastModifiedDate = _currentDate
             };
             _notes.AddEntity(note);
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
 
             // Act
             note.Subject = "new note subject";
@@ -280,15 +280,15 @@ namespace Hmm.Core.Tests
 
             // Assert
             Assert.NotNull(newNote);
-            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"UTF-16\" ?><note xmlns=\"http://schema.hmm.com/2017\"><content>This is new note content</content></note>");
-            Assert.Equal<string>(xmldoc.InnerXml, newNote.Content);
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\" ?><note xmlns=\"http://schema.hmm.com/2017\"><content>This is new note content</content></note>");
+            Assert.Equal(xmldoc.InnerXml, newNote.Content);
             Assert.Equal("new note subject", newNote.Subject);
             Assert.Equal(oldDate, newNote.CreateDate);
             Assert.Equal(_currentDate, newNote.LastModifiedDate);
 
-            Assert.Equal(1, _notes.Count);
+            Assert.Single(_notes);
             Assert.Equal("new note subject", _notes[0].Subject);
-            Assert.Equal<string>(xmldoc.InnerXml, _notes[0].Content);
+            Assert.Equal(xmldoc.InnerXml, _notes[0].Content);
             Assert.Equal(oldDate, _notes[0].CreateDate);
             Assert.Equal(_currentDate, _notes[0].LastModifiedDate);
         }
