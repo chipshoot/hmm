@@ -1,10 +1,11 @@
-﻿using Hmm.Api.Areas.Gaslog.Models;
+﻿using Hmm.Api.Areas.GaslogNote.Models;
+using Hmm.Api.Models;
 using Hmm.Contract.GasLogMan;
 using Hmm.Utility.Validation;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
-namespace Hmm.Api.Areas.Gaslog.Controllers
+namespace Hmm.Api.Areas.GaslogNote.Controllers
 {
     [Route("api/gaslogs")]
     public class GaslogController : Controller
@@ -27,14 +28,24 @@ namespace Hmm.Api.Areas.Gaslog.Controllers
 
         // POST api/gaslogs
         [HttpPost]
-        public void Post([FromBody] ApiGaslog gaslog)
+        public IActionResult Post([FromBody] ApiGaslog gaslog)
         {
+            if (gaslog == null)
+            {
+                return BadRequest(new ApiBadRequestResponse("null gas log found"));
+            }
+
+            var config = ApiDomainEntityConvertHelper.Api2DomainEntity();
+            var log = config.CreateMapper();
+
+            return Ok(new ApiOkResponse(log));
         }
 
         // PUT api/gaslogs/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string gaslog)
+        public IActionResult Put(int id, [FromBody]string gaslog)
         {
+            throw new NotImplementedException();
         }
 
         // DELETE api/gaslogs/5

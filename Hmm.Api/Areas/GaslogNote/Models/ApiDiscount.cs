@@ -1,6 +1,6 @@
 ﻿using Hmm.Api.Models;
 
-namespace Hmm.Api.Areas.Gaslog.Models
+namespace Hmm.Api.Areas.GaslogNote.Models
 {
     public class ApiDiscount : ApiEntity
     {
