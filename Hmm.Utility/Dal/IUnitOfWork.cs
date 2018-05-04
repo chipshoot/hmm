@@ -2,6 +2,7 @@
 
 namespace Hmm.Utility.Dal
 {
+    /// <inheritdoc />
     /// <summary>
     /// The Unit of work base contract
     /// </summary>

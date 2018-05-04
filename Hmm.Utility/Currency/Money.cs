@@ -161,7 +161,7 @@ namespace Hmm.Utility.Currency
                 return true;
             }
 
-            if (ReferenceEquals(first, null) || ReferenceEquals(second, null))
+            if (first is null || second is null)
             {
                 return false;
             }
@@ -213,7 +213,7 @@ namespace Hmm.Utility.Currency
 
         public bool Equals(Money other)
         {
-            if (ReferenceEquals(other, null))
+            if (other is null)
             {
                 return false;
             }
@@ -308,7 +308,7 @@ namespace Hmm.Utility.Currency
 
         public static bool operator ==(Money money, decimal value)
         {
-            if (ReferenceEquals(money, null))
+            if (money is null)
             {
                 return false;
             }
@@ -318,7 +318,7 @@ namespace Hmm.Utility.Currency
 
         public static bool operator ==(Money money, double value)
         {
-            if (ReferenceEquals(money, null))
+            if (money is null)
             {
                 return false;
             }

@@ -20,7 +20,6 @@ namespace Hmm.Core.Tests
     {
         private readonly List<HmmNote> _notes;
         private readonly List<NoteCatalog> _cats;
-        private readonly List<NoteRender> _renders;
         private readonly List<User> _authors;
         private DateTime _currentDate;
         private readonly IHmmNoteManager<HmmNote> _manager;
@@ -70,7 +69,7 @@ namespace Hmm.Core.Tests
                     Description = "Testing catalog"
                 }
             };
-            _renders = new List<NoteRender>
+            var renders = new List<NoteRender>
             {
                 new NoteRender
                 {
@@ -136,7 +135,7 @@ namespace Hmm.Core.Tests
             });
             lookupMock.Setup(lk => lk.GetEntity<NoteRender>(It.IsAny<int>())).Returns((int id) =>
             {
-                var rec = _renders.FirstOrDefault(n => n.Id == id);
+                var rec = renders.FirstOrDefault(n => n.Id == id);
                 return rec;
             });
 

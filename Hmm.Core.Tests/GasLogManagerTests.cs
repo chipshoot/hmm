@@ -1,7 +1,7 @@
 ﻿using DomainEntity.Misc;
 using DomainEntity.User;
 using DomainEntity.Vehicle;
-using Hmm.Core.Manager;
+using Hmm.Core.Manager.GasLogMan;
 using Hmm.Dal.Storages;
 using Hmm.Dal.Validation;
 using Hmm.Utility.Currency;
@@ -13,7 +13,6 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Hmm.Core.Manager.GasLogMan;
 using Xunit;
 
 namespace Hmm.Core.Tests
@@ -23,8 +22,6 @@ namespace Hmm.Core.Tests
         private readonly List<GasLog> _notes;
         private readonly List<User> _authors;
         private readonly List<NoteCatalog> _cats;
-        private readonly List<NoteRender> _renders;
-        private readonly DateTime _currentDate;
         private readonly GasLogManager _manager;
 
         public GasLogManagerTests()
@@ -72,7 +69,7 @@ namespace Hmm.Core.Tests
                     Description = "Testing catalog"
                 }
             };
-            _renders = new List<NoteRender>
+            var renders = new List<NoteRender>
             {
                 new NoteRender
                 {
@@ -138,7 +135,7 @@ namespace Hmm.Core.Tests
             });
             lookupMock.Setup(lk => lk.GetEntity<NoteRender>(It.IsAny<int>())).Returns((int id) =>
             {
-                var rec = _renders.FirstOrDefault(n => n.Id == id);
+                var rec = renders.FirstOrDefault(n => n.Id == id);
                 return rec;
             });
 
@@ -146,9 +143,9 @@ namespace Hmm.Core.Tests
             var validator = new HmmNoteValidator(lookupMock.Object);
 
             // set up date time provider
-            _currentDate = DateTime.Now;
+            var currentDate = DateTime.Now;
             var timeProviderMock = new Mock<IDateTimeProvider>();
-            timeProviderMock.Setup(t => t.UtcNow).Returns(() => _currentDate);
+            timeProviderMock.Setup(t => t.UtcNow).Returns(() => currentDate);
 
             var noteStorage = new NoteStorage<GasLog>(uowMock.Object, validator, lookupMock.Object, timeProviderMock.Object);
             var lkmoc = new Mock<IEntityLookup>();

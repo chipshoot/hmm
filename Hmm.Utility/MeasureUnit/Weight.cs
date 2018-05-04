@@ -6,19 +6,18 @@ using System.Xml;
 
 namespace Hmm.Utility.MeasureUnit
 {
-    /// <summary>
-    /// Help class to help convert between lb and kg
-    /// <remarks>
-    /// The value of weight internally saved as grams and can be convert to kg and lb
-    ///
-    /// The only way to get <see cref="Weight"/> object if from four static method, e.g.
-    ///  <code>
-    ///     var weight1 = Weight.FromGrams(35.0);
-    ///     var weight2 = Weight.FromKilograms(0.035);
-    ///     var weight3 = Weight.FromPonds(34.0);
-    ///  </code>
-    /// </remarks>
-    /// </summary>
+    ///  <summary>
+    ///  Help class to help convert between lb and kg
+    ///  <remarks>
+    ///  The value of weight internally saved as grams and can be convert to kg and lb
+    ///  The only way to get <see cref="T:Hmm.Utility.MeasureUnit.Weight" /> object if from four static method, e.g.
+    ///   <code>
+    ///      var weight1 = Weight.FromGrams(35.0);
+    ///      var weight2 = Weight.FromKilograms(0.035);
+    ///      var weight3 = Weight.FromPonds(34.0);
+    ///   </code>
+    ///  </remarks>
+    ///  </summary>
     [ImmutableObject(true)]
     public struct Weight : IEquatable<Weight>, IComparable<Weight>, IHmmSerializable
     {
@@ -263,7 +262,7 @@ namespace Hmm.Utility.MeasureUnit
 
         public override bool Equals(object obj)
         {
-            return obj is Weight && Equals((Weight)obj);
+            return obj is Weight weight && Equals(weight);
         }
 
         public override int GetHashCode()
