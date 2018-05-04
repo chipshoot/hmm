@@ -1,10 +1,8 @@
-﻿using Hmm.Utility.Misc;
+﻿using DomainEntity.Vehicle;
 
 namespace Hmm.Contract.GasLogMan
 {
-    public interface IGasLogManager
+    public interface IGasLogManager : IHmmNoteManager<GasLog>
     {
-        
-        ProcessingResult ErrorMessage { get; }
     }
 }

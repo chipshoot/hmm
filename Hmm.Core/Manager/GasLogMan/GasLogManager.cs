@@ -1,12 +1,11 @@
 ﻿using DomainEntity.Vehicle;
-using Hmm.Contract.GasLogMan;
 using Hmm.Utility.Dal.DataStore;
 using Hmm.Utility.Dal.Query;
 using System.Xml;
 
 namespace Hmm.Core.Manager.GasLogMan
 {
-    public class GasLogManager : HmmNoteManager<GasLog>, IGasLogManager
+    public class GasLogManager : HmmNoteManager<GasLog>
     {
         public GasLogManager(IDataStore<GasLog> storage, IEntityLookup lookup) : base(storage, lookup)
         {

@@ -1,11 +1,11 @@
 ﻿using DomainEntity.Misc;
 using Hmm.Contract;
 using Hmm.Utility.Dal.DataStore;
+using Hmm.Utility.Dal.Query;
+using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
 using System.Xml;
-using Hmm.Utility.Dal.Query;
-using Hmm.Utility.Misc;
 
 namespace Hmm.Core.Manager
 {
@@ -24,6 +24,12 @@ namespace Hmm.Core.Manager
             Guard.Against<ArgumentNullException>(lookup == null, nameof(lookup));
             _noteStorage = storage;
             _lookup = lookup;
+        }
+
+        public T GetNoteById(int id)
+        {
+            var note = _lookup.GetEntity<T>(id);
+            return note;
         }
 
         public virtual T Create(T note)

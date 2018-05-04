@@ -3,9 +3,9 @@ using Hmm.Utility.Currency;
 
 namespace DomainEntity.Vehicle
 {
-    public class Discount : HmmNote
+    public class GasDiscount : HmmNote
     {
-        public Discount()
+        public GasDiscount()
         {
             Subject = "Discount";
         }

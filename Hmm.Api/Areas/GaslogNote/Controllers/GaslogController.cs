@@ -1,18 +1,19 @@
 ﻿using Hmm.Api.Areas.GaslogNote.Models;
 using Hmm.Api.Models;
-using Hmm.Contract.GasLogMan;
 using Hmm.Utility.Validation;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using DomainEntity.Vehicle;
+using Hmm.Contract;
 
 namespace Hmm.Api.Areas.GaslogNote.Controllers
 {
     [Route("api/gaslogs")]
     public class GaslogController : Controller
     {
-        private readonly IGasLogManager _gaslogManager;
+        private readonly IHmmNoteManager<GasLog> _gaslogManager;
 
-        public GaslogController(IGasLogManager gaslogManager)
+        public GaslogController(IHmmNoteManager<GasLog> gaslogManager)
         {
             Guard.Against<ArgumentNullException>(gaslogManager == null, nameof(gaslogManager));
 
@@ -23,7 +24,12 @@ namespace Hmm.Api.Areas.GaslogNote.Controllers
         [HttpGet("{id}")]
         public ApiGaslog Get(int id)
         {
-            return new ApiGaslog();
+            var log = _gaslogManager.GetNoteById(id);
+            var config = ApiDomainEntityConvertHelper.DomainEntity2Api();
+            var mapper = config.CreateMapper();
+            var apilog = mapper..Map(log);
+            
+            return apilog;
         }
 
         // POST api/gaslogs

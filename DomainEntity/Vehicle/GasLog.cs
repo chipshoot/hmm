@@ -19,7 +19,7 @@ namespace DomainEntity.Vehicle
 
         public Money Price { get; set; }
 
-        public List<Discount> Discounts { get; set; }
+        public List<GasDiscount> Discounts { get; set; }
 
         public string GasStation { get; set; }
     }
