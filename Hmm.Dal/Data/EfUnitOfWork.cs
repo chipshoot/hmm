@@ -17,7 +17,7 @@ namespace Hmm.Dal.Data
 
         public void Dispose()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public T Add<T>(T entity) where T : class
@@ -56,12 +56,12 @@ namespace Hmm.Dal.Data
 
         public IGenericTransaction BeginTransaction()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public void Flush()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }
