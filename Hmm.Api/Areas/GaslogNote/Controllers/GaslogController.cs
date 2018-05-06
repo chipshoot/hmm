@@ -1,10 +1,11 @@
-﻿using Hmm.Api.Areas.GaslogNote.Models;
+﻿using DomainEntity.Vehicle;
+using Hmm.Api.Areas.GaslogNote.Models;
 using Hmm.Api.Models;
+using Hmm.Contract;
 using Hmm.Utility.Validation;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using DomainEntity.Vehicle;
-using Hmm.Contract;
+using System.Linq;
 
 namespace Hmm.Api.Areas.GaslogNote.Controllers
 {
@@ -27,24 +28,37 @@ namespace Hmm.Api.Areas.GaslogNote.Controllers
             var log = _gaslogManager.GetNoteById(id);
             var config = ApiDomainEntityConvertHelper.DomainEntity2Api();
             var mapper = config.CreateMapper();
-            var apilog = mapper..Map(log);
-            
+            var apilog = mapper.Map<ApiGaslog>(log);
+
             return apilog;
         }
 
         // POST api/gaslogs
         [HttpPost]
-        public IActionResult Post([FromBody] ApiGaslog gaslog)
+        public IActionResult Post([FromBody] ApiGaslog apiGaslog)
         {
-            if (gaslog == null)
+            if (apiGaslog == null)
             {
                 return BadRequest(new ApiBadRequestResponse("null gas log found"));
             }
 
             var config = ApiDomainEntityConvertHelper.Api2DomainEntity();
-            var log = config.CreateMapper();
+            var mapper = config.CreateMapper();
+            var gaslog = mapper.Map<GasLog>(apiGaslog);
+            var result = _gaslogManager.Create(gaslog);
 
-            return Ok(new ApiOkResponse(log));
+            if (!_gaslogManager.ErrorMessage.MessageList.Any())
+            {
+                config = ApiDomainEntityConvertHelper.DomainEntity2Api();
+                mapper = config.CreateMapper();
+                var newlog = mapper.Map<ApiGaslog>(result);
+
+                return Ok(new ApiOkResponse(newlog));
+            }
+            else
+            {
+                return Ok;
+            }
         }
 
         // PUT api/gaslogs/5
