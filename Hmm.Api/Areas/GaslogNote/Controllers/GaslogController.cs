@@ -2,11 +2,10 @@
 using Hmm.Api.Areas.GaslogNote.Models;
 using Hmm.Api.Models;
 using Hmm.Api.Models.Validation;
-using Hmm.Contract;
+using Hmm.Contract.GasLogMan;
 using Hmm.Utility.Validation;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using Hmm.Api.Areas.HmmNote.Models;
 
 namespace Hmm.Api.Areas.GaslogNote.Controllers
 {
@@ -14,9 +13,9 @@ namespace Hmm.Api.Areas.GaslogNote.Controllers
     [ValidationModel]
     public class GaslogController : Controller
     {
-        private readonly IHmmNoteManager<GasLog> _gaslogManager;
+        private readonly IGasLogManager _gaslogManager;
 
-        public GaslogController(IHmmNoteManager<GasLog> gaslogManager)
+        public GaslogController(IGasLogManager gaslogManager)
         {
             Guard.Against<ArgumentNullException>(gaslogManager == null, nameof(gaslogManager));
 
@@ -25,19 +24,19 @@ namespace Hmm.Api.Areas.GaslogNote.Controllers
 
         // GET api/gaslogs/5
         [HttpGet("{id}")]
-        public ApiNote Get(int id)
+        public IActionResult Get(int id)
         {
-            var log = _gaslogManager.GetNoteById(id);
+            var log = _gaslogManager.GetGasLogById(id);
             var config = ApiDomainEntityConvertHelper.DomainEntity2Api();
             var mapper = config.CreateMapper();
-            var apilog = mapper.Map<ApiNote>(log);
+            var apilog = mapper.Map<ApiGasLog>(log);
 
-            return apilog;
+            return Ok(apilog);
         }
 
         // POST api/gaslogs
         [HttpPost]
-        public IActionResult Post([FromBody] ApiNote apiGaslog)
+        public IActionResult Post([FromBody] ApiGasLog apiGaslog)
         {
             if (apiGaslog == null)
             {
@@ -47,11 +46,11 @@ namespace Hmm.Api.Areas.GaslogNote.Controllers
             var config = ApiDomainEntityConvertHelper.Api2DomainEntity();
             var mapper = config.CreateMapper();
             var gaslog = mapper.Map<GasLog>(apiGaslog);
-            var result = _gaslogManager.Create(gaslog);
+            var result = _gaslogManager.CreateLog(gaslog);
 
             config = ApiDomainEntityConvertHelper.DomainEntity2Api();
             mapper = config.CreateMapper();
-            var newlog = mapper.Map<ApiNote>(result);
+            var newlog = mapper.Map<ApiGasLog>(result);
 
             return Ok(new ApiOkResponse(newlog));
         }

@@ -12,7 +12,7 @@ namespace Hmm.Api.Areas.GaslogNote.Models
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ApiUser, User>();
-                cfg.CreateMap<ApiGaslog, GasLog>();
+                cfg.CreateMap<ApiGasLog, GasLog>();
             });
 
             return config;
@@ -23,7 +23,7 @@ namespace Hmm.Api.Areas.GaslogNote.Models
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<User, ApiUser>();
-                cfg.CreateMap<GasLog, ApiGaslog>();
+                cfg.CreateMap<GasLog, ApiGasLog>();
             });
 
             return config;

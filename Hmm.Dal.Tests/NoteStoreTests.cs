@@ -6,6 +6,7 @@ using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
 using Hmm.Utility.TestHelp;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,6 @@ namespace Hmm.Dal.Tests
 {
     public class NoteStorageTests : IDisposable
     {
-        private const bool UseMoc = true;
         private readonly List<HmmNote> _notes;
         private readonly List<User> _authors;
         private readonly List<NoteCatalog> _cats;
@@ -89,7 +89,8 @@ namespace Hmm.Dal.Tests
                 }
             };
 
-            _dsp = UseMoc ? GetMockDataSource() : GetDatabase();
+            var isUseMoc = IsUsingMocEnv();
+            _dsp = isUseMoc ? GetMockDataSource() : GetDatabase();
 
             // set up note validator
             var validator = new HmmNoteValidator(_dsp.Lookup);
@@ -185,6 +186,21 @@ namespace Hmm.Dal.Tests
         private IDataSourceProvider GetDatabase()
         {
             return null;
+        }
+
+        private static bool IsUsingMocEnv()
+        {
+            var config = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)
+                .AddJsonFile("appsettings.json").Build();
+
+            var useMocconf = config["TestEnviornment:UseMoc"];
+            if (useMocconf == null || !bool.TryParse(useMocconf, out var isUseMoc))
+            {
+                isUseMoc = true;
+            }
+
+            return isUseMoc;
         }
 
         public void Dispose()

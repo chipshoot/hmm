@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Hmm.Api.Areas.GaslogNote.Models
 {
-    public class ApiGaslog : ApiEntity, IValidatableObject
+    public class ApiGasLog : ApiEntity, IValidatableObject
     {
         public string Subject { get; set; }
 

@@ -27,7 +27,7 @@ namespace Hmm.Api.Areas.HmmNote.Models
             {
                 var error = new ValidationError($"The create date {CreateDate} is in the future", nameof(CreateDate));
             }
-            var errRst = new ValidationFailedResult();
+            //var errRst = new ValidationFailedResult();
             throw new NotImplementedException();
         }
     }
