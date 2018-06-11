@@ -64,8 +64,9 @@ namespace Hmm.Api.Areas.GaslogNote.Controllers
 
         // DELETE api/gaslogs/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult Delete(int id)
         {
+            throw new NotImplementedException();
         }
     }
 }
