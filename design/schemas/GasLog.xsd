@@ -1,20 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2015 rel. 4 (x64) (http://www.altova.com) by Dan Guy (Hadrian Manufacturing Inc.) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning" xmlns:rns="http://schema.hmm.com/2017" targetNamespace="http://schema.hmm.com/2017" elementFormDefault="qualified" attributeFormDefault="unqualified" vc:minVersion="1.1">
-	<xs:element name="GasLog">
+	<xs:element name="note">
 		<xs:annotation>
-			<xs:documentation>Comment describing your root element</xs:documentation>
+			<xs:documentation>The root of all note managed by HMM</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="Date" type="xs:dateTime"/>
-				<xs:element name="Distance" type="rns:DimensionType"/>
-				<xs:element name="Gas" type="rns:VolumeType"/>
-				<xs:element name="Price" type="rns:MonetaryType"/>
-				<xs:element name="Total" type="rns:MonetaryType"/>
-				<xs:element name="Discounts">
+				<xs:element name="content">
 					<xs:complexType>
 						<xs:sequence>
-							<xs:element name="Discount" type="rns:DiscountType" minOccurs="0" maxOccurs="unbounded"/>
+							<xs:element name="GasLog">
+								<xs:annotation>
+									<xs:documentation>Comment describing your root element</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="Date" type="xs:dateTime"/>
+										<xs:element name="Distance" type="rns:DimensionType"/>
+										<xs:element name="Gas" type="rns:VolumeType"/>
+										<xs:element name="Price" type="rns:MonetaryType"/>
+										<xs:element name="Total" type="rns:MonetaryType"/>
+										<xs:element name="Discounts">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="Discount" type="rns:DiscountType" minOccurs="0" maxOccurs="unbounded"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
