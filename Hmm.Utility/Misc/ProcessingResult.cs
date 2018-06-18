@@ -14,6 +14,12 @@ namespace Hmm.Utility.Misc
 
         public List<string> MessageList { get; private set; }
 
+        public void Rest()
+        {
+            Success = true;
+            MessageList.Clear();
+        }
+
         public void AddMessage(string message)
         {
             MessageList.Add(message);

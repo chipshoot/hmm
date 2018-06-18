@@ -9,16 +9,16 @@ using System.Xml;
 
 namespace Hmm.Core.Manager
 {
-    public class HmmNoteManager<T> : IHmmNoteManager<T> where T : HmmNote
+    public class HmmNoteManager : IHmmNoteManager<HmmNote>
     {
         #region private fields
 
-        private readonly IDataStore<T> _noteStorage;
+        private readonly IDataStore<HmmNote> _noteStorage;
         private readonly IEntityLookup _lookup;
 
         #endregion private fields
 
-        public HmmNoteManager(IDataStore<T> storage, IEntityLookup lookup)
+        public HmmNoteManager(IDataStore<HmmNote> storage, IEntityLookup lookup)
         {
             Guard.Against<ArgumentNullException>(storage == null, nameof(storage));
             Guard.Against<ArgumentNullException>(lookup == null, nameof(lookup));
@@ -26,21 +26,15 @@ namespace Hmm.Core.Manager
             _lookup = lookup;
         }
 
-        public T GetNoteById(int id)
+        public HmmNote Create(HmmNote note)
         {
-            var note = _lookup.GetEntity<T>(id);
-            return note;
-        }
-
-        public virtual T Create(T note)
-        {
-            var xmlContent = GetNoteContent(note);
+            var xmlContent = GetNoteContent(note, true);
             note.Content = xmlContent.InnerXml;
             var ret = _noteStorage.Add(note);
             return ret;
         }
 
-        public virtual T Update(T note)
+        public HmmNote Update(HmmNote note)
         {
             var xmlContent = GetNoteContent(note);
             note.Content = xmlContent.InnerXml;
@@ -49,9 +43,15 @@ namespace Hmm.Core.Manager
             return ret;
         }
 
+        HmmNote IHmmNoteManager<HmmNote>.GetNoteById(int id)
+        {
+            var note = _lookup.GetEntity<HmmNote>(id);
+            return note;
+        }
+
         public ProcessingResult ErrorMessage { get; } = new ProcessingResult();
 
-        protected virtual XmlDocument GetNoteContent(T note, bool isXmlConent = false)
+        public  XmlDocument GetNoteContent(HmmNote note, bool isXmlConent = false)
         {
             var xmldoc = new XmlDocument();
             var content = note.Content;

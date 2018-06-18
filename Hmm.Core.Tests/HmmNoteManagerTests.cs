@@ -149,7 +149,7 @@ namespace Hmm.Core.Tests
 
             var noteStorage = new NoteStorage<HmmNote>(uowMock.Object, validator, lookupMock.Object, timeProviderMock.Object);
             var lkmoc = new Mock<IEntityLookup>();
-            _manager = new HmmNoteManager<HmmNote>(noteStorage, lkmoc.Object);
+            _manager = new HmmNoteManager(noteStorage, lkmoc.Object);
         }
 
         public void Dispose()

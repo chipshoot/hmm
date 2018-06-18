@@ -13,6 +13,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Hmm.Core.Manager;
 using Xunit;
 
 namespace Hmm.Core.Tests
@@ -147,9 +148,10 @@ namespace Hmm.Core.Tests
             var timeProviderMock = new Mock<IDateTimeProvider>();
             timeProviderMock.Setup(t => t.UtcNow).Returns(() => currentDate);
 
-            var noteStorage = new NoteStorage<GasLog>(uowMock.Object, validator, lookupMock.Object, timeProviderMock.Object);
+            var noteStorage = new NoteStorage<HmmNote>(uowMock.Object, validator, lookupMock.Object, timeProviderMock.Object);
             var lkmoc = new Mock<IEntityLookup>();
-            _manager = new GasLogManager(noteStorage, lkmoc.Object);
+            var noteman = new HmmNoteManager(noteStorage, lkmoc.Object);
+            _manager = new GasLogManager(noteman);
         }
 
         public void Dispose()
@@ -174,7 +176,7 @@ namespace Hmm.Core.Tests
             };
 
             // Act
-            var newgas = _manager.Create(gaslog);
+            var newgas = _manager.CreateLog(gaslog);
 
             // Assert
             Assert.Equal(1, newgas.Id);
