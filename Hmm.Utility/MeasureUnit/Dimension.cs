@@ -3,7 +3,7 @@ using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
-using System.Xml;
+using System.Xml.Linq;
 
 namespace Hmm.Utility.MeasureUnit
 {
@@ -175,6 +175,34 @@ namespace Hmm.Utility.MeasureUnit
         public static Dimension FromFeet(double value)
         {
             return new Dimension(value, DimensionUnit.Feet);
+        }
+
+        public static Dimension FromXml(XElement xmlcontent)
+        {
+            var root = xmlcontent?.Element("Dimension");
+            if (root == null)
+            {
+                throw new ArgumentException("The XML element does not contains Dimension element");
+            }
+
+            if (!double.TryParse(root.Element("Value")?.Value, out var value))
+            {
+                throw new ArgumentException("The XML element does not contains valid value element");
+            }
+
+            var unit = root.Element("Unit")?.Value;
+            if (string.IsNullOrEmpty(unit))
+            {
+                throw new ArgumentException("The XML element does not contains unit element");
+            }
+
+            if (!Enum.TryParse(unit, true, out DimensionUnit unitType))
+            {
+                throw new ArgumentException("The XML element does not contains unit element");
+            }
+
+            var dim = new Dimension(value, unitType);
+            return dim;
         }
 
         public static Dimension Max(params Dimension[] items)
@@ -434,17 +462,11 @@ namespace Hmm.Utility.MeasureUnit
 
         #region implementation of interface IHmmSerializable
 
-        public XmlDocument Measure2Xml()
+        public XElement Measure2Xml()
         {
-            var xml = new XmlDocument();
-            var str = $"<Dimension><Value>{Value}</Value><Unit>{Unit}</Unit></Dimension>";
-            xml.LoadXml(str);
-            return xml;
-        }
-
-        public void Xml2Measure(XmlDocument xmlcontent)
-        {
-            throw new NotImplementedException();
+            return new XElement("Dimension",
+                new XElement("Value", Value),
+                new XElement("Unit", Unit));
         }
 
         #endregion implementation of interface IHmmSerializable

@@ -2,7 +2,7 @@
 using Hmm.Utility.Validation;
 using System;
 using System.Globalization;
-using System.Xml;
+using System.Xml.Linq;
 
 namespace Hmm.Utility.Currency
 {
@@ -35,11 +35,17 @@ namespace Hmm.Utility.Currency
     /// </Summary>
     public class Money : IComparable<Money>, IEquatable<Money>, ICloneable, IHmmSerializable
     {
+        #region private fields
+
         private const int DecimalDigits = 2;
 
         private double _amount;
 
         private readonly CurrencyCodeType _currencyCode;
+
+        #endregion private fields
+
+        #region constructors
 
         public Money() : this(0d)
         {
@@ -58,6 +64,10 @@ namespace Hmm.Utility.Currency
             _amount = amount;
             _currencyCode = currencyCode;
         }
+
+        #endregion constructors
+
+        #region public properties
 
         public static bool AllowImplicitConversion { get; set; }
 
@@ -106,6 +116,42 @@ namespace Hmm.Utility.Currency
         /// </summary>
         /// <returns>A decimal with the _amount truncated to the significant number of decimal digits.</returns>
         public decimal TruncatedAmount => (decimal)((long)Math.Truncate(_amount * DecimalDigits)) / DecimalDigits;
+
+        #endregion public properties
+
+        #region public methods
+
+        public static Money FromXml(XElement xmlcontent)
+        {
+            var root = xmlcontent?.Element("Money");
+            if (root == null)
+            {
+                throw new ArgumentException("The XML element does not contains Money element");
+            }
+
+            if (!double.TryParse(root.Element("Value")?.Value, out var value))
+            {
+                throw new ArgumentException("The Money XML element does not contains valid value element");
+            }
+
+            var code = root.Element("Code")?.Value;
+            if (string.IsNullOrEmpty(code))
+            {
+                throw new ArgumentException("The Money XML element does not contains code element");
+            }
+
+            if (!Enum.TryParse(code, true, out CurrencyCodeType codeType))
+            {
+                throw new ArgumentException("The Money XML element does not contains valid code element");
+            }
+
+            var money = new Money(value, codeType);
+            return money;
+        }
+
+        #endregion public methods
+
+        #region override operators
 
         public static Money operator -(Money first, Money second)
         {
@@ -326,6 +372,10 @@ namespace Hmm.Utility.Currency
             return (money.Amount == (decimal)value);
         }
 
+        #endregion override operators
+
+        #region implementation of interface ICloneable
+
         /// <summary>
         /// Evenly distributes the _amount over n parts, resolving remainders that occur due to rounding
         /// errors, thereby guaranteeing the post-condition: result->sum(r|r._amount) = _amount and
@@ -359,6 +409,8 @@ namespace Hmm.Utility.Currency
             return new Money(_amount, _currencyCode);
         }
 
+        #endregion implementation of interface ICloneable
+
         private static void CheckCurrencyType(Money first, Money second, string operation)
         {
             if (first.CurrencyCode != second.CurrencyCode)
@@ -367,17 +419,15 @@ namespace Hmm.Utility.Currency
             }
         }
 
-        public XmlDocument Measure2Xml()
+        #region implementation of interface IHmmSerializable
+
+        public XElement Measure2Xml()
         {
-            var xml = new XmlDocument();
-            var str = $"<money><value>{InternalAmount}</value><code>{CurrencyCode}</code></money>";
-            xml.LoadXml(str);
-            return xml;
+            return new XElement("Money",
+                new XElement("Value", InternalAmount),
+                new XElement("Code", CurrencyCode));
         }
 
-        public void Xml2Measure(XmlDocument xmlcontent)
-        {
-            throw new NotImplementedException();
-        }
+        #endregion implementation of interface IHmmSerializable
     }
 }

@@ -5,7 +5,7 @@ using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
-using System.Xml;
+using System.Xml.Linq;
 
 namespace Hmm.Core.Manager
 {
@@ -29,7 +29,7 @@ namespace Hmm.Core.Manager
         public HmmNote Create(HmmNote note)
         {
             var xmlContent = GetNoteContent(note, true);
-            note.Content = xmlContent.InnerXml;
+            note.Content = xmlContent.ToString();
             var ret = _noteStorage.Add(note);
             return ret;
         }
@@ -37,7 +37,7 @@ namespace Hmm.Core.Manager
         public HmmNote Update(HmmNote note)
         {
             var xmlContent = GetNoteContent(note);
-            note.Content = xmlContent.InnerXml;
+            note.Content = xmlContent.ToString();
             var ret = _noteStorage.Update(note);
 
             return ret;
@@ -51,28 +51,47 @@ namespace Hmm.Core.Manager
 
         public ProcessingResult ErrorMessage { get; } = new ProcessingResult();
 
-        public  XmlDocument GetNoteContent(HmmNote note, bool isXmlConent = false)
+        public XDocument GetNoteContent(HmmNote note, bool isXmlConent = false)
         {
-            var xmldoc = new XmlDocument();
-            var content = note.Content;
-            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\" ?><note><content></content></note>");
-            xmldoc.DocumentElement.SetAttribute("xmlns", "http://schema.hmm.com/2017");
-            var ns = new XmlNamespaceManager(xmldoc.NameTable);
-            ns.AddNamespace("", "http://schema.hmm.com/2017");
-            var contNode = xmldoc.SelectNodes("/note/content", ns);
-            if (contNode != null)
-            {
-                if (isXmlConent)
-                {
-                    contNode[0].InnerXml = content;
-                }
-                else
-                {
-                    contNode[0].InnerText = content;
-                }
-            }
+            XNamespace ns = "http://schema.hmm.com/2017";
+            var xml = new XDocument(
+                new XDeclaration("1.0", "utf-16", "yes"),
+                new XElement("Note",
+                    new XElement("Content", "")));
 
-            return xmldoc;
+            // ReSharper disable once PossibleNullReferenceException
+            xml.Root.Add(new XAttribute(XNamespace.Xmlns + "hmm", ns));
+
+            if (isXmlConent)
+            {
+                var innerElement = XElement.Parse(note.Content);
+                xml.Root.Element("Content")?.Add(innerElement);
+            }
+            else
+            {
+                // ReSharper disable once PossibleNullReferenceException
+                xml.Root.Element("Content").Value = note.Content;
+            }
+            //var xmldoc = new XmlDocument();
+            //var content = note.Content;
+            //xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\" ?><Note><Content></Content></Note>");
+            //xmldoc.DocumentElement.SetAttribute("xmlns", "http://schema.hmm.com/2017");
+            //var ns = new XmlNamespaceManager(xmldoc.NameTable);
+            //ns.AddNamespace("", "http://schema.hmm.com/2017");
+            //var contNode = xmldoc.SelectNodes("/Note/Content", ns);
+            //if (contNode != null)
+            //{
+            //    if (isXmlConent)
+            //    {
+            //        contNode[0].InnerXml = content;
+            //    }
+            //    else
+            //    {
+            //        contNode[0].InnerText = content;
+            //    }
+            //}
+
+            return xml;
         }
     }
 }

@@ -29,7 +29,7 @@ namespace Hmm.Dal.Storages
             var catalog = PropertyChecking(entity.Catalog);
             entity.Catalog = catalog ?? throw new DataSourceException("Cannot find default note catalog.");
 
-            // check if need apply default catalog
+            // check if need apply default render
             var render = PropertyChecking(entity.Catalog.Render);
             entity.Catalog.Render = render ?? throw new DataSourceException("Cannot find default note render.");
 

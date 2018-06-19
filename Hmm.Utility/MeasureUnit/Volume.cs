@@ -3,7 +3,7 @@ using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
-using System.Xml;
+using System.Xml.Linq;
 
 namespace Hmm.Utility.MeasureUnit
 {
@@ -163,7 +163,7 @@ namespace Hmm.Utility.MeasureUnit
 
         public static Volume Max(params Volume[] items)
         {
-            if (items.Count() == 0)
+            if (items.Length == 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(items), ErrorMsg);
             }
@@ -175,7 +175,7 @@ namespace Hmm.Utility.MeasureUnit
 
         public static Volume Min(params Volume[] items)
         {
-            if (items.Count() == 0)
+            if (items.Length == 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(items), ErrorMsg);
             }
@@ -420,6 +420,34 @@ namespace Hmm.Utility.MeasureUnit
             return new Volume(value, VolumeUnit.Bushel);
         }
 
+        public static Volume FromXml(XElement xmlcontent)
+        {
+            var root = xmlcontent?.Element("Volume");
+            if (root == null)
+            {
+                throw new ArgumentException("The XML element does not contains Volume element");
+            }
+
+            if (!double.TryParse(root.Element("Value")?.Value, out var value))
+            {
+                throw new ArgumentException("The XML element does not contains valid value element");
+            }
+
+            var unit = root.Element("Unit")?.Value;
+            if (string.IsNullOrEmpty(unit))
+            {
+                throw new ArgumentException("The XML element does not contains unit element");
+            }
+
+            if (!Enum.TryParse(unit, true, out VolumeUnit unitType))
+            {
+                throw new ArgumentException("The XML element does not contains unit element");
+            }
+
+            var vol = new Volume(value, unitType);
+            return vol;
+        }
+
         #endregion public methods
 
         #region implementation of interface IComparable
@@ -490,17 +518,11 @@ namespace Hmm.Utility.MeasureUnit
 
         #region implementation of interface IHmmSerializable
 
-        public XmlDocument Measure2Xml()
+        public XElement Measure2Xml()
         {
-            var xml = new XmlDocument();
-            var str = $"<Volume><Value>{Value}</Value><Unit>{Unit}</Unit></Volume>";
-            xml.LoadXml(str);
-            return xml;
-        }
-
-        public void Xml2Measure(XmlDocument xmlcontent)
-        {
-            throw new NotImplementedException();
+            return new XElement("Volume",
+                new XElement("Value", Value),
+                new XElement("Unit", Unit));
         }
 
         #endregion implementation of interface IHmmSerializable

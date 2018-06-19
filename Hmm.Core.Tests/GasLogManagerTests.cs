@@ -1,6 +1,7 @@
 ﻿using DomainEntity.Misc;
 using DomainEntity.User;
 using DomainEntity.Vehicle;
+using Hmm.Core.Manager;
 using Hmm.Core.Manager.GasLogMan;
 using Hmm.Dal.Storages;
 using Hmm.Dal.Validation;
@@ -13,21 +14,20 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Hmm.Core.Manager;
 using Xunit;
 
 namespace Hmm.Core.Tests
 {
     public class GasLogManagerTests : IDisposable
     {
-        private readonly List<GasLog> _notes;
+        private readonly List<HmmNote> _notes;
         private readonly List<User> _authors;
         private readonly List<NoteCatalog> _cats;
         private readonly GasLogManager _manager;
 
         public GasLogManagerTests()
         {
-            _notes = new List<GasLog>();
+            _notes = new List<HmmNote>();
             _authors = new List<User>
             {
                 new User
@@ -90,14 +90,14 @@ namespace Hmm.Core.Tests
 
             // set up unit of work
             var uowMock = new Mock<IUnitOfWork>();
-            uowMock.Setup(u => u.Add(It.IsAny<GasLog>())).Returns((GasLog note) =>
+            uowMock.Setup(u => u.Add(It.IsAny<HmmNote>())).Returns((HmmNote note) =>
             {
                 note.Id = _notes.GetNextId();
                 _notes.AddEntity(note);
                 var savedRec = _notes.FirstOrDefault(n => n.Id == note.Id);
                 return savedRec;
             });
-            uowMock.Setup(u => u.Delete(It.IsAny<GasLog>())).Callback((GasLog note) =>
+            uowMock.Setup(u => u.Delete(It.IsAny<HmmNote>())).Callback((HmmNote note) =>
             {
                 var rec = _notes.FirstOrDefault(n => n.Id == note.Id);
                 if (rec != null)
@@ -105,7 +105,7 @@ namespace Hmm.Core.Tests
                     _notes.Remove(rec);
                 }
             });
-            uowMock.Setup(u => u.Update(It.IsAny<GasLog>())).Callback((GasLog note) =>
+            uowMock.Setup(u => u.Update(It.IsAny<HmmNote>())).Callback((HmmNote note) =>
             {
                 var rec = _notes.FirstOrDefault(n => n.Id == note.Id);
                 if (rec == null)
@@ -119,7 +119,7 @@ namespace Hmm.Core.Tests
 
             // set up look up repository
             var lookupMock = new Mock<IEntityLookup>();
-            lookupMock.Setup(lk => lk.GetEntity<GasLog>(It.IsAny<int>())).Returns((int id) =>
+            lookupMock.Setup(lk => lk.GetEntity<HmmNote>(It.IsAny<int>())).Returns((int id) =>
             {
                 var rec = _notes.FirstOrDefault(n => n.Id == id);
                 return rec;
@@ -172,7 +172,8 @@ namespace Hmm.Core.Tests
                 GasStation = "Costco",
                 Gas = Volume.FromLiter(40),
                 Price = new Money(40.0),
-                Distance = Dimension.FromKilometre(300)
+                Distance = Dimension.FromKilometre(300),
+                CreateDate = DateTime.UtcNow
             };
 
             // Act

@@ -2,11 +2,12 @@
 using DomainEntity.Vehicle;
 using Hmm.Contract;
 using Hmm.Contract.GasLogMan;
+using Hmm.Utility.MeasureUnit;
 using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
-using System.Xml;
 using System.Xml.Linq;
+using Hmm.Utility.Currency;
 
 namespace Hmm.Core.Manager.GasLogMan
 {
@@ -45,30 +46,16 @@ namespace Hmm.Core.Manager.GasLogMan
 
         private static void SetGasLogContent(GasLog gaslog)
         {
-            var xml = new XmlDocument();
-            xml.LoadXml("<GasLog/>");
-            var root = xml.DocumentElement;
+            var xml = new XElement("GasLog",
+                new XElement("Date", gaslog.CreateDate.ToString("O")),
+                new XElement("Distance", gaslog.Distance.Measure2Xml()),
+                new XElement("Gas", gaslog.Gas.Measure2Xml()),
+                new XElement("Price", gaslog.Price.Measure2Xml()),
+                new XElement("GasStation", gaslog.GasStation),
+                new XElement("Discounts", "")
+            );
 
-            var date = xml.CreateElement("Date");
-            date.InnerText = gaslog.CreateDate.ToLongDateString();
-            root.AppendChild(date);
-
-            var dst = xml.CreateElement("Distance");
-            dst.InnerXml = gaslog.Distance.Measure2Xml().InnerXml;
-            root.AppendChild(dst);
-
-            var gas = xml.CreateElement("Gas");
-            gas.InnerXml = gaslog.Gas.Measure2Xml().InnerXml;
-            root.AppendChild(gas);
-
-            var price = xml.CreateElement("Price");
-            price.InnerXml = gaslog.Price.Measure2Xml().InnerXml;
-            root.AppendChild(price);
-
-            var station = xml.CreateElement("GasStation");
-            station.InnerText = gaslog.GasStation;
-            root.AppendChild(station);
-            gaslog.Content = xml.InnerXml;
+            gaslog.Content = xml.ToString();
         }
 
         private GasLog GetLogFromNote(HmmNote note)
@@ -79,9 +66,29 @@ namespace Hmm.Core.Manager.GasLogMan
             }
 
             var notestr = note.Content;
-            var notexml = XElement.Parse(notestr);
+            var notexml = XDocument.Parse(notestr);
+            var logroot = notexml.Root?.Element("Content")?.Element("GasLog");
+            if (logroot == null)
+            {
+                return null;
+            }
 
-            return new GasLog();
+            var gas = new GasLog
+            {
+                Id = note.Id,
+                Author = note.Author,
+                Catalog = note.Catalog,
+                CreateDate = note.CreateDate,
+                LastModifiedDate = note.LastModifiedDate,
+                Content = note.Content,
+                GasStation = logroot.Element("GasStation")?.Value,
+                Description = note.Description,
+                Distance = Dimension.FromXml(logroot.Element("Distance")),
+                Gas = Volume.FromXml(logroot.Element("Gas")),
+                Price = Money.FromXml(logroot.Element("Price"))
+            };
+
+            return gas;
         }
     }
 }

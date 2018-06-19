@@ -17,8 +17,23 @@ namespace Hmm.Core.Tests
         private static void ShallowCopy(object dest, object src)
         {
             const BindingFlags flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+
+            // find the right type to copy
+            var destType = dest.GetType();
+            var srcType = src.GetType();
+            while (destType != srcType && srcType != null)
+            {
+                srcType = src.GetType().GetTypeInfo().BaseType;
+            }
+
+            // cannot find matched type, then return without copy
+            if (srcType == null)
+            {
+                return;
+            }
+
             var destFields = dest.GetType().GetFields(flags);
-            var srcFields = src.GetType().GetFields(flags);
+            var srcFields = srcType.GetFields(flags);
 
             foreach (var srcField in srcFields)
             {
@@ -36,7 +51,7 @@ namespace Hmm.Core.Tests
             }
 
             var destBase = dest.GetType().GetTypeInfo().BaseType;
-            var srcBase = src.GetType().GetTypeInfo().BaseType;
+            var srcBase = srcType.GetTypeInfo().BaseType;
             while (destBase != null && srcBase != null)
             {
                 destFields = destBase.GetFields(flags);

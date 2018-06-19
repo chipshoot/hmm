@@ -1,11 +1,9 @@
-﻿using System.Xml;
+﻿using System.Xml.Linq;
 
 namespace Hmm.Utility.Misc
 {
     public interface IHmmSerializable
     {
-        XmlDocument Measure2Xml();
-
-        void Xml2Measure(XmlDocument xmlcontent);
+        XElement Measure2Xml();
     }
 }
