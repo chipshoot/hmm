@@ -277,7 +277,7 @@ namespace Hmm.Utility.MeasureUnit
         public XmlDocument Measure2Xml()
         {
             var xml = new XmlDocument();
-            var str = $"<weight><value>{Value}</value><unit>{Unit}</unit></weight>";
+            var str = $"<Weight><Value>{Value}</Value><Unit>{Unit}</Unit></Weight>";
             xml.LoadXml(str);
             return xml;
         }

@@ -491,7 +491,7 @@ namespace Hmm.Utility.MeasureUnit
         public XmlDocument Measure2Xml()
         {
             var xml = new XmlDocument();
-            var str = $"<volume><value>{Value}</value><unit>{Unit}</unit></volume>";
+            var str = $"<Volume><Value>{Value}</Value><Unit>{Unit}</Unit></Volume>";
             xml.LoadXml(str);
             return xml;
         }
