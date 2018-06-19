@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Hmm.Utility.Misc;
+using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Xml;
-using Hmm.Utility.Misc;
 
 namespace Hmm.Utility.MeasureUnit
 {
@@ -432,6 +432,8 @@ namespace Hmm.Utility.MeasureUnit
 
         #endregion private methods
 
+        #region implementation of interface IHmmSerializable
+
         public XmlDocument Measure2Xml()
         {
             var xml = new XmlDocument();
@@ -444,5 +446,7 @@ namespace Hmm.Utility.MeasureUnit
         {
             throw new NotImplementedException();
         }
+
+        #endregion implementation of interface IHmmSerializable
     }
 }
