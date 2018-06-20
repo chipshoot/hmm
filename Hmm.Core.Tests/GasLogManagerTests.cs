@@ -173,7 +173,15 @@ namespace Hmm.Core.Tests
                 Gas = Volume.FromLiter(40),
                 Price = new Money(40.0),
                 Distance = Dimension.FromKilometre(300),
-                CreateDate = DateTime.UtcNow
+                CreateDate = DateTime.UtcNow,
+                Discounts = new List<GasDiscount>
+                {
+                    new GasDiscount
+                    {
+                        Amount = new Money(0.2),
+
+                    }
+                }
             };
 
             // Act

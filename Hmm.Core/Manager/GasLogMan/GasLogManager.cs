@@ -55,10 +55,10 @@ namespace Hmm.Core.Manager.GasLogMan
                 new XElement("Discounts", "")
             );
 
-            gaslog.Content = xml.ToString();
+            gaslog.Content = xml.ToString(SaveOptions.DisableFormatting);
         }
 
-        private GasLog GetLogFromNote(HmmNote note)
+        private static GasLog GetLogFromNote(HmmNote note)
         {
             if (note == null)
             {

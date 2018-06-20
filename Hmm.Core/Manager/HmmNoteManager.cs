@@ -29,7 +29,7 @@ namespace Hmm.Core.Manager
         public HmmNote Create(HmmNote note)
         {
             var xmlContent = GetNoteContent(note, true);
-            note.Content = xmlContent.ToString();
+            note.Content = xmlContent.ToString(SaveOptions.DisableFormatting);
             var ret = _noteStorage.Add(note);
             return ret;
         }
@@ -37,7 +37,7 @@ namespace Hmm.Core.Manager
         public HmmNote Update(HmmNote note)
         {
             var xmlContent = GetNoteContent(note);
-            note.Content = xmlContent.ToString();
+            note.Content = xmlContent.ToString(SaveOptions.DisableFormatting);
             var ret = _noteStorage.Update(note);
 
             return ret;
@@ -51,7 +51,7 @@ namespace Hmm.Core.Manager
 
         public ProcessingResult ErrorMessage { get; } = new ProcessingResult();
 
-        public XDocument GetNoteContent(HmmNote note, bool isXmlConent = false)
+        private static XDocument GetNoteContent(HmmNote note, bool isXmlConent = false)
         {
             XNamespace ns = "http://schema.hmm.com/2017";
             var xml = new XDocument(

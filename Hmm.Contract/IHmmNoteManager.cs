@@ -1,5 +1,4 @@
-﻿using System.Xml;
-using DomainEntity.Misc;
+﻿using DomainEntity.Misc;
 using Hmm.Utility.Misc;
 
 namespace Hmm.Contract
