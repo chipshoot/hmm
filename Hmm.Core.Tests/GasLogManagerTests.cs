@@ -174,12 +174,12 @@ namespace Hmm.Core.Tests
                 Price = new Money(40.0),
                 Distance = Dimension.FromKilometre(300),
                 CreateDate = DateTime.UtcNow,
-                Discounts = new List<GasDiscount>
+                Discounts = new List<GasDiscountInfo>
                 {
-                    new GasDiscount
+                    new GasDiscountInfo
                     {
-                        Amount = new Money(0.2),
-
+                        Amount = new Money(0.8),
+                        Program = "Patrol Canada RBC connection"
                     }
                 }
             };

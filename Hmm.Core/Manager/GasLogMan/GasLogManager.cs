@@ -6,6 +6,7 @@ using Hmm.Utility.MeasureUnit;
 using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
+using System.Linq;
 using System.Xml.Linq;
 using Hmm.Utility.Currency;
 
@@ -54,6 +55,18 @@ namespace Hmm.Core.Manager.GasLogMan
                 new XElement("GasStation", gaslog.GasStation),
                 new XElement("Discounts", "")
             );
+
+            if (gaslog.Discounts.Any())
+            {
+                foreach (var disc in gaslog.Discounts)
+                {
+                    var discElement = new XElement("Discount", 
+                        new XElement("Amount", disc.Amount.Measure2Xml()),
+                        new XElement("Program", disc.Program));
+                    xml.Element("Discounts")?.Add(discElement);
+                }
+
+            }
 
             gaslog.Content = xml.ToString(SaveOptions.DisableFormatting);
         }
