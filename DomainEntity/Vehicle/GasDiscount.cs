@@ -1,4 +1,5 @@
 ﻿using DomainEntity.Misc;
+using Hmm.Utility.Currency;
 
 namespace DomainEntity.Vehicle
 {
@@ -16,6 +17,8 @@ namespace DomainEntity.Vehicle
         }
 
         public string Program { get; set; }
+
+        public Money Amount { get; set; }
 
         public bool IsActive { get; set; }
 

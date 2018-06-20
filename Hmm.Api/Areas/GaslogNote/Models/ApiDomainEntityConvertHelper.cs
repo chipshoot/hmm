@@ -2,6 +2,7 @@
 using DomainEntity.User;
 using DomainEntity.Vehicle;
 using Hmm.Api.Areas.HmmNote.Models;
+using Hmm.Utility.Currency;
 
 namespace Hmm.Api.Areas.GaslogNote.Models
 {
@@ -13,6 +14,8 @@ namespace Hmm.Api.Areas.GaslogNote.Models
             {
                 cfg.CreateMap<ApiUser, User>();
                 cfg.CreateMap<ApiGasLog, GasLog>();
+                cfg.CreateMap<ApiDiscountInfo, GasDiscountInfo>()
+                    .ForMember(dest => dest.Amount, opt => opt.MapFrom(src => new Money(src.Amount)));
             });
 
             return config;
@@ -24,6 +27,8 @@ namespace Hmm.Api.Areas.GaslogNote.Models
             {
                 cfg.CreateMap<User, ApiUser>();
                 cfg.CreateMap<GasLog, ApiGasLog>();
+                cfg.CreateMap<GasDiscountInfo, ApiDiscountInfo>()
+                    .ForMember(dest => dest.Amount, opt => opt.MapFrom(src => src.Amount));
             });
 
             return config;
