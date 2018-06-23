@@ -49,7 +49,7 @@ namespace Hmm.Dal.Tests
             var uow = new EfUnitOfWork(_dbcontext);
 
             // Act
-            var newusr = uow.Add<User>(usr);
+            var newusr = uow.Add(usr);
 
             // Assert
             Assert.NotNull(newusr);

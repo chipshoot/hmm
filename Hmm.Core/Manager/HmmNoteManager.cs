@@ -72,24 +72,6 @@ namespace Hmm.Core.Manager
                 // ReSharper disable once PossibleNullReferenceException
                 xml.Root.Element("Content").Value = note.Content;
             }
-            //var xmldoc = new XmlDocument();
-            //var content = note.Content;
-            //xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\" ?><Note><Content></Content></Note>");
-            //xmldoc.DocumentElement.SetAttribute("xmlns", "http://schema.hmm.com/2017");
-            //var ns = new XmlNamespaceManager(xmldoc.NameTable);
-            //ns.AddNamespace("", "http://schema.hmm.com/2017");
-            //var contNode = xmldoc.SelectNodes("/Note/Content", ns);
-            //if (contNode != null)
-            //{
-            //    if (isXmlConent)
-            //    {
-            //        contNode[0].InnerXml = content;
-            //    }
-            //    else
-            //    {
-            //        contNode[0].InnerText = content;
-            //    }
-            //}
 
             return xml;
         }

@@ -13,7 +13,9 @@ namespace Hmm.Api.Areas.GaslogNote.Models
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ApiUser, User>();
-                cfg.CreateMap<ApiGasLog, GasLog>();
+                cfg.CreateMap<ApiGasLog, GasLog>()
+                    .ForMember(dest=>dest.Subject, opt=>opt.Ignore())
+                    .ForMember(dest=>dest.Content, opt=>opt.Ignore());
                 cfg.CreateMap<ApiDiscountInfo, GasDiscountInfo>()
                     .ForMember(dest => dest.Amount, opt => opt.MapFrom(src => new Money(src.Amount)));
             });

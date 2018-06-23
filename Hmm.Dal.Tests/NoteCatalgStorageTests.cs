@@ -6,11 +6,11 @@ using Hmm.Dal.Validation;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
+using Hmm.Utility.TestHelp;
 using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Hmm.Utility.TestHelp;
 using Xunit;
 
 namespace Hmm.Dal.Tests
@@ -97,10 +97,8 @@ namespace Hmm.Dal.Tests
                 return notes;
             });
 
-
             // set up note catalog validator
             var validator = new NoteCatalogValidator(dsp.Lookup, queryMock.Object);
-
 
             // set up catalog repository
             _catalogStorage = new NoteCatalogStorage(dsp.UnitOfWork, validator, dsp.Lookup, noteQueryMock.Object, dsp.DateTimeAdapter);

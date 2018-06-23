@@ -6,9 +6,8 @@ namespace Hmm.Dal.Data
 {
     public class HmmDataContext : DbContext, IHmmDataContext
     {
-        public HmmDataContext(DbContextOptions<HmmDataContext> options) : base(options)
+        public HmmDataContext(DbContextOptions options) : base(options)
         {
-
         }
 
         public DbSet<HmmNote> Notes { get; set; }

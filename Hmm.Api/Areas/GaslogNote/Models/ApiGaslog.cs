@@ -8,10 +8,6 @@ namespace Hmm.Api.Areas.GaslogNote.Models
 {
     public class ApiGasLog : ApiEntity, IValidatableObject
     {
-        public string Subject { get; set; }
-
-        public string Content { get; set; }
-
         public ApiUser Author { get; set; }
 
         public DateTime CreateDate { get; set; }

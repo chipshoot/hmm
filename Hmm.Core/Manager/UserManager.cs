@@ -44,7 +44,7 @@ namespace Hmm.Core.Manager
 
         public User Update(User userInfo)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public ProcessingResult ErrorMessage { get; } = new ProcessingResult();
