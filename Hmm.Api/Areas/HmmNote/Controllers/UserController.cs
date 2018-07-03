@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
-namespace Hmm.Api.Areas.HmmNote
+namespace Hmm.Api.Areas.HmmNote.Controllers
 {
     [Route("api/users")]
     public class UserController : Controller

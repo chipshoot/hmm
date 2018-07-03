@@ -1,30 +1,22 @@
-﻿using DomainEntity.Misc;
-using DomainEntity.User;
+﻿using DomainEntity.User;
 using Hmm.Dal.Querys;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
-using Hmm.Utility.Validation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Hmm.Utility.Misc;
+using Hmm.Utility.Validation;
+using System.Linq;
+using DomainEntity.Misc;
 
 namespace Hmm.Dal.Storages
 {
     public class UserStorage : StorageBase<User>
     {
-        private readonly IQueryHandler<IQuery<IEnumerable<HmmNote>>, IEnumerable<HmmNote>> _noteQuery;
-
         public UserStorage(
             IUnitOfWork uow,
             IValidator<User> validator,
             IEntityLookup lookupRepo,
-            IQueryHandler<IQuery<IEnumerable<HmmNote>>, IEnumerable<HmmNote>> noteQuery,
             IDateTimeProvider dateTimeProvider) : base(uow, validator, lookupRepo, dateTimeProvider)
         {
-            Guard.Against<ArgumentNullException>(noteQuery == null, nameof(noteQuery));
-
-            _noteQuery = noteQuery;
         }
 
         public override User Add(User entity)
@@ -55,7 +47,8 @@ namespace Hmm.Dal.Storages
             {
                 return false;
             }
-            var userHasNote = _noteQuery.Execute(new NoteQueryByAuthor { Author = entity }).Any();
+
+            var userHasNote = LookupRepo.GetEntities<HmmNote>().Any(n => n.Author.Id == entity.Id);
             if (userHasNote)
             {
                 Validator.ValidationErrors.Add($"Error: The user {entity.Id} still has notes in data source.");

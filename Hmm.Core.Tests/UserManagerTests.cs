@@ -36,9 +36,8 @@ namespace Hmm.Core.Tests
             var validmoc = new Mock<IValidator<User>>();
             validmoc.Setup(v => v.IsValid(It.IsAny<User>(), It.IsAny<bool>())).Returns(true);
             var lookupmoc = new Mock<IEntityLookup>();
-            var notequerymoc = new Mock<IQueryHandler<IQuery<IEnumerable<HmmNote>>, IEnumerable<HmmNote>>>();
             var timeAdp = new Mock<IDateTimeProvider>();
-            var data = new UserStorage(uowmoc.Object, validmoc.Object, lookupmoc.Object, notequerymoc.Object, timeAdp.Object);
+            var data = new UserStorage(uowmoc.Object, validmoc.Object, lookupmoc.Object, timeAdp.Object);
 
             _usrmanager = new UserManager(data);
         }

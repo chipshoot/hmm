@@ -4,15 +4,16 @@ using Hmm.Dal.Storages;
 using Hmm.Utility.Encrypt;
 using Hmm.Utility.Validation;
 using System;
+using Hmm.Utility.Dal.DataStore;
 using Hmm.Utility.Misc;
 
 namespace Hmm.Core.Manager
 {
     public class UserManager : IUserManager
     {
-        private readonly UserStorage _dataSource;
+        private readonly IDataStore<User> _dataSource;
 
-        public UserManager(UserStorage dataSource)
+        public UserManager(IDataStore<User> dataSource)
         {
             Guard.Against<ArgumentNullException>(dataSource == null, nameof(dataSource));
             _dataSource = dataSource;

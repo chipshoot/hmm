@@ -55,34 +55,14 @@ namespace Hmm.Dal.Tests
                 }
             });
 
-            // set up query handler
-            var queryMock = new Mock<IQueryHandler<UserQueryByAccount, User>>();
-            queryMock.Setup(q => q.Execute(It.IsAny<UserQueryByAccount>())).Returns((UserQueryByAccount q) =>
-            {
-                var userfound = _users.FirstOrDefault(c => c.AccountName == q.AccountName);
-                return userfound;
-            });
-
-            var noteQueryMock = new Mock<IQueryHandler<IQuery<IEnumerable<HmmNote>>, IEnumerable<HmmNote>>>();
-            noteQueryMock.Setup(q => q.Execute(It.IsAny<NoteQueryByAuthor>())).Returns((NoteQueryByAuthor query) =>
-            {
-                IEnumerable<HmmNote> notes = new List<HmmNote>();
-                if (query.Author.Id > 0)
-                {
-                    notes = _notes.Where(n => n.Author.Id == query.Author.Id).Select(n => n).AsEnumerable();
-                }
-
-                return notes;
-            });
-
             // set up user validator
-            var valiator = new UserValidator(lookupMoc.Object, queryMock.Object);
+            var valiator = new UserValidator(lookupMoc.Object);
 
             // setup date time provider
             var timeProviderMock = new Mock<IDateTimeProvider>();
 
             // setup user storage
-            _userStorage = new UserStorage(uowmock.Object, valiator, lookupMoc.Object, noteQueryMock.Object, timeProviderMock.Object);
+            _userStorage = new UserStorage(uowmock.Object, valiator, lookupMoc.Object, timeProviderMock.Object);
         }
 
         public void Dispose()

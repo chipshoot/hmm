@@ -1,20 +1,14 @@
 ﻿using DomainEntity.User;
-using Hmm.Dal.Querys;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Validation;
-using System;
+using System.Linq;
 
 namespace Hmm.Dal.Validation
 {
     public class UserValidator : ValidatorBase<User>
     {
-        private readonly IQueryHandler<UserQueryByAccount, User> _queryByAccountName;
-
-        public UserValidator(IEntityLookup lookupRepo, IQueryHandler<UserQueryByAccount, User> queryByAccountName) : base(lookupRepo)
+        public UserValidator(IEntityLookup lookupRepo) : base(lookupRepo)
         {
-            Guard.Against<ArgumentNullException>(queryByAccountName == null, nameof(queryByAccountName));
-
-            _queryByAccountName = queryByAccountName;
         }
 
         public override bool IsValid(User entity, bool isNewEntity)
@@ -22,13 +16,14 @@ namespace Hmm.Dal.Validation
             // validating when try to create a new entity
             if (isNewEntity)
             {
-                var saveduser = _queryByAccountName.Execute(new UserQueryByAccount { AccountName = entity.AccountName });
+                var saveduser = LookupRepo.GetEntities<User>().FirstOrDefault(u => u.AccountName == entity.AccountName);
                 if (saveduser != null)
                 {
                     ValidationErrors.Add($"The account name {entity.AccountName} exists in data source");
                     return false;
                 }
             }
+
             // validating for existing entity
             else
             {
@@ -45,7 +40,8 @@ namespace Hmm.Dal.Validation
                     return false;
                 }
 
-                var exuserWithSameAccount = _queryByAccountName.Execute(new UserQueryByAccount { AccountName = entity.AccountName });
+                var exuserWithSameAccount = LookupRepo.GetEntities<User>()
+                    .FirstOrDefault(u => u.AccountName == entity.AccountName);
                 if (exuserWithSameAccount != null && exuserWithSameAccount.Id != entity.Id)
                 {
                     ValidationErrors.Add($"Duplicated account name : {entity.AccountName} found");
