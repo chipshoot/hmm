@@ -5,7 +5,6 @@ using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,18 +12,12 @@ namespace Hmm.Dal.Storages
 {
     public class NoteCatalogStorage : StorageBase<NoteCatalog>
     {
-        private readonly IQueryHandler<IQuery<IEnumerable<HmmNote>>, IEnumerable<HmmNote>> _noteQuery;
-
         public NoteCatalogStorage(
             IUnitOfWork uow,
             IValidator<NoteCatalog> validator,
             IEntityLookup lookupRepo,
-            IQueryHandler<IQuery<IEnumerable<HmmNote>>, IEnumerable<HmmNote>> noteQuery,
             IDateTimeProvider dateTimeProvider) : base(uow, validator, lookupRepo, dateTimeProvider)
         {
-            Guard.Against<ArgumentNullException>(noteQuery == null, nameof(noteQuery));
-
-            _noteQuery = noteQuery;
         }
 
         public override NoteCatalog Add(NoteCatalog entity)
@@ -63,7 +56,7 @@ namespace Hmm.Dal.Storages
             }
 
             // make sure there's no note attached to catalog
-            var catalogHasNote = _noteQuery.Execute(new NoteQueryByCatalog { Catalog = entity }).Any();
+            var catalogHasNote = LookupRepo.GetEntities<HmmNote>().Any(n => n.Catalog.Id == entity.Id);
             if (catalogHasNote)
             {
                 Validator.ValidationErrors.Add($"Error: The catalog {entity.Name} still has notes in data source attached to it.");

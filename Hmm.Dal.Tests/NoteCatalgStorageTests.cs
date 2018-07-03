@@ -101,7 +101,7 @@ namespace Hmm.Dal.Tests
             var validator = new NoteCatalogValidator(dsp.Lookup, queryMock.Object);
 
             // set up catalog repository
-            _catalogStorage = new NoteCatalogStorage(dsp.UnitOfWork, validator, dsp.Lookup, noteQueryMock.Object, dsp.DateTimeAdapter);
+            _catalogStorage = new NoteCatalogStorage(dsp.UnitOfWork, validator, dsp.Lookup, dsp.DateTimeAdapter);
         }
 
         public void Dispose()

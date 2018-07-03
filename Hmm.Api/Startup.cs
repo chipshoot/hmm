@@ -38,7 +38,7 @@ namespace Hmm.Api
             services.AddDbContext<HmmDataContext>(opt => opt.UseSqlServer(connstr));
             services.AddScoped<IUnitOfWork, EfUnitOfWork>();
             services.AddSingleton<IDateTimeProvider, DateTimeAdapter>();
-            services.AddSingleton<IHmmDataContext, HmmDataContext>();
+            services.AddScoped<IHmmDataContext, HmmDataContext>();
             services.AddScoped<IValidator<User>, UserValidator>();
             services.AddScoped<IEntityLookup, EfEntityLookup>();
             services.AddScoped<IDataStore<User>, UserStorage>();

@@ -17,7 +17,6 @@ namespace Hmm.Dal.Data
 
         public void Dispose()
         {
-            throw new NotImplementedException();
         }
 
         public T Add<T>(T entity) where T : class

@@ -1,5 +1,6 @@
 ﻿using Hmm.Utility.Dal.DataEntity;
 using Hmm.Utility.Validation;
+using System.Collections.Generic;
 
 namespace Hmm.Utility.Dal.DataStore
 {
@@ -37,5 +38,11 @@ namespace Hmm.Utility.Dal.DataStore
         /// <param name="entity">The entity which will be removed.</param>
         /// <returns>True if delete successfully, otherwise false</returns>
         bool Delete(T entity);
+
+        /// <summary>
+        /// Gets the entities from data source.
+        /// </summary>
+        /// <returns>The list of entities with type {T}</returns>
+        IEnumerable<T> GetEntities();
     }
 }

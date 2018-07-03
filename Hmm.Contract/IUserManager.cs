@@ -22,6 +22,9 @@ namespace Hmm.Contract
         ///  null </returns>
         User Update(User userInfo);
 
+
+        User FindUser(int id);
+
         ProcessingResult ErrorMessage { get; }
     }
 }

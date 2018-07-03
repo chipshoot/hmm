@@ -1,11 +1,11 @@
-﻿using DomainEntity.User;
-using Hmm.Dal.Querys;
+﻿using System.Collections.Generic;
+using DomainEntity.Misc;
+using DomainEntity.User;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System.Linq;
-using DomainEntity.Misc;
 
 namespace Hmm.Dal.Storages
 {

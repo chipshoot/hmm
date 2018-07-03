@@ -33,9 +33,10 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
         #endregion constructor
 
         [HttpGet("{id}")]
-        public string Get(int id)
+        public IActionResult Get(int id)
         {
-            return "value";
+            var user = _userManager.FindUser(id);
+            return Ok(user);
         }
 
         // POST api/users

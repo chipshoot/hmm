@@ -1,11 +1,11 @@
 ﻿using DomainEntity.User;
 using Hmm.Contract;
-using Hmm.Dal.Storages;
+using Hmm.Utility.Dal.DataStore;
 using Hmm.Utility.Encrypt;
+using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
-using Hmm.Utility.Dal.DataStore;
-using Hmm.Utility.Misc;
+using System.Linq;
 
 namespace Hmm.Core.Manager
 {
@@ -46,6 +46,12 @@ namespace Hmm.Core.Manager
         public User Update(User userInfo)
         {
             throw new NotImplementedException();
+        }
+
+        public User FindUser(int id)
+        {
+            var user = _dataSource.GetEntities().FirstOrDefault(u => u.Id == id);
+            return user;
         }
 
         public ProcessingResult ErrorMessage { get; } = new ProcessingResult();

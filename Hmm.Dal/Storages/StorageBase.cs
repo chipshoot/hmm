@@ -5,6 +5,7 @@ using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
+using System.Collections.Generic;
 
 namespace Hmm.Dal.Storages
 {
@@ -38,6 +39,11 @@ namespace Hmm.Dal.Storages
         public abstract bool Delete(T entity);
 
         public abstract T Update(T entity);
+
+        public IEnumerable<T> GetEntities()
+        {
+            return LookupRepo.GetEntities<T>();
+        }
 
         protected TP PropertyChecking<TP>(TP property) where TP : Entity
         {
