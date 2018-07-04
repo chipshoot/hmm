@@ -6,6 +6,7 @@ using Hmm.Utility.Validation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using Hmm.Api.Models;
 
 namespace Hmm.Api.Areas.HmmNote.Controllers
 {
@@ -65,8 +66,30 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
 
         // PUT api/users/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]ApiUser user)
+        public IActionResult Put(int id, [FromBody]ApiUser user)
         {
+            if (user == null || id <= 0)
+            {
+                return BadRequest(new ApiBadRequestResponse("user information is null or invalid id found"));
+            }
+
+            try
+            {
+
+                var usr = _mapper.Map<ApiUser, User>(user);
+                if (usr == null)
+                {
+                    return BadRequest();
+                }
+
+                var apiNewUser = _userManager.Update(usr);
+                var newUser = _mapper.Map<User, ApiUser>(apiNewUser);
+                return Ok(newUser);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         // DELETE api/users/5
