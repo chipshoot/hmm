@@ -45,7 +45,17 @@ namespace Hmm.Core.Manager
 
         public User Update(User userInfo)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var updatedusr = _dataSource.Update(userInfo);
+                return updatedusr;
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage.Success = false;
+                ErrorMessage.MessageList.Add(ex.Message);
+                return null;
+            }
         }
 
         public User FindUser(int id)

@@ -1,12 +1,13 @@
 ﻿using AutoMapper;
 using DomainEntity.User;
 using Hmm.Api.Areas.HmmNote.Models;
+using Hmm.Api.Models;
 using Hmm.Contract;
 using Hmm.Utility.Validation;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using Hmm.Api.Models;
 
 namespace Hmm.Api.Areas.HmmNote.Controllers
 {
@@ -37,7 +38,8 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
         public IActionResult Get(int id)
         {
             var user = _userManager.FindUser(id);
-            return Ok(user);
+            var ret = _mapper.Map<User, ApiUser>(user);
+            return Ok(ret);
         }
 
         // POST api/users
@@ -75,16 +77,55 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
 
             try
             {
-
-                var usr = _mapper.Map<ApiUser, User>(user);
-                if (usr == null)
+                var curUsr = _userManager.FindUser(id);
+                if (curUsr == null)
                 {
-                    return BadRequest();
+                    return NotFound();
                 }
 
-                var apiNewUser = _userManager.Update(usr);
-                var newUser = _mapper.Map<User, ApiUser>(apiNewUser);
-                return Ok(newUser);
+                curUsr = _mapper.Map(user, curUsr);
+                var apiNewUser = _userManager.Update(curUsr);
+                if (apiNewUser == null)
+                {
+                    return BadRequest(_userManager.ErrorMessage.MessageList);
+                }
+
+                return NoContent();
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        // PATCH api/users/5
+        [HttpPatch("{id}")]
+        public IActionResult Patch(int id, [FromBody] JsonPatchDocument<ApiUser> patchDoc)
+        {
+            if (patchDoc == null || id <= 0)
+            {
+                return BadRequest(new ApiBadRequestResponse("Patch information is null or invalid id found"));
+            }
+
+            try
+            {
+                var curUsr = _userManager.FindUser(id);
+                if (curUsr == null)
+                {
+                    return NotFound();
+                }
+
+                var user2Update = _mapper.Map<ApiUser>(curUsr);
+                patchDoc.ApplyTo(user2Update);
+                _mapper.Map(user2Update, curUsr);
+
+                var newUser = _userManager.Update(curUsr);
+                if (newUser == null)
+                {
+                    return BadRequest(_userManager.ErrorMessage.MessageList);
+                }
+
+                return NoContent();
             }
             catch (Exception)
             {

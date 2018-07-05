@@ -8,7 +8,8 @@ namespace Hmm.Api.Models
     {
         public MappingProfile()
         {
-            CreateMap<ApiUser, User>();
+            CreateMap<ApiUser, User>()
+                .ForMember(dest=>dest.Id, opt=>opt.Ignore());
             CreateMap<User, ApiUser>();
         }
     }
