@@ -1,5 +1,4 @@
-﻿using DomainEntity.Misc;
-using DomainEntity.User;
+﻿using DomainEntity.User;
 using Hmm.Contract;
 using Hmm.Core.Manager;
 using Hmm.Dal.Storages;
