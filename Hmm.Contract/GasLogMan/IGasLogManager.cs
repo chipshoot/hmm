@@ -5,7 +5,7 @@ namespace Hmm.Contract.GasLogMan
 {
     public interface IGasLogManager
     {
-        GasLog GetGasLogById(int id);
+        GasLog FindGasLog(int id);
 
         GasLog CreateLog(GasLog log);
 

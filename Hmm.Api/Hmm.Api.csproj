@@ -12,7 +12,7 @@
     <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="4.0.1" />
     <PackageReference Include="FluentValidation" Version="7.6.104" />
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.2" />
   </ItemGroup>
 
   <ItemGroup>

@@ -24,7 +24,7 @@ namespace Hmm.Core.Manager.GasLogMan
 
         public ProcessingResult ErrorMessage { get; } = new ProcessingResult();
 
-        public GasLog GetGasLogById(int id)
+        public GasLog FindGasLog(int id)
         {
             var note = _noteManager.GetNoteById(id);
             if (note == null)

@@ -84,24 +84,11 @@ namespace Hmm.Dal.Tests
                 return catfound;
             });
 
-            // set up note query handler
-            var noteQueryMock = new Mock<IQueryHandler<IQuery<IEnumerable<HmmNote>>, IEnumerable<HmmNote>>>();
-            noteQueryMock.Setup(q => q.Execute(It.IsAny<NoteQueryByCatalog>())).Returns((NoteQueryByCatalog query) =>
-            {
-                IEnumerable<HmmNote> notes = new List<HmmNote>();
-                if (query.Catalog.Id > 0)
-                {
-                    notes = _notes.Where(n => n.Catalog.Id == query.Catalog.Id).Select(n => n).AsEnumerable();
-                }
-
-                return notes;
-            });
-
             // set up note catalog validator
             var validator = new NoteCatalogValidator(dsp.Lookup, queryMock.Object);
 
             // set up catalog repository
-            _catalogStorage = new NoteCatalogStorage(dsp.UnitOfWork, validator, dsp.Lookup, noteQueryMock.Object, dsp.DateTimeAdapter);
+            _catalogStorage = new NoteCatalogStorage(dsp.UnitOfWork, validator, dsp.Lookup, dsp.DateTimeAdapter);
         }
 
         public void Dispose()
