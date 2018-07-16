@@ -25,6 +25,8 @@ namespace Hmm.Contract
 
         User FindUser(int id);
 
+        void Delete(int id);
+
         ProcessingResult ErrorMessage { get; }
     }
 }

@@ -64,6 +64,31 @@ namespace Hmm.Core.Manager
             return user;
         }
 
+        public void Delete(int id)
+        {
+            var user = _dataSource.GetEntities().FirstOrDefault(u => u.Id == id && u.IsActivated);
+            if (user == null)
+            {
+                ErrorMessage.Rest();
+                ErrorMessage.Success = false;
+                ErrorMessage.AddMessage($"Cannot find user with id : {id}");
+            }
+            else
+            {
+                try
+                {
+                    user.IsActivated = false;
+                    _dataSource.Update(user);
+                }
+                catch (Exception ex)
+                {
+                    ErrorMessage.Success = false;
+                    ErrorMessage.AddMessage(ex.Message);
+                    ErrorMessage.AddMessage(ex.InnerException.Message);
+                }
+            }
+        }
+
         public ProcessingResult ErrorMessage { get; } = new ProcessingResult();
     }
 }

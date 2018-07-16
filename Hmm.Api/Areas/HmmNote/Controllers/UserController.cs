@@ -135,8 +135,20 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
 
         // DELETE api/users/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public ActionResult Delete(int id)
         {
+            _userManager.Delete(id);
+            if (_userManager.ErrorMessage.Success)
+            {
+                return NoContent();
+            }
+
+            if (_userManager.ErrorMessage.MessageList.Contains($"Cannot find user with id : {id}"))
+            {
+                return NotFound();
+            }
+
+            throw new Exception($"Deleting user {id} failed on saving");
         }
     }
 }
