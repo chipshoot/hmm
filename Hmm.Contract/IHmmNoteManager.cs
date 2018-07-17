@@ -1,4 +1,5 @@
-﻿using DomainEntity.Misc;
+﻿using System.Xml.Linq;
+using DomainEntity.Misc;
 using Hmm.Utility.Misc;
 
 namespace Hmm.Contract
@@ -10,6 +11,8 @@ namespace Hmm.Contract
         T Create(T note);
 
         T Update(T note);
+
+        XNamespace ContentNamespace { get; }
 
         ProcessingResult ErrorMessage { get; }
     }

@@ -7,17 +7,17 @@ using Hmm.Utility.Validation;
 
 namespace Hmm.Dal.Storages
 {
-    public class NoteStorage<T> : StorageBase<T> where T : HmmNote
+    public class NoteStorage : StorageBase<HmmNote>
     {
         public NoteStorage(
             IUnitOfWork uow,
-            IValidator<T> validator,
+            IValidator<HmmNote> validator,
             IEntityLookup lookupRepo,
             IDateTimeProvider dateTimeProvider) : base(uow, validator, lookupRepo, dateTimeProvider)
         {
         }
 
-        public override T Add(T entity)
+        public override HmmNote Add(HmmNote entity)
         {
             Validator.Reset();
             if (!Validator.IsValid(entity, isNewEntity: true))
@@ -39,7 +39,7 @@ namespace Hmm.Dal.Storages
             return newRec;
         }
 
-        public override bool Delete(T entity)
+        public override bool Delete(HmmNote entity)
         {
             Validator.Reset();
             if (!Validator.IsValid(entity, isNewEntity: false))
@@ -51,7 +51,7 @@ namespace Hmm.Dal.Storages
             return true;
         }
 
-        public override T Update(T entity)
+        public override HmmNote Update(HmmNote entity)
         {
             Validator.Reset();
             if (!Validator.IsValid(entity, false))
@@ -66,7 +66,7 @@ namespace Hmm.Dal.Storages
             entity.LastModifiedDate = DateTimeProvider.UtcNow;
             UnitOfWork.Update(entity);
 
-            var savedRec = LookupRepo.GetEntity<T>(entity.Id);
+            var savedRec = LookupRepo.GetEntity<HmmNote>(entity.Id);
 
             return savedRec;
         }

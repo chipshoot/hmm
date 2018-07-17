@@ -49,6 +49,8 @@ namespace Hmm.Core.Manager
             return note;
         }
 
+        public XNamespace ContentNamespace  => "http://schema.hmm.com/2017";
+
         public ProcessingResult ErrorMessage { get; } = new ProcessingResult();
 
         private static XDocument GetNoteContent(HmmNote note, bool isXmlConent = false)

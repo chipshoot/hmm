@@ -2,7 +2,6 @@
 using System;
 using System.ComponentModel;
 using System.Globalization;
-using System.Xml;
 using System.Xml.Linq;
 
 namespace Hmm.Utility.MeasureUnit
@@ -275,8 +274,15 @@ namespace Hmm.Utility.MeasureUnit
 
         #region implementation of interface IHmmSerializable
 
-        public XElement Measure2Xml()
+        public XElement Measure2Xml(XNamespace ns)
         {
+            if (ns != null)
+            {
+                return new XElement(ns + "Weight",
+                    new XElement(ns + "Value", Value),
+                    new XElement(ns + "Unit", Unit));
+            }
+
             return new XElement("Weight",
                 new XElement("Value", Value),
                 new XElement("Unit", Unit));

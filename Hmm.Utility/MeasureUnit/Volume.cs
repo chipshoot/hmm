@@ -518,7 +518,7 @@ namespace Hmm.Utility.MeasureUnit
 
         #region implementation of interface IHmmSerializable
 
-        public XElement Measure2Xml()
+        public XElement Measure2Xml(XNamespace ns)
         {
             return new XElement("Volume",
                 new XElement("Value", Value),

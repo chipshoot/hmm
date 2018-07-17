@@ -45,13 +45,13 @@ namespace Hmm.Core.Manager.GasLogMan
             return newLog;
         }
 
-        private static void SetGasLogContent(GasLog gaslog)
+        private void SetGasLogContent(GasLog gaslog)
         {
             var xml = new XElement("GasLog",
                 new XElement("Date", gaslog.CreateDate.ToString("O")),
-                new XElement("Distance", gaslog.Distance.Measure2Xml()),
-                new XElement("Gas", gaslog.Gas.Measure2Xml()),
-                new XElement("Price", gaslog.Price.Measure2Xml()),
+                new XElement("Distance", gaslog.Distance.Measure2Xml(_noteManager.ContentNamespace)),
+                new XElement("Gas", gaslog.Gas.Measure2Xml(_noteManager.ContentNamespace)),
+                new XElement("Price", gaslog.Price.Measure2Xml(_noteManager.ContentNamespace)),
                 new XElement("GasStation", gaslog.GasStation),
                 new XElement("Discounts", "")
             );
@@ -61,7 +61,7 @@ namespace Hmm.Core.Manager.GasLogMan
                 foreach (var disc in gaslog.Discounts)
                 {
                     var discElement = new XElement("Discount", 
-                        new XElement("Amount", disc.Amount.Measure2Xml()),
+                        new XElement("Amount", disc.Amount.Measure2Xml(_noteManager.ContentNamespace)),
                         new XElement("Program", disc.Program));
                     xml.Element("Discounts")?.Add(discElement);
                 }
@@ -71,7 +71,7 @@ namespace Hmm.Core.Manager.GasLogMan
             gaslog.Content = xml.ToString(SaveOptions.DisableFormatting);
         }
 
-        private static GasLog GetLogFromNote(HmmNote note)
+        private GasLog GetLogFromNote(HmmNote note)
         {
             if (note == null)
             {
@@ -80,7 +80,8 @@ namespace Hmm.Core.Manager.GasLogMan
 
             var notestr = note.Content;
             var notexml = XDocument.Parse(notestr);
-            var logroot = notexml.Root?.Element("Content")?.Element("GasLog");
+            var ns = _noteManager.ContentNamespace;
+            var logroot = notexml.Root?.Element(ns + "Content")?.Element(ns + "GasLog");
             if (logroot == null)
             {
                 return null;
@@ -94,11 +95,11 @@ namespace Hmm.Core.Manager.GasLogMan
                 CreateDate = note.CreateDate,
                 LastModifiedDate = note.LastModifiedDate,
                 Content = note.Content,
-                GasStation = logroot.Element("GasStation")?.Value,
+                GasStation = logroot.Element(ns + "GasStation")?.Value,
                 Description = note.Description,
-                Distance = Dimension.FromXml(logroot.Element("Distance")),
-                Gas = Volume.FromXml(logroot.Element("Gas")),
-                Price = Money.FromXml(logroot.Element("Price"))
+                Distance = Dimension.FromXml(logroot.Element(ns + "Distance")),
+                Gas = Volume.FromXml(logroot.Element(ns + "Gas")),
+                Price = Money.FromXml(logroot.Element(ns + "Price"))
             };
 
             return gas;

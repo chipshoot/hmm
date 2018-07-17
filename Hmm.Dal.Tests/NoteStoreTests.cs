@@ -22,7 +22,7 @@ namespace Hmm.Dal.Tests
         private readonly List<User> _authors;
         private readonly List<NoteCatalog> _cats;
         private readonly List<NoteRender> _renders;
-        private readonly NoteStorage<HmmNote> _noteStorage;
+        private readonly NoteStorage _noteStorage;
         private DateTime _currentDate = DateTime.Now;
         private IDataSourceProvider _dsp;
 
@@ -95,7 +95,7 @@ namespace Hmm.Dal.Tests
             // set up note validator
             var validator = new HmmNoteValidator(_dsp.Lookup);
 
-            _noteStorage = new NoteStorage<HmmNote>(_dsp.UnitOfWork, validator, _dsp.Lookup, _dsp.DateTimeAdapter);
+            _noteStorage = new NoteStorage(_dsp.UnitOfWork, validator, _dsp.Lookup, _dsp.DateTimeAdapter);
         }
 
         private IDataSourceProvider GetMockDataSource()

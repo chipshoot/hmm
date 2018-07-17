@@ -421,8 +421,15 @@ namespace Hmm.Utility.Currency
 
         #region implementation of interface IHmmSerializable
 
-        public XElement Measure2Xml()
+        public XElement Measure2Xml(XNamespace ns)
         {
+            if (ns != null)
+            {
+                return new XElement(ns + "Money",
+                    new XElement(ns + "Value", InternalAmount),
+                    new XElement(ns + "Code", CurrencyCode));
+            }
+
             return new XElement("Money",
                 new XElement("Value", InternalAmount),
                 new XElement("Code", CurrencyCode));

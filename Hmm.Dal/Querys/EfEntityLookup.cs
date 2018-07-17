@@ -31,8 +31,12 @@ namespace Hmm.Dal.Querys
             {
                 entity = _dataContext.Renders.Find(id) as T;
             }
+            else if (typeof(T) == typeof(HmmNote))
+            {
+                entity = _dataContext.Notes.Find(id) as T;
+            }
 
-            return entity;
+        return entity;
         }
 
         public IEnumerable<T> GetEntities<T>() where T : Entity
