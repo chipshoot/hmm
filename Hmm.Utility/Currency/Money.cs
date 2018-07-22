@@ -123,24 +123,27 @@ namespace Hmm.Utility.Currency
 
         public static Money FromXml(XElement xmlcontent)
         {
-            var root = xmlcontent?.Element("Money");
+            var ns = xmlcontent.GetDefaultNamespace();
+            var doc = new XDocument(xmlcontent);
+            var root = GetXElement("Money", doc, ns);
             if (root == null)
             {
                 throw new ArgumentException("The XML element does not contains Money element");
             }
 
-            if (!double.TryParse(root.Element("Value")?.Value, out var value))
+            var dv = GetXElement("Value", root, ns);
+            if (!double.TryParse(dv?.Value, out var value))
             {
                 throw new ArgumentException("The Money XML element does not contains valid value element");
             }
 
-            var code = root.Element("Code")?.Value;
-            if (string.IsNullOrEmpty(code))
+            var code = GetXElement("Code", root, ns);
+            if (string.IsNullOrEmpty(code?.Value))
             {
                 throw new ArgumentException("The Money XML element does not contains code element");
             }
 
-            if (!Enum.TryParse(code, true, out CurrencyCodeType codeType))
+            if (!Enum.TryParse(code.Value, true, out CurrencyCodeType codeType))
             {
                 throw new ArgumentException("The Money XML element does not contains valid code element");
             }
@@ -436,5 +439,14 @@ namespace Hmm.Utility.Currency
         }
 
         #endregion implementation of interface IHmmSerializable
+
+        #region private methods
+
+        private static XElement GetXElement(string ename, XContainer content, XNamespace ns)
+        {
+            return ns != null ? content?.Element(ns + ename) : content?.Element(ename);
+        }
+
+        #endregion private methods
     }
 }

@@ -422,24 +422,27 @@ namespace Hmm.Utility.MeasureUnit
 
         public static Volume FromXml(XElement xmlcontent)
         {
-            var root = xmlcontent?.Element("Volume");
+            var ns = xmlcontent.GetDefaultNamespace();
+            var doc = new XDocument(xmlcontent);
+            var root = GetXElement("Volume", doc, ns);
             if (root == null)
             {
                 throw new ArgumentException("The XML element does not contains Volume element");
             }
 
-            if (!double.TryParse(root.Element("Value")?.Value, out var value))
+            var dv = GetXElement("Value", root, ns);
+            if (!double.TryParse(dv?.Value, out var value))
             {
                 throw new ArgumentException("The XML element does not contains valid value element");
             }
 
-            var unit = root.Element("Unit")?.Value;
-            if (string.IsNullOrEmpty(unit))
+            var unit = GetXElement("Unit", root, ns);
+            if (string.IsNullOrEmpty(unit?.Value))
             {
                 throw new ArgumentException("The XML element does not contains unit element");
             }
 
-            if (!Enum.TryParse(unit, true, out VolumeUnit unitType))
+            if (!Enum.TryParse(unit.Value, true, out VolumeUnit unitType))
             {
                 throw new ArgumentException("The XML element does not contains unit element");
             }
@@ -526,5 +529,14 @@ namespace Hmm.Utility.MeasureUnit
         }
 
         #endregion implementation of interface IHmmSerializable
+
+        #region private methods
+
+        private static XElement GetXElement(string ename, XContainer content, XNamespace ns)
+        {
+            return ns != null ? content?.Element(ns + ename) : content?.Element(ename);
+        }
+
+        #endregion private methods
     }
 }

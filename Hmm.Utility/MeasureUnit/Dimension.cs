@@ -186,6 +186,7 @@ namespace Hmm.Utility.MeasureUnit
             {
                 throw new ArgumentException("The XML element does not contains Dimension element");
             }
+
             var dv = GetXElement("Value", root, ns);
             if (!double.TryParse(dv?.Value, out var value))
             {
@@ -460,11 +461,6 @@ namespace Hmm.Utility.MeasureUnit
             }
         }
 
-        private static XElement GetXElement(string ename, XContainer content, XNamespace ns)
-        {
-            return ns != null ? content?.Element(ns + ename) : content?.Element(ename);
-        }
-
         #endregion private methods
 
         #region implementation of interface IHmmSerializable
@@ -484,5 +480,14 @@ namespace Hmm.Utility.MeasureUnit
         }
 
         #endregion implementation of interface IHmmSerializable
+
+        #region private methods
+
+        private static XElement GetXElement(string ename, XContainer content, XNamespace ns)
+        {
+            return ns != null ? content?.Element(ns + ename) : content?.Element(ename);
+        }
+
+        #endregion private methods
     }
 }

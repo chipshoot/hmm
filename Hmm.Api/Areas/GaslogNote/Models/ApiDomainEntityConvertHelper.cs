@@ -42,7 +42,10 @@ namespace Hmm.Api.Areas.GaslogNote.Models
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<User, ApiUser>();
-                cfg.CreateMap<GasLog, ApiGasLog>();
+                cfg.CreateMap<GasLog, ApiGasLog>()
+                    .ForMember(dest => dest.Distance, opt => opt.MapFrom(src => src.Distance.TotalKilometre))
+                    .ForMember(dest => dest.Gas, opt => opt.MapFrom(src => src.Gas.TotalLiter))
+                    .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price.Amount));
                 cfg.CreateMap<GasDiscountInfo, ApiDiscountInfo>()
                     .ForMember(dest => dest.Amount, opt => opt.MapFrom(src => src.Amount));
             });

@@ -123,8 +123,8 @@ namespace Hmm.Core.Manager.GasLogMan
                 GasStation = logroot.Element(ns + "GasStation")?.Value,
                 Description = note.Description,
                 Distance = Dimension.FromXml(logroot.Element(ns + "Distance")?.Element(ns + "Dimension")),
-                Gas = Volume.FromXml(logroot.Element(ns + "Gas")),
-                Price = Money.FromXml(logroot.Element(ns + "Price"))
+                Gas = Volume.FromXml(logroot.Element(ns + "Gas")?.Element(ns + "Volume")),
+                Price = Money.FromXml(logroot.Element(ns + "Price")?.Element(ns + "Money"))
             };
 
             return gas;
