@@ -1,5 +1,4 @@
-﻿using Hmm.Api.Areas.HmmNote.Models;
-using Hmm.Api.Models;
+﻿using Hmm.Api.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
