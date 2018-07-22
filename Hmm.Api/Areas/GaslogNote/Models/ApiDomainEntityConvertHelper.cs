@@ -43,6 +43,7 @@ namespace Hmm.Api.Areas.GaslogNote.Models
             {
                 cfg.CreateMap<User, ApiUser>();
                 cfg.CreateMap<GasLog, ApiGasLog>()
+                    .ForMember(dest => dest.AuthorId, opt => opt.MapFrom(src => src.Author.Id))
                     .ForMember(dest => dest.Distance, opt => opt.MapFrom(src => src.Distance.TotalKilometre))
                     .ForMember(dest => dest.Gas, opt => opt.MapFrom(src => src.Gas.TotalLiter))
                     .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price.Amount));
