@@ -181,12 +181,11 @@ namespace Hmm.Utility.MeasureUnit
         {
             var ns = xmlcontent.GetDefaultNamespace();
             var doc = new XDocument(xmlcontent);
-            var root = GetXElement("Distance", doc, ns);
+            var root = GetXElement("Dimension", doc, ns);
             if (root == null)
             {
                 throw new ArgumentException("The XML element does not contains Dimension element");
             }
-
             var dv = GetXElement("Value", root, ns);
             if (!double.TryParse(dv?.Value, out var value))
             {

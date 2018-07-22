@@ -6,10 +6,11 @@ using Hmm.Contract.GasLogMan;
 using Hmm.Utility.Validation;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
 
 namespace Hmm.Api.Areas.GaslogNote.Controllers
 {
-    [Route("api/gaslogs")]
+    [Route("api/authors/{authorId}/gaslogs")]
     [ValidationModel]
     public class GaslogController : Controller
     {
@@ -36,7 +37,7 @@ namespace Hmm.Api.Areas.GaslogNote.Controllers
 
         // POST api/gaslogs
         [HttpPost]
-        public IActionResult Post([FromBody] ApiGasLog apiGaslog)
+        public IActionResult Post(int authorId, [FromBody] ApiGasLogForCreation apiGaslog)
         {
             if (apiGaslog == null)
             {
@@ -46,13 +47,22 @@ namespace Hmm.Api.Areas.GaslogNote.Controllers
             var config = ApiDomainEntityConvertHelper.Api2DomainEntity();
             var mapper = config.CreateMapper();
             var gaslog = mapper.Map<GasLog>(apiGaslog);
-            var result = _gaslogManager.CreateLog(gaslog);
+            var result = _gaslogManager.CreateLogForAuthor(authorId, gaslog);
+            switch (result)
+            {
+                case null when _gaslogManager.ErrorMessage.MessageList.Contains("Cannot found author with Id"):
+                    return NotFound();
 
-            config = ApiDomainEntityConvertHelper.DomainEntity2Api();
-            mapper = config.CreateMapper();
-            var newlog = mapper.Map<ApiGasLog>(result);
+                case null:
+                    throw new Exception(_gaslogManager.ErrorMessage.MessageList.FirstOrDefault());
 
-            return Ok(new ApiOkResponse(newlog));
+                default:
+                    config = ApiDomainEntityConvertHelper.DomainEntity2Api();
+                    mapper = config.CreateMapper();
+                    var newlog = mapper.Map<ApiGasLog>(result);
+
+                    return Ok(new ApiOkResponse(newlog));
+            }
         }
 
         // PUT api/gaslogs/5

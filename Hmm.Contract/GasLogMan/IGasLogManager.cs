@@ -9,6 +9,8 @@ namespace Hmm.Contract.GasLogMan
 
         GasLog CreateLog(GasLog log);
 
+        GasLog CreateLogForAuthor(int authorId, GasLog log);
+
         ProcessingResult ErrorMessage { get; }
     }
 }

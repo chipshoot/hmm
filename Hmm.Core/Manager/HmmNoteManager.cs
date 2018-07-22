@@ -53,25 +53,24 @@ namespace Hmm.Core.Manager
 
         public ProcessingResult ErrorMessage { get; } = new ProcessingResult();
 
-        private static XDocument GetNoteContent(HmmNote note, bool isXmlConent = false)
+        private XDocument GetNoteContent(HmmNote note, bool isXmlConent = false)
         {
-            XNamespace ns = "http://schema.hmm.com/2017";
             var xml = new XDocument(
                 new XDeclaration("1.0", "utf-16", "yes"),
                 new XElement("Note",
                     new XElement("Content", "")));
 
-            // ReSharper disable once PossibleNullReferenceException
-            xml.Root.Add(new XAttribute(XNamespace.Xmlns + "hmm", ns));
-
             if (isXmlConent)
             {
                 var innerElement = XElement.Parse(note.Content);
-                xml.Root.Element("Content")?.Add(innerElement);
+                xml.Root?.Element("Content")?.Add(innerElement);
+                foreach (var el in xml.Descendants())
+                {
+                    el.Name = ContentNamespace + el.Name.LocalName;
+                }
             }
             else
             {
-                // ReSharper disable once PossibleNullReferenceException
                 xml.Root.Element("Content").Value = note.Content;
             }
 

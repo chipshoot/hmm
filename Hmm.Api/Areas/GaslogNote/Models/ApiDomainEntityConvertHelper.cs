@@ -3,6 +3,7 @@ using DomainEntity.User;
 using DomainEntity.Vehicle;
 using Hmm.Api.Areas.HmmNote.Models;
 using Hmm.Utility.Currency;
+using Hmm.Utility.MeasureUnit;
 
 namespace Hmm.Api.Areas.GaslogNote.Models
 {
@@ -14,8 +15,21 @@ namespace Hmm.Api.Areas.GaslogNote.Models
             {
                 cfg.CreateMap<ApiUser, User>();
                 cfg.CreateMap<ApiGasLog, GasLog>()
-                    .ForMember(dest=>dest.Subject, opt=>opt.Ignore())
-                    .ForMember(dest=>dest.Content, opt=>opt.Ignore());
+                    .ForMember(dest => dest.Subject, opt => opt.Ignore())
+                    .ForMember(dest => dest.Content, opt => opt.Ignore())
+                    .ForMember(dest => dest.Distance, opt => opt.MapFrom(src => Dimension.FromKilometre(src.Distance)))
+                    .ForMember(dest => dest.Gas, opt => opt.MapFrom(src => Volume.FromLiter(src.Distance)))
+                    .ForMember(dest => dest.Price, opt => opt.MapFrom(src => new Money(src.Price)))
+                    .ForMember(dest => dest.LastModifiedDate, opt => opt.Ignore());
+                cfg.CreateMap<ApiGasLogForCreation, GasLog>()
+                    .ForMember(dest => dest.Author, opt => opt.Ignore())
+                    .ForMember(dest => dest.Subject, opt => opt.Ignore())
+                    .ForMember(dest => dest.Content, opt => opt.Ignore())
+                    .ForMember(dest => dest.Distance, opt => opt.MapFrom(src => Dimension.FromKilometre(src.Distance)))
+                    .ForMember(dest => dest.Gas, opt => opt.MapFrom(src => Volume.FromLiter(src.Distance)))
+                    .ForMember(dest => dest.Price, opt => opt.MapFrom(src => new Money(src.Price)))
+                    .ForMember(dest => dest.LastModifiedDate, opt => opt.MapFrom(src => src.CreateDate));
+
                 cfg.CreateMap<ApiDiscountInfo, GasDiscountInfo>()
                     .ForMember(dest => dest.Amount, opt => opt.MapFrom(src => new Money(src.Amount)));
             });

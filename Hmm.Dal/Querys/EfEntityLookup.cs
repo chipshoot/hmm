@@ -35,6 +35,10 @@ namespace Hmm.Dal.Querys
             {
                 entity = _dataContext.Notes.Find(id) as T;
             }
+            else if (typeof(T) == typeof(NoteCatalog))
+            {
+                entity = _dataContext.Catalogs.Find(id) as T;
+            }
 
         return entity;
         }
@@ -53,6 +57,10 @@ namespace Hmm.Dal.Querys
             else if (typeof(T) == typeof(HmmNote))
             {
                 entities = _dataContext.Notes.Cast<T>().ToList();
+            }
+            else if (typeof(T) == typeof(NoteCatalog))
+            {
+                entities = _dataContext.Catalogs.Cast<T>().ToList();
             }
 
             return entities;
