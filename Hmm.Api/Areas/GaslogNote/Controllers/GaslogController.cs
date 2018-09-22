@@ -25,9 +25,9 @@ namespace Hmm.Api.Areas.GaslogNote.Controllers
 
         // GET api/gaslogs/5
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public IActionResult Get(int authorId, int noteId)
         {
-            var log = _gaslogManager.FindGasLog(id);
+            var log = _gaslogManager.FindGasLog(noteId);
             var config = ApiDomainEntityConvertHelper.DomainEntity2Api();
             var mapper = config.CreateMapper();
             var apilog = mapper.Map<ApiGasLog>(log);
