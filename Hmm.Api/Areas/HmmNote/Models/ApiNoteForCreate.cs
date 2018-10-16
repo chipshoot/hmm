@@ -1,9 +1,9 @@
-﻿using System;
-using Hmm.Api.Models;
+﻿using Hmm.Api.Models;
+using System;
 
 namespace Hmm.Api.Areas.HmmNote.Models
 {
-    public class ApiNote : ApiEntity
+    public class ApiNoteForCreate : ApiEntity
     {
         public string Subject { get; set; }
 
