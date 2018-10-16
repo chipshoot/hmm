@@ -2,7 +2,7 @@
 using FluentValidation;
 using Hmm.Api.Areas.HmmNote.Models;
 
-namespace Hmm.Api.Areas.Validators
+namespace Hmm.Api.Areas.HmmNote.Validators
 {
     public class ApiNoteForCreateValidator : AbstractValidator<ApiNoteForCreate>
     {
