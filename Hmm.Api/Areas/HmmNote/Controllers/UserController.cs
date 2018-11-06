@@ -44,11 +44,11 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
 
         // POST api/users
         [HttpPost]
-        public IActionResult Post([FromBody] ApiUser user)
+        public IActionResult Post([FromBody] ApiUserForCreate user)
         {
             try
             {
-                var usr = _mapper.Map<ApiUser, User>(user);
+                var usr = _mapper.Map<ApiUserForCreate, User>(user);
                 var newusr = _userManager.Create(usr);
 
                 if (newusr == null)
