@@ -19,7 +19,6 @@ namespace Hmm.Dal.Tests
     public class UserStorageTests : IDisposable
     {
         private List<User> _users;
-        private List<HmmNote> _notes;
         private UserStorage _userStorage;
         private NoteStorage _noteStorage;
         private NoteRenderStorage _renderStorage;
@@ -93,7 +92,6 @@ namespace Hmm.Dal.Tests
         private void SetMockEnvironment()
         {
             _users = new List<User>();
-            _notes = new List<HmmNote>();
 
             var lookupMoc = new Mock<IEntityLookup>();
             lookupMoc.Setup(lk => lk.GetEntity<User>(It.IsAny<int>())).Returns((int id) =>
