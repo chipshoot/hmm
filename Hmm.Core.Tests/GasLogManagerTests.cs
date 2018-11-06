@@ -3,7 +3,7 @@ using DomainEntity.User;
 using DomainEntity.Vehicle;
 using Hmm.Core.Manager;
 using Hmm.Core.Manager.GasLogMan;
-using Hmm.Dal.Storages;
+using Hmm.Dal.Storage;
 using Hmm.Dal.Validation;
 using Hmm.Utility.Currency;
 using Hmm.Utility.Dal;
@@ -140,17 +140,14 @@ namespace Hmm.Core.Tests
                 return rec;
             });
 
-            // set up note validator
-            var validator = new HmmNoteValidator(lookupMock.Object);
-
             // set up date time provider
             var currentDate = DateTime.Now;
             var timeProviderMock = new Mock<IDateTimeProvider>();
             timeProviderMock.Setup(t => t.UtcNow).Returns(() => currentDate);
 
-            var noteStorage = new NoteStorage(uowMock.Object, validator, lookupMock.Object, timeProviderMock.Object);
-            var noteman = new HmmNoteManager(noteStorage, lookupMock.Object);
-            _manager = new GasLogManager(noteman, lookupMock.Object);
+            var noteStorage = new NoteStorage(uowMock.Object, lookupMock.Object, timeProviderMock.Object);
+            var noteManager = new HmmNoteManager(noteStorage, lookupMock.Object);
+            _manager = new GasLogManager(noteManager, lookupMock.Object);
         }
 
         public void Dispose()
@@ -164,7 +161,7 @@ namespace Hmm.Core.Tests
             // Arrange
             var user = _authors[0];
             var cat = _cats[1];
-            var gaslog = new GasLog
+            var gasLog = new GasLog
             {
                 Author = user,
                 Catalog = cat,
@@ -184,10 +181,10 @@ namespace Hmm.Core.Tests
             };
 
             // Act
-            var newgas = _manager.CreateLog(gaslog);
+            var newGas = _manager.CreateLog(gasLog);
 
             // Assert
-            Assert.Equal(1, newgas.Id);
+            Assert.Equal(1, newGas.Id);
         }
 
         [Fact]

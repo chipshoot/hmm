@@ -1,8 +1,6 @@
 ﻿using DomainEntity.Misc;
 using DomainEntity.User;
-using Hmm.Dal.Querys;
-using Hmm.Dal.Storages;
-using Hmm.Dal.Validation;
+using Hmm.Dal.Storage;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
@@ -15,14 +13,16 @@ using Xunit;
 
 namespace Hmm.Dal.Tests
 {
-    public class NoteCatalgStorageTests : IDisposable
+    public class NoteCatalogStorageTests : IDisposable
     {
+        private readonly List<NoteRender> _renders;
         private readonly List<NoteCatalog> _catalogs;
         private readonly List<HmmNote> _notes;
         private readonly NoteCatalogStorage _catalogStorage;
 
-        public NoteCatalgStorageTests()
+        public NoteCatalogStorageTests()
         {
+            _renders = new List<NoteRender>();
             _catalogs = new List<NoteCatalog>();
             _notes = new List<HmmNote>();
 
@@ -42,19 +42,29 @@ namespace Hmm.Dal.Tests
             // set up unit of work
             IUnitOfWork Uowp()
             {
-                var uowmock = new Mock<IUnitOfWork>();
-                uowmock.Setup(u => u.Add(It.IsAny<NoteCatalog>())).Returns((NoteCatalog cat) =>
+                var uowMock = new Mock<IUnitOfWork>();
+                uowMock.Setup(u => u.Add(It.IsAny<NoteRender>())).Returns((NoteRender render) =>
+                    {
+                        render.Id = _renders.GetNextId();
+                        _renders.AddEntity(render);
+                        return render;
+                    }
+                );
+
+                uowMock.Setup(u => u.Add(It.IsAny<NoteCatalog>())).Returns((NoteCatalog cat) =>
                     {
                         cat.Id = _catalogs.GetNextId();
                         _catalogs.AddEntity(cat);
                         return cat;
                     }
                 );
-                uowmock.Setup(u => u.Delete(It.IsAny<NoteCatalog>())).Callback((NoteCatalog cat) =>
+
+                uowMock.Setup(u => u.Delete(It.IsAny<NoteCatalog>())).Callback((NoteCatalog cat) =>
                 {
                     _catalogs.Remove(cat);
                 });
-                uowmock.Setup(u => u.Update(It.IsAny<NoteCatalog>())).Callback((NoteCatalog cat) =>
+
+                uowMock.Setup(u => u.Update(It.IsAny<NoteCatalog>())).Callback((NoteCatalog cat) =>
                 {
                     var orgCat = _catalogs.FirstOrDefault(c => c.Id == cat.Id);
                     if (orgCat != null)
@@ -64,7 +74,7 @@ namespace Hmm.Dal.Tests
                     }
                 });
 
-                return uowmock.Object;
+                return uowMock.Object;
             }
 
             // set up date time provider
@@ -76,19 +86,8 @@ namespace Hmm.Dal.Tests
 
             var dsp = new DataSourceProvider(Lkp, Uowp, Dtp);
 
-            // set up query handler
-            var queryMock = new Mock<IQueryHandler<NoteCatalogQueryByName, NoteCatalog>>();
-            queryMock.Setup(q => q.Execute(It.IsAny<NoteCatalogQueryByName>())).Returns((NoteCatalogQueryByName q) =>
-            {
-                var catfound = _catalogs.FirstOrDefault(c => c.Name == q.CatalogName);
-                return catfound;
-            });
-
-            // set up note catalog validator
-            var validator = new NoteCatalogValidator(dsp.Lookup, queryMock.Object);
-
             // set up catalog repository
-            _catalogStorage = new NoteCatalogStorage(dsp.UnitOfWork, validator, dsp.Lookup, dsp.DateTimeAdapter);
+            _catalogStorage = new NoteCatalogStorage(dsp.UnitOfWork, dsp.Lookup, dsp.DateTimeAdapter);
         }
 
         public void Dispose()
@@ -224,7 +223,6 @@ namespace Hmm.Dal.Tests
             // Assert
             Assert.False(result, "Error: deleted catalog with note attached to it");
             Assert.Single(_catalogs);
-            Assert.True(_catalogStorage.Validator.ValidationErrors.Count > 0);
         }
 
         [Fact]

@@ -2,7 +2,7 @@
 using DomainEntity.User;
 using Hmm.Contract;
 using Hmm.Core.Manager;
-using Hmm.Dal.Storages;
+using Hmm.Dal.Storage;
 using Hmm.Dal.Validation;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
@@ -139,17 +139,14 @@ namespace Hmm.Core.Tests
                 return rec;
             });
 
-            // set up note validator
-            var validator = new HmmNoteValidator(lookupMock.Object);
-
             // set up date time provider
             _currentDate = DateTime.Now;
             var timeProviderMock = new Mock<IDateTimeProvider>();
             timeProviderMock.Setup(t => t.UtcNow).Returns(() => _currentDate);
 
-            var noteStorage = new NoteStorage(uowMock.Object, validator, lookupMock.Object, timeProviderMock.Object);
-            var lkmoc = new Mock<IEntityLookup>();
-            _manager = new HmmNoteManager(noteStorage, lkmoc.Object);
+            var noteStorage = new NoteStorage(uowMock.Object, lookupMock.Object, timeProviderMock.Object);
+            var lkMoc = new Mock<IEntityLookup>();
+            _manager = new HmmNoteManager(noteStorage, lkMoc.Object);
         }
 
         public void Dispose()
@@ -158,7 +155,7 @@ namespace Hmm.Core.Tests
         }
 
         [Fact]
-        public void CanAddNoteToDataSouce()
+        public void CanAddNoteToDataSource()
         {
             // Arrange
             var user = _authors[0];

@@ -27,7 +27,7 @@ namespace Hmm.Dal.Data
                 .ValueGeneratedOnAddOrUpdate();
 
             modelBuilder.Entity<User>().ToTable("Users");
-            modelBuilder.Entity<NoteCatalog>().ToTable("NoteCatalogues");
+            modelBuilder.Entity<NoteCatalog>().ToTable("NoteCatalogs");
             modelBuilder.Entity<NoteRender>().ToTable("NoteRenders");
         }
     }

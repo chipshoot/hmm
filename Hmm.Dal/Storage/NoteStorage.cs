@@ -3,28 +3,20 @@ using Hmm.Dal.Data;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
-using Hmm.Utility.Validation;
 
-namespace Hmm.Dal.Storages
+namespace Hmm.Dal.Storage
 {
     public class NoteStorage : StorageBase<HmmNote>
     {
         public NoteStorage(
             IUnitOfWork uow,
-            IValidator<HmmNote> validator,
             IEntityLookup lookupRepo,
-            IDateTimeProvider dateTimeProvider) : base(uow, validator, lookupRepo, dateTimeProvider)
+            IDateTimeProvider dateTimeProvider) : base(uow, lookupRepo, dateTimeProvider)
         {
         }
 
         public override HmmNote Add(HmmNote entity)
         {
-            Validator.Reset();
-            if (!Validator.IsValid(entity, isNewEntity: true))
-            {
-                return null;
-            }
-
             // check if need apply default catalog
             var catalog = PropertyChecking(entity.Catalog);
             entity.Catalog = catalog ?? throw new DataSourceException("Cannot find default note catalog.");
@@ -41,24 +33,12 @@ namespace Hmm.Dal.Storages
 
         public override bool Delete(HmmNote entity)
         {
-            Validator.Reset();
-            if (!Validator.IsValid(entity, isNewEntity: false))
-            {
-                return false;
-            }
-
             UnitOfWork.Delete(entity);
             return true;
         }
 
         public override HmmNote Update(HmmNote entity)
         {
-            Validator.Reset();
-            if (!Validator.IsValid(entity, false))
-            {
-                return null;
-            }
-
             // check if need apply default catalog
             var catalog = PropertyChecking(entity.Catalog);
             entity.Catalog = catalog ?? throw new DataSourceException("Cannot find default note catalog.");

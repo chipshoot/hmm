@@ -7,26 +7,23 @@ using Hmm.Utility.Validation;
 using System;
 using System.Collections.Generic;
 
-namespace Hmm.Dal.Storages
+namespace Hmm.Dal.Storage
 {
     public abstract class StorageBase<T> : IDataStore<T> where T : Entity
     {
         private const int DefaultPropId = 1;
 
-        protected StorageBase(IUnitOfWork uow, IValidator<T> validator, IEntityLookup lookupRepo, IDateTimeProvider dateTimeProvider)
+        protected StorageBase(IUnitOfWork uow, IEntityLookup lookupRepo, IDateTimeProvider dateTimeProvider)
         {
             Guard.Against<ArgumentNullException>(uow == null, nameof(uow));
-            Guard.Against<ArgumentNullException>(validator == null, nameof(validator));
             Guard.Against<ArgumentNullException>(lookupRepo == null, nameof(lookupRepo));
             Guard.Against<ArgumentNullException>(dateTimeProvider == null, nameof(dateTimeProvider));
 
             UnitOfWork = uow;
-            Validator = validator;
             LookupRepo = lookupRepo;
             DateTimeProvider = dateTimeProvider;
+            ProcessMessage = new ProcessingResult();
         }
-
-        public IValidator<T> Validator { get; set; }
 
         protected IEntityLookup LookupRepo { get; }
 
@@ -44,6 +41,8 @@ namespace Hmm.Dal.Storages
         {
             return LookupRepo.GetEntities<T>();
         }
+
+        public ProcessingResult ProcessMessage { get; }
 
         protected TP PropertyChecking<TP>(TP property) where TP : Entity
         {

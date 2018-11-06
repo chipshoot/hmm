@@ -7,12 +7,12 @@ namespace Hmm.Dal.Data
 {
     public class EfUnitOfWork : IUnitOfWork
     {
-        private readonly IHmmDataContext _dbcontext;
+        private readonly IHmmDataContext _dbContext;
 
-        public EfUnitOfWork(IHmmDataContext dbcontext)
+        public EfUnitOfWork(IHmmDataContext dbContext)
         {
-            Guard.Against<ArgumentNullException>(dbcontext == null, nameof(dbcontext));
-            _dbcontext = dbcontext;
+            Guard.Against<ArgumentNullException>(dbContext == null, nameof(dbContext));
+            _dbContext = dbContext;
         }
 
         public void Dispose()
@@ -21,10 +21,17 @@ namespace Hmm.Dal.Data
 
         public T Add<T>(T entity) where T : class
         {
-            if (_dbcontext is DbContext context)
+            if (_dbContext is DbContext context)
             {
-                context.Add(entity);
-                context.SaveChanges();
+                try
+                {
+                    context.Add(entity);
+                    context.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    throw new DataSourceException(ex.Message, ex);
+                }
             }
             else
             {
@@ -37,25 +44,45 @@ namespace Hmm.Dal.Data
 
         public void Delete<T>(T entity) where T : class
         {
-            if (_dbcontext is DbContext context)
+            if (_dbContext is DbContext context)
             {
-                context.Remove(entity);
-                context.SaveChanges();
+                try
+                {
+                    context.Remove(entity);
+                    context.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    throw new DataSourceException(ex.Message, ex);
+                }
             }
         }
 
         public void Update<T>(T entity) where T : class
         {
-            if (_dbcontext is DbContext context)
+            if (_dbContext is DbContext context)
             {
-                context.Update(entity);
-                context.SaveChanges();
+                try
+                {
+                    context.Update(entity);
+                    context.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    throw new DataSourceException(ex.Message, ex);
+                }
             }
         }
 
         public IGenericTransaction BeginTransaction()
         {
-            throw new NotImplementedException();
+            if (!(_dbContext is DbContext context))
+            {
+                return null;
+            }
+
+            var transaction = new EfTransaction(context.Database.BeginTransaction());
+            return transaction;
         }
 
         public void Flush()

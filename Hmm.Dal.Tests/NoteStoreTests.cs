@@ -1,7 +1,6 @@
 ﻿using DomainEntity.Misc;
 using DomainEntity.User;
-using Hmm.Dal.Storages;
-using Hmm.Dal.Validation;
+using Hmm.Dal.Storage;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
@@ -24,7 +23,7 @@ namespace Hmm.Dal.Tests
         private readonly List<NoteRender> _renders;
         private readonly NoteStorage _noteStorage;
         private DateTime _currentDate = DateTime.Now;
-        private IDataSourceProvider _dsp;
+        private readonly IDataSourceProvider _dsp;
 
         public NoteStorageTests()
         {
@@ -92,10 +91,7 @@ namespace Hmm.Dal.Tests
             var isUseMoc = IsUsingMocEnv();
             _dsp = isUseMoc ? GetMockDataSource() : GetDatabase();
 
-            // set up note validator
-            var validator = new HmmNoteValidator(_dsp.Lookup);
-
-            _noteStorage = new NoteStorage(_dsp.UnitOfWork, validator, _dsp.Lookup, _dsp.DateTimeAdapter);
+            _noteStorage = new NoteStorage(_dsp.UnitOfWork, _dsp.Lookup, _dsp.DateTimeAdapter);
         }
 
         private IDataSourceProvider GetMockDataSource()
@@ -255,7 +251,6 @@ namespace Hmm.Dal.Tests
 
             // Asset
             Assert.Null(result);
-            Assert.True(_noteStorage.Validator.ValidationErrors.Count == 1);
             Assert.Empty(_notes);
         }
 
@@ -404,7 +399,6 @@ namespace Hmm.Dal.Tests
             // Assert
             Assert.Null(savedRec);
             Assert.Empty(_notes);
-            Assert.Single(_noteStorage.Validator.ValidationErrors);
 
             // Arrange - none exists author
             var author = new User
@@ -427,7 +421,6 @@ namespace Hmm.Dal.Tests
             // Assert
             Assert.Null(savedRec);
             Assert.Empty(_notes);
-            Assert.Single(_noteStorage.Validator.ValidationErrors);
 
             // Arrange - author with invalid author id
             author.Id = 0;
@@ -439,7 +432,6 @@ namespace Hmm.Dal.Tests
             // Assert
             Assert.Null(savedRec);
             Assert.Empty(_notes);
-            Assert.Single(_noteStorage.Validator.ValidationErrors);
         }
 
         [Fact]
@@ -811,8 +803,6 @@ namespace Hmm.Dal.Tests
 
             // Assert
             Assert.Null(savedRec);
-            Assert.Single(_noteStorage.Validator.ValidationErrors);
-
             Assert.Single(_notes);
             Assert.Equal("jfang", _notes[0].Author.AccountName);
         }
@@ -845,7 +835,6 @@ namespace Hmm.Dal.Tests
             // Assert
             Assert.Null(savedRec);
             Assert.Single(_notes);
-            Assert.Single(_noteStorage.Validator.ValidationErrors);
 
             // Arrange - invalid id
             note.Id = 0;
@@ -856,7 +845,6 @@ namespace Hmm.Dal.Tests
             // Assert
             Assert.Null(savedRec);
             Assert.Single(_notes);
-            Assert.Single(_noteStorage.Validator.ValidationErrors);
         }
 
         [Fact]
@@ -921,7 +909,6 @@ namespace Hmm.Dal.Tests
             // Assert
             Assert.False(result);
             Assert.Single(_notes);
-            Assert.NotEmpty(_noteStorage.Validator.ValidationErrors);
         }
     }
 }

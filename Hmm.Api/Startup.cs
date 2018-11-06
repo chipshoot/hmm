@@ -7,7 +7,7 @@ using Hmm.Core.Manager;
 using Hmm.Core.Manager.GasLogMan;
 using Hmm.Dal.Data;
 using Hmm.Dal.Querys;
-using Hmm.Dal.Storages;
+using Hmm.Dal.Storage;
 using Hmm.Dal.Validation;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.DataStore;
@@ -34,8 +34,8 @@ namespace Hmm.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var connstr = Configuration.GetConnectionString("DefaultConnection");
-            services.AddDbContext<HmmDataContext>(opt => opt.UseSqlServer(connstr));
+            var connectString = Configuration.GetConnectionString("DefaultConnection");
+            services.AddDbContext<HmmDataContext>(opt => opt.UseSqlServer(connectString));
             services.AddScoped<IUnitOfWork, EfUnitOfWork>();
             services.AddSingleton<IDateTimeProvider, DateTimeAdapter>();
             services.AddScoped<IDataStore<HmmNote>, NoteStorage>();

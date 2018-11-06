@@ -20,8 +20,13 @@ namespace Hmm.Utility.Misc
             MessageList.Clear();
         }
 
-        public void AddMessage(string message)
+        public void AddMessage(string message, bool clearOldMessage = false)
         {
+            if (clearOldMessage)
+            {
+                MessageList.Clear();
+            }
+
             MessageList.Add(message);
         }
     }

@@ -1,7 +1,7 @@
 ﻿using DomainEntity.User;
 using Hmm.Contract;
 using Hmm.Core.Manager;
-using Hmm.Dal.Storages;
+using Hmm.Dal.Storage;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
@@ -32,11 +32,9 @@ namespace Hmm.Core.Tests
                   _users.Add(usr);
                   return usr;
               });
-            var validmoc = new Mock<IValidator<User>>();
-            validmoc.Setup(v => v.IsValid(It.IsAny<User>(), It.IsAny<bool>())).Returns(true);
-            var lookupmoc = new Mock<IEntityLookup>();
+            var lookupMoc = new Mock<IEntityLookup>();
             var timeAdp = new Mock<IDateTimeProvider>();
-            var data = new UserStorage(uowmoc.Object, validmoc.Object, lookupmoc.Object, timeAdp.Object);
+            var data = new UserStorage(uowmoc.Object, lookupMoc.Object, timeAdp.Object);
 
             _usrmanager = new UserManager(data);
         }

@@ -1,6 +1,7 @@
 ﻿using Hmm.Utility.Dal.DataEntity;
 using Hmm.Utility.Validation;
 using System.Collections.Generic;
+using Hmm.Utility.Misc;
 
 namespace Hmm.Utility.Dal.DataStore
 {
@@ -12,12 +13,6 @@ namespace Hmm.Utility.Dal.DataStore
     /// <typeparam name="TIdentity">the type of entity identity</typeparam>
     public interface IGenericDataStore<T, in TIdentity> where T : AbstractEntity<TIdentity>
     {
-        /// <summary>
-        /// Get and Set the entity validator which is used for validating entity when insert, update or delete
-        /// entity
-        /// </summary>
-        IValidator<T> Validator { get; set; }
-
         /// <summary>
         /// Adds the entity to data source.
         /// </summary>
@@ -44,5 +39,13 @@ namespace Hmm.Utility.Dal.DataStore
         /// </summary>
         /// <returns>The list of entities with type {T}</returns>
         IEnumerable<T> GetEntities();
+
+        /// <summary>
+        /// Gets the process message.
+        /// </summary>
+        /// <value>
+        /// The process message.
+        /// </value>
+        ProcessingResult ProcessMessage { get; }
     }
 }

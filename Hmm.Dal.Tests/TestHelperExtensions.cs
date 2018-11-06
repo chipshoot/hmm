@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 
 namespace Hmm.Dal.Tests
 {
@@ -60,8 +61,34 @@ namespace Hmm.Dal.Tests
 
         public static int GetNextId<T>(this IList<T> list) where T : Entity
         {
-            var curid = list.Count > 0 ? list.Max(n => n.Id) : 0;
-            return curid + 1;
+            var currentId = list.Count > 0 ? list.Max(n => n.Id) : 0;
+            return currentId + 1;
+        }
+
+        public static void Reset(this DbContext context)
+        {
+            var entries = context.ChangeTracker
+                .Entries()
+                .Where(e => e.State != EntityState.Unchanged)
+                .ToArray();
+
+            foreach (var entry in entries)
+            {
+                switch (entry.State)
+                {
+                    case EntityState.Modified:
+                        entry.State = EntityState.Unchanged;
+                        break;
+
+                    case EntityState.Added:
+                        entry.State = EntityState.Detached;
+                        break;
+
+                    case EntityState.Deleted:
+                        entry.Reload();
+                        break;
+                }
+            }
         }
     }
 }

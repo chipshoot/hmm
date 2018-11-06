@@ -1,8 +1,6 @@
 ﻿using DomainEntity.Misc;
 using DomainEntity.User;
-using Hmm.Dal.Querys;
-using Hmm.Dal.Storages;
-using Hmm.Dal.Validation;
+using Hmm.Dal.Storage;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
@@ -34,19 +32,19 @@ namespace Hmm.Dal.Tests
             });
 
             // set up unit of work
-            var uowmock = new Mock<IUnitOfWork>();
-            uowmock.Setup(u => u.Add(It.IsAny<NoteRender>())).Returns((NoteRender render) =>
+            var uowMock = new Mock<IUnitOfWork>();
+            uowMock.Setup(u => u.Add(It.IsAny<NoteRender>())).Returns((NoteRender render) =>
                 {
                     render.Id = _renders.GetNextId();
                     _renders.AddEntity(render);
                     return render;
                 }
             );
-            uowmock.Setup(u => u.Delete(It.IsAny<NoteRender>())).Callback((NoteRender render) =>
+            uowMock.Setup(u => u.Delete(It.IsAny<NoteRender>())).Callback((NoteRender render) =>
             {
                 _renders.Remove(render);
             });
-            uowmock.Setup(u => u.Update(It.IsAny<NoteRender>())).Callback((NoteRender render) =>
+            uowMock.Setup(u => u.Update(It.IsAny<NoteRender>())).Callback((NoteRender render) =>
             {
                 var orgRender = _renders.FirstOrDefault(c => c.Id == render.Id);
                 if (orgRender != null)
@@ -56,35 +54,11 @@ namespace Hmm.Dal.Tests
                 }
             });
 
-            // set up query handler
-            var queryMock = new Mock<IQueryHandler<NoteRenderQueryByName, NoteRender>>();
-            queryMock.Setup(q => q.Execute(It.IsAny<NoteRenderQueryByName>())).Returns((NoteRenderQueryByName q) =>
-            {
-                var catfound = _renders.FirstOrDefault(c => c.Name == q.RenderName);
-                return catfound;
-            });
-
-            // set up note query handler
-            var noteQueryMock = new Mock<IQueryHandler<IQuery<IEnumerable<HmmNote>>, IEnumerable<HmmNote>>>();
-            noteQueryMock.Setup(q => q.Execute(It.IsAny<NoteQueryByRender>())).Returns((NoteQueryByRender query) =>
-            {
-                IEnumerable<HmmNote> notes = new List<HmmNote>();
-                if (query.Render.Id > 0)
-                {
-                    notes = _notes.Where(n => n.Catalog.Render.Id == query.Render.Id).Select(n => n).AsEnumerable();
-                }
-
-                return notes;
-            });
-
-            // set up note render validator
-            var validator = new NoteRenderValidator(lookupMoc.Object, queryMock.Object);
-
             // set up date time provider
             var timeProviderMock = new Mock<IDateTimeProvider>();
 
             // set up render storage
-            _renderStorage = new NoteRenderStorage(uowmock.Object, validator, lookupMoc.Object, noteQueryMock.Object, timeProviderMock.Object);
+            _renderStorage = new NoteRenderStorage(uowMock.Object, lookupMoc.Object, timeProviderMock.Object);
         }
 
         public void Dispose()
@@ -227,7 +201,6 @@ namespace Hmm.Dal.Tests
             // Assert
             Assert.False(result, "Error: deleted render with note attached to it");
             Assert.Single(_renders);
-            Assert.True(_renderStorage.Validator.ValidationErrors.Count > 0);
         }
 
         [Fact]
