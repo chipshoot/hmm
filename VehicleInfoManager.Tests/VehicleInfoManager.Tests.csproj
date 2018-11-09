@@ -15,4 +15,17 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Hmm.Contract\Hmm.Contract.csproj" />
+    <ProjectReference Include="..\Hmm.Core\Hmm.Core.csproj" />
+    <ProjectReference Include="..\Hmm.Utility.TestHelp\Hmm.Utility.TestHelp.csproj" />
+    <ProjectReference Include="..\VehicleInfoManager\VehicleInfoManager.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

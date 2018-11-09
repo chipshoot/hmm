@@ -24,7 +24,6 @@ namespace Hmm.Utility.TestHelp
         private List<NoteCatalog> _catalogs;
         private List<HmmNote> _notes;
         private IHmmDataContext _dbContext;
-        private IEntityLookup _lookupRepo;
         private readonly bool _isUsingMock;
 
         protected TestFixtureBase()
@@ -58,6 +57,8 @@ namespace Hmm.Utility.TestHelp
 
         protected NoteRenderStorage RenderStorage { get; private set; }
 
+        protected IEntityLookup LookupRepo { get; private set; }
+
         protected void SetupRecords(
             IEnumerable<User> users,
             IEnumerable<NoteRender> renders,
@@ -82,7 +83,7 @@ namespace Hmm.Utility.TestHelp
             {
                 if (catalog.Render != null)
                 {
-                    var render = _lookupRepo.GetEntities<NoteRender>()
+                    var render = LookupRepo.GetEntities<NoteRender>()
                         .FirstOrDefault(r => r.Name == catalog.Render.Name);
                     if (render != null)
                     {
@@ -95,7 +96,7 @@ namespace Hmm.Utility.TestHelp
                 }
                 else
                 {
-                    var render = _lookupRepo.GetEntities<NoteRender>().FirstOrDefault();
+                    var render = LookupRepo.GetEntities<NoteRender>().FirstOrDefault();
                     if (render != null)
                     {
                         catalog.Render = render;
@@ -128,25 +129,25 @@ namespace Hmm.Utility.TestHelp
                     context.Reset();
                 }
 
-                var notes = _lookupRepo.GetEntities<HmmNote>();
+                var notes = LookupRepo.GetEntities<HmmNote>();
                 foreach (var note in notes)
                 {
                     NoteStorage.Delete(note);
                 }
 
-                var catalogs = _lookupRepo.GetEntities<NoteCatalog>();
+                var catalogs = LookupRepo.GetEntities<NoteCatalog>();
                 foreach (var catalog in catalogs)
                 {
                     CatalogStorage.Delete(catalog);
                 }
 
-                var renders = _lookupRepo.GetEntities<NoteRender>();
+                var renders = LookupRepo.GetEntities<NoteRender>();
                 foreach (var render in renders)
                 {
                     RenderStorage.Delete(render);
                 }
 
-                var users = _lookupRepo.GetEntities<User>();
+                var users = LookupRepo.GetEntities<User>();
                 foreach (var user in users)
                 {
                     UserStorage.Delete(user);
@@ -310,12 +311,12 @@ namespace Hmm.Utility.TestHelp
                 .UseSqlServer(connectString);
             _dbContext = new HmmDataContext(optBuilder.Options);
             var uow = new EfUnitOfWork(_dbContext);
-            _lookupRepo = new EfEntityLookup(_dbContext);
+            LookupRepo = new EfEntityLookup(_dbContext);
             var dateProvider = new DateTimeAdapter();
-            UserStorage = new UserStorage(uow, _lookupRepo, dateProvider);
-            NoteStorage = new NoteStorage(uow, _lookupRepo, dateProvider);
-            RenderStorage = new NoteRenderStorage(uow, _lookupRepo, dateProvider);
-            CatalogStorage = new NoteCatalogStorage(uow, _lookupRepo, dateProvider);
+            UserStorage = new UserStorage(uow, LookupRepo, dateProvider);
+            NoteStorage = new NoteStorage(uow, LookupRepo, dateProvider);
+            RenderStorage = new NoteRenderStorage(uow, LookupRepo, dateProvider);
+            CatalogStorage = new NoteCatalogStorage(uow, LookupRepo, dateProvider);
         }
     }
 }

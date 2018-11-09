@@ -1,195 +1,140 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using Xunit;
+﻿using DomainEntity.Misc;
+using DomainEntity.User;
+using DomainEntity.Vehicle;
+using Hmm.Contract.GasLogMan;
+using Hmm.Core.Manager;
+using Hmm.Utility.Currency;
+using Hmm.Utility.MeasureUnit;
+using Hmm.Utility.TestHelp;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using VehicleInfoManager.GasLogMan;
+using Xunit;
 
-//namespace VehicleInfoManager.Tests
-//{
-//    public class GasLogManagerTests : IDisposable
-//    {
-//        private readonly List<HmmNote> _notes;
-//        private readonly List<User> _authors;
-//        private readonly List<NoteCatalog> _cats;
-//        private readonly GasLogManager _manager;
+namespace VehicleInfoManager.Tests
+{
+    public class GasLogManagerTests : TestFixtureBase
+    {
+        private readonly IGasLogManager _manager;
 
-//        public GasLogManagerTests()
-//        {
-//            _notes = new List<HmmNote>();
-//            _authors = new List<User>
-//            {
-//                new User
-//                {
-//                    Id = 1,
-//                    FirstName = "Jack",
-//                    LastName = "Fang",
-//                    AccountName = "jfang",
-//                    BirthDay = new DateTime(1977, 05, 21),
-//                    Password = "lucky1",
-//                    Salt = "passwordSalt",
-//                    IsActivated = true,
-//                    Description = "testing user"
-//                },
-//                new User
-//                {
-//                    Id = 2,
-//                    FirstName = "Amy",
-//                    LastName = "Wang",
-//                    AccountName = "awang",
-//                    BirthDay = new DateTime(1977, 05, 21),
-//                    Password = "lucky1",
-//                    Salt = "passwordSalt",
-//                    IsActivated = true,
-//                    Description = "testing user"
-//                }
-//            };
-//            _cats = new List<NoteCatalog>
-//            {
-//                new NoteCatalog
-//                {
-//                    Id = 1,
-//                    Name = "DefaultNoteCatalog",
-//                    Description = "Testing catalog"
-//                },
-//                new NoteCatalog
-//                {
-//                    Id = 2,
-//                    Name = "Gas Log",
-//                    Description = "Testing catalog"
-//                }
-//            };
-//            var renders = new List<NoteRender>
-//            {
-//                new NoteRender
-//                {
-//                    Id = 1,
-//                    Name = "DefaultNoteRender",
-//                    Namespace = "Hmm.Renders",
-//                    Description = "Testing default note render"
-//                },
-//                new NoteRender
-//                {
-//                    Id = 2,
-//                    Name = "GasLog",
-//                    Namespace = "Hmm.Renders",
-//                    Description = "Testing default note render"
-//                }
-//            };
+        public GasLogManagerTests()
+        {
+            var authors = new List<User>
+            {
+                new User
+                {
+                    FirstName = "Jack",
+                    LastName = "Fang",
+                    AccountName = "jfang",
+                    BirthDay = new DateTime(1977, 05, 21),
+                    Password = "lucky1",
+                    Salt = "passwordSalt",
+                    IsActivated = true,
+                    Description = "testing user"
+                },
+                new User
+                {
+                    FirstName = "Amy",
+                    LastName = "Wang",
+                    AccountName = "awang",
+                    BirthDay = new DateTime(1977, 05, 21),
+                    Password = "lucky1",
+                    Salt = "passwordSalt",
+                    IsActivated = true,
+                    Description = "testing user"
+                }
+            };
 
-//            // set up unit of work
-//            var uowMock = new Mock<IUnitOfWork>();
-//            uowMock.Setup(u => u.Add(It.IsAny<HmmNote>())).Returns((HmmNote note) =>
-//            {
-//                note.Id = _notes.GetNextId();
-//                _notes.AddEntity(note);
-//                var savedRec = _notes.FirstOrDefault(n => n.Id == note.Id);
-//                return savedRec;
-//            });
-//            uowMock.Setup(u => u.Delete(It.IsAny<HmmNote>())).Callback((HmmNote note) =>
-//            {
-//                var rec = _notes.FirstOrDefault(n => n.Id == note.Id);
-//                if (rec != null)
-//                {
-//                    _notes.Remove(rec);
-//                }
-//            });
-//            uowMock.Setup(u => u.Update(It.IsAny<HmmNote>())).Callback((HmmNote note) =>
-//            {
-//                var rec = _notes.FirstOrDefault(n => n.Id == note.Id);
-//                if (rec == null)
-//                {
-//                    return;
-//                }
+            var renders = new List<NoteRender>
+            {
+                new NoteRender
+                {
+                    Name = "DefaultNoteRender",
+                    Namespace = "Hmm.Renders",
+                    Description = "Testing default note render"
+                },
+                new NoteRender
+                {
+                    Name = "GasLog",
+                    Namespace = "Hmm.Renders",
+                    Description = "Testing default note render"
+                }
+            };
 
-//                _notes.Remove(rec);
-//                _notes.AddEntity(note);
-//            });
+            var catalogs = new List<NoteCatalog>
+            {
+                new NoteCatalog
+                {
+                    Name = "DefaultNoteCatalog",
+                    Render = renders[0],
+                    Schema = "<?xml version=\"1.0\" encoding=\"UTF-16\"?><xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xmlns:vc=\"http://www.w3.org/2007/XMLSchema-versioning\" xmlns:hmm=\"http://schema.hmm.com/2017\" targetNamespace=\"http://schema.hmm.com/2017\" elementFormDefault=\"qualified\" attributeFormDefault=\"unqualified\" vc:minVersion=\"1.1\"><xs:element name=\"Note\"><xs:annotation><xs:documentation>The root of all note managed by HMM</xs:documentation></xs:annotation><xs:complexType><xs:sequence><xs:element name=\"Content\" type=\"xs:string\"/></xs:sequence></xs:complexType></xs:element></xs:schema>",
+                    Description = "Testing catalog"
+                },
 
-//            // set up look up repository
-//            var lookupMock = new Mock<IEntityLookup>();
-//            lookupMock.Setup(lk => lk.GetEntity<HmmNote>(It.IsAny<int>())).Returns((int id) =>
-//            {
-//                var rec = _notes.FirstOrDefault(n => n.Id == id);
-//                return rec;
-//            });
-//            lookupMock.Setup(lk => lk.GetEntity<User>(It.IsAny<int>())).Returns((int id) =>
-//            {
-//                var rec = _authors.FirstOrDefault(n => n.Id == id);
-//                return rec;
-//            });
-//            lookupMock.Setup(lk => lk.GetEntity<NoteCatalog>(It.IsAny<int>())).Returns((int id) =>
-//            {
-//                var rec = _cats.FirstOrDefault(n => n.Id == id);
-//                return rec;
-//            });
-//            lookupMock.Setup(lk => lk.GetEntity<NoteRender>(It.IsAny<int>())).Returns((int id) =>
-//            {
-//                var rec = renders.FirstOrDefault(n => n.Id == id);
-//                return rec;
-//            });
+                new NoteCatalog
+                {
+                    Name = "Gas Log",
+                    Render = renders[1],
+                    Schema = "<?xml version=\"1.0\" encoding=\"UTF-16\"?><xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xmlns:vc=\"http://www.w3.org/2007/XMLSchema-versioning\" xmlns:rns=\"http://schema.hmm.com/2017\" targetNamespace=\"http://schema.hmm.com/2017\" elementFormDefault=\"qualified\" attributeFormDefault=\"unqualified\" vc:minVersion=\"1.1\"><xs:element name=\"Note\"><xs:annotation><xs:documentation>The root of all note managed by HMM</xs:documentation></xs:annotation><xs:complexType><xs:sequence><xs:element name=\"Content\"><xs:complexType><xs:sequence><xs:element name=\"GasLog\"><xs:annotation><xs:documentation>Comment describing your root element</xs:documentation></xs:annotation><xs:complexType><xs:sequence><xs:element name=\"Date\" type=\"xs:dateTime\"/><xs:element name=\"Distance\" type=\"rns:DimensionType\"/><xs:element name=\"Gas\"><xs:complexType><xs:complexContent><xs:extension base=\"rns:VolumeType\"/></xs:complexContent></xs:complexType></xs:element><xs:element name=\"Price\" type=\"rns:MonetaryType\"/><xs:element name=\"GasStation\" type=\"xs:string\"/><xs:element name=\"Discounts\"><xs:complexType><xs:sequence><xs:element name=\"Discount\" type=\"rns:DiscountType\" minOccurs=\"0\" maxOccurs=\"unbounded\"/></xs:sequence></xs:complexType></xs:element></xs:sequence></xs:complexType></xs:element></xs:sequence></xs:complexType></xs:element></xs:sequence></xs:complexType></xs:element><xs:complexType name=\"DimensionType\"><xs:sequence><xs:element name=\"Dimension\"><xs:complexType><xs:sequence><xs:element name=\"Value\" type=\"xs:double\"/><xs:element name=\"Unit\" type=\"xs:string\"/></xs:sequence></xs:complexType></xs:element></xs:sequence></xs:complexType><xs:complexType name=\"VolumeType\"><xs:sequence><xs:element name=\"Volume\"><xs:complexType><xs:sequence><xs:element name=\"Value\"/><xs:element name=\"Unit\"/></xs:sequence></xs:complexType></xs:element></xs:sequence></xs:complexType><xs:complexType name=\"MonetaryType\"><xs:sequence><xs:element name=\"Money\"><xs:complexType><xs:sequence><xs:element name=\"Value\" type=\"xs:decimal\"/><xs:element name=\"Code\" type=\"xs:string\"/></xs:sequence></xs:complexType></xs:element></xs:sequence></xs:complexType><xs:complexType name=\"DiscountType\"><xs:sequence><xs:element name=\"Amount\" type=\"rns:MonetaryType\"/><xs:element name=\"Program\" type=\"xs:string\"/></xs:sequence></xs:complexType></xs:schema>",
+                    Description = "Testing catalog"
+                }
+            };
 
-//            // set up date time provider
-//            var currentDate = DateTime.Now;
-//            var timeProviderMock = new Mock<IDateTimeProvider>();
-//            timeProviderMock.Setup(t => t.UtcNow).Returns(() => currentDate);
+            SetupRecords(authors, renders, catalogs);
+            var noteManager = new HmmNoteManager(NoteStorage, LookupRepo);
+            _manager = new GasLogManager(noteManager, LookupRepo);
+        }
 
-//            var noteStorage = new NoteStorage(uowMock.Object, lookupMock.Object, timeProviderMock.Object);
-//            var noteManager = new HmmNoteManager(noteStorage, lookupMock.Object);
-//            _manager = new GasLogManager(noteManager, lookupMock.Object);
-//        }
+        [Fact]
+        public void CanAddGasLog()
+        {
+            // Arrange
+            var user = UserStorage.GetEntities().FirstOrDefault();
+            var catalog = CatalogStorage.GetEntities().FirstOrDefault(cat => cat.Name == "Gas Log");
+            var gasLog = new GasLog
+            {
+                Author = user,
+                Catalog = catalog,
+                GasStation = "Costco",
+                Gas = Volume.FromLiter(40),
+                Price = new Money(40.0),
+                Distance = Dimension.FromKilometre(300),
+                CreateDate = DateTime.UtcNow,
+                Discounts = new List<GasDiscountInfo>
+                {
+                    new GasDiscountInfo
+                    {
+                        Amount = new Money(0.8),
+                        Program = "Patrol Canada RBC connection"
+                    }
+                }
+            };
 
-//        public void Dispose()
-//        {
-//            _notes.Clear();
-//        }
+            // Act
+            var newGas = _manager.CreateLog(gasLog);
 
-//        [Fact]
-//        public void CanAddGasLog()
-//        {
-//            // Arrange
-//            var user = _authors[0];
-//            var cat = _cats[1];
-//            var gasLog = new GasLog
-//            {
-//                Author = user,
-//                Catalog = cat,
-//                GasStation = "Costco",
-//                Gas = Volume.FromLiter(40),
-//                Price = new Money(40.0),
-//                Distance = Dimension.FromKilometre(300),
-//                CreateDate = DateTime.UtcNow,
-//                Discounts = new List<GasDiscountInfo>
-//                {
-//                    new GasDiscountInfo
-//                    {
-//                        Amount = new Money(0.8),
-//                        Program = "Patrol Canada RBC connection"
-//                    }
-//                }
-//            };
+            // Assert
+            Assert.True(newGas.Id >= 1, "newGas.Id >= 1");
+            Assert.True(_manager.ProcessResult.Success);
+        }
 
-//            // Act
-//            var newGas = _manager.CreateLog(gasLog);
+        //        [Fact]
+        //        public void CanUpdateGasLog()
+        //        {
+        //            throw new NotImplementedException();
+        //        }
 
-//            // Assert
-//            Assert.Equal(1, newGas.Id);
-//        }
+        //        [Fact]
+        //        public void CanDeleteCasLog()
+        //        {
+        //            throw new NotImplementedException();
+        //        }
 
-//        [Fact]
-//        public void CanUpdateGasLog()
-//        {
-//            throw new NotImplementedException();
-//        }
-
-//        [Fact]
-//        public void CanDeleteCasLog()
-//        {
-//            throw new NotImplementedException();
-//        }
-
-//        [Fact]
-//        public void CanFindGasLog()
-//        {
-//            throw new NotImplementedException();
-//        }
-//    }
-//}
+        //        [Fact]
+        //        public void CanFindGasLog()
+        //        {
+        //            throw new NotImplementedException();
+        //        }
+    }
+}

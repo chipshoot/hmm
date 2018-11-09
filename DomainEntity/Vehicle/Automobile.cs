@@ -9,6 +9,8 @@ namespace DomainEntity.Vehicle
             Subject = "Automobile";
         }
 
+        public int MeterReading { get; set; }
+
         public string Brand { get; set; }
 
         public string Maker { get; set; }

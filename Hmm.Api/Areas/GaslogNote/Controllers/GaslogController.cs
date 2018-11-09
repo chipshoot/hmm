@@ -50,11 +50,11 @@ namespace Hmm.Api.Areas.GaslogNote.Controllers
             var result = _gaslogManager.CreateLogForAuthor(authorId, gaslog);
             switch (result)
             {
-                case null when _gaslogManager.ErrorMessage.MessageList.Contains("Cannot found author with Id"):
+                case null when _gaslogManager.ProcessResult.MessageList.Contains("Cannot found author with Id"):
                     return NotFound();
 
                 case null:
-                    throw new Exception(_gaslogManager.ErrorMessage.MessageList.FirstOrDefault());
+                    throw new Exception(_gaslogManager.ProcessResult.MessageList.FirstOrDefault());
 
                 default:
                     config = ApiDomainEntityConvertHelper.DomainEntity2Api();

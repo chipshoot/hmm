@@ -27,7 +27,7 @@ namespace VehicleInfoManager.GasLogMan
             _lookupRepo = lookupRepo;
         }
 
-        public ProcessingResult ErrorMessage { get; } = new ProcessingResult();
+        public ProcessingResult ProcessResult { get; } = new ProcessingResult();
 
         public GasLog FindGasLog(int id)
         {
@@ -37,13 +37,13 @@ namespace VehicleInfoManager.GasLogMan
                 return null;
             }
 
-            var gaslog = GetLogFromNote(note);
-            return gaslog;
+            var gasLog = GetLogFromNote(note);
+            return gasLog;
         }
 
         public GasLog CreateLog(GasLog log)
         {
-            var cat = _lookupRepo.GetEntities<NoteCatalog>().FirstOrDefault(c => c.Name == "GasLog");
+            var cat = _lookupRepo.GetEntities<NoteCatalog>().FirstOrDefault(c => c.Name == "gasLog");
             if (cat != null)
             {
                 log.Catalog = cat;
@@ -61,30 +61,30 @@ namespace VehicleInfoManager.GasLogMan
             var author = _lookupRepo.GetEntity<User>(authorId);
             if (author == null)
             {
-                ErrorMessage.Success = false;
-                ErrorMessage.AddMessage($"Cannot found author with Id {authorId}");
+                ProcessResult.Success = false;
+                ProcessResult.AddMessage($"Cannot found author with Id {authorId}");
                 return null;
             }
 
             log.Author = author;
-            var newlog = CreateLog(log);
-            return newlog;
+            var newLog = CreateLog(log);
+            return newLog;
         }
 
-        private void SetGasLogContent(GasLog gaslog)
+        private void SetGasLogContent(GasLog gasLog)
         {
-            var xml = new XElement("GasLog",
-                new XElement("Date", gaslog.CreateDate.ToString("O")),
-                new XElement("Distance", gaslog.Distance.Measure2Xml(_noteManager.ContentNamespace)),
-                new XElement("Gas", gaslog.Gas.Measure2Xml(_noteManager.ContentNamespace)),
-                new XElement("Price", gaslog.Price.Measure2Xml(_noteManager.ContentNamespace)),
-                new XElement("GasStation", gaslog.GasStation),
+            var xml = new XElement("gasLog",
+                new XElement("Date", gasLog.CreateDate.ToString("O")),
+                new XElement("Distance", gasLog.Distance.Measure2Xml(_noteManager.ContentNamespace)),
+                new XElement("Gas", gasLog.Gas.Measure2Xml(_noteManager.ContentNamespace)),
+                new XElement("Price", gasLog.Price.Measure2Xml(_noteManager.ContentNamespace)),
+                new XElement("GasStation", gasLog.GasStation),
                 new XElement("Discounts", "")
             );
 
-            if (gaslog.Discounts.Any())
+            if (gasLog.Discounts.Any())
             {
-                foreach (var disc in gaslog.Discounts)
+                foreach (var disc in gasLog.Discounts)
                 {
                     var discElement = new XElement("Discount",
                         new XElement("Amount", disc.Amount.Measure2Xml(_noteManager.ContentNamespace)),
@@ -93,7 +93,7 @@ namespace VehicleInfoManager.GasLogMan
                 }
             }
 
-            gaslog.Content = xml.ToString(SaveOptions.DisableFormatting);
+            gasLog.Content = xml.ToString(SaveOptions.DisableFormatting);
         }
 
         private GasLog GetLogFromNote(HmmNote note)
@@ -103,11 +103,11 @@ namespace VehicleInfoManager.GasLogMan
                 return null;
             }
 
-            var notestr = note.Content;
-            var notexml = XDocument.Parse(notestr);
-            var ns = notexml.Root?.GetDefaultNamespace();
-            var logroot = notexml.Root?.Element(ns + "Content")?.Element(ns + "GasLog");
-            if (logroot == null)
+            var noteStr = note.Content;
+            var noteXml = XDocument.Parse(noteStr);
+            var ns = noteXml.Root?.GetDefaultNamespace();
+            var logRoot = noteXml.Root?.Element(ns + "Content")?.Element(ns + "gasLog");
+            if (logRoot == null)
             {
                 return null;
             }
@@ -120,11 +120,11 @@ namespace VehicleInfoManager.GasLogMan
                 CreateDate = note.CreateDate,
                 LastModifiedDate = note.LastModifiedDate,
                 Content = note.Content,
-                GasStation = logroot.Element(ns + "GasStation")?.Value,
+                GasStation = logRoot.Element(ns + "GasStation")?.Value,
                 Description = note.Description,
-                Distance = Dimension.FromXml(logroot.Element(ns + "Distance")?.Element(ns + "Dimension")),
-                Gas = Volume.FromXml(logroot.Element(ns + "Gas")?.Element(ns + "Volume")),
-                Price = Money.FromXml(logroot.Element(ns + "Price")?.Element(ns + "Money"))
+                Distance = Dimension.FromXml(logRoot.Element(ns + "Distance")?.Element(ns + "Dimension")),
+                Gas = Volume.FromXml(logRoot.Element(ns + "Gas")?.Element(ns + "Volume")),
+                Price = Money.FromXml(logRoot.Element(ns + "Price")?.Element(ns + "Money"))
             };
 
             return gas;

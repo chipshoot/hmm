@@ -11,6 +11,6 @@ namespace Hmm.Contract.GasLogMan
 
         GasLog CreateLogForAuthor(int authorId, GasLog log);
 
-        ProcessingResult ErrorMessage { get; }
+        ProcessingResult ProcessResult { get; }
     }
 }
