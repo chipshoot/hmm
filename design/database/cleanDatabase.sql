@@ -1,3 +1,13 @@
+DROP TABLE dbo.NoteTagRefs
+DROP TABLE dbo.Tags
+DROP TABLE dbo.Emails
+DROP TABLE dbo.Phones
+DROP TABLE dbo.ContactInfoCatalogs
+DROP TABLE dbo.Notes
+DROP TABLE dbo.Users
+DROP TABLE dbo.NoteCatalogs
+DROP TABLE dbo.NoteRenders
+
 /****** Object:  Table [dbo].[Users]    Script Date: 03/05/2018 16:05:01 ******/
 SET ANSI_NULLS ON
 GO

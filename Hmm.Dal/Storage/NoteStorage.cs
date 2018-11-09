@@ -3,6 +3,8 @@ using Hmm.Dal.Data;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
+using Hmm.Utility.Validation;
+using System;
 
 namespace Hmm.Dal.Storage
 {
@@ -17,38 +19,69 @@ namespace Hmm.Dal.Storage
 
         public override HmmNote Add(HmmNote entity)
         {
-            // check if need apply default catalog
-            var catalog = PropertyChecking(entity.Catalog);
-            entity.Catalog = catalog ?? throw new DataSourceException("Cannot find default note catalog.");
+            Guard.Against<ArgumentNullException>(entity == null, nameof(entity));
 
-            // check if need apply default render
-            var render = PropertyChecking(entity.Catalog.Render);
-            entity.Catalog.Render = render ?? throw new DataSourceException("Cannot find default note render.");
+            try
+            {
+                // check if need apply default catalog
+                // ReSharper disable once PossibleNullReferenceException
+                var catalog = PropertyChecking(entity.Catalog);
+                entity.Catalog = catalog ?? throw new DataSourceException("Cannot find default note catalog.");
 
-            entity.CreateDate = DateTimeProvider.UtcNow;
-            entity.LastModifiedDate = DateTimeProvider.UtcNow;
-            var newRec = UnitOfWork.Add(entity);
-            return newRec;
+                entity.CreateDate = DateTimeProvider.UtcNow;
+                entity.LastModifiedDate = DateTimeProvider.UtcNow;
+                var newRec = UnitOfWork.Add(entity);
+                return newRec;
+            }
+            catch (DataSourceException ex)
+            {
+                ProcessMessage.Success = false;
+                ProcessMessage.AddMessage(ex.Message, true);
+                return null;
+            }
         }
 
         public override bool Delete(HmmNote entity)
         {
-            UnitOfWork.Delete(entity);
-            return true;
+            Guard.Against<ArgumentNullException>(entity == null, nameof(entity));
+
+            try
+            {
+                UnitOfWork.Delete(entity);
+                return true;
+            }
+            catch (DataSourceException ex)
+            {
+                ProcessMessage.Success = false;
+                ProcessMessage.AddMessage(ex.Message, true);
+                return false;
+            }
         }
 
         public override HmmNote Update(HmmNote entity)
         {
-            // check if need apply default catalog
-            var catalog = PropertyChecking(entity.Catalog);
-            entity.Catalog = catalog ?? throw new DataSourceException("Cannot find default note catalog.");
+            Guard.Against<ArgumentNullException>(entity == null, nameof(entity));
 
-            entity.LastModifiedDate = DateTimeProvider.UtcNow;
-            UnitOfWork.Update(entity);
+            try
+            {
+                // check if need apply default catalog
+                // ReSharper disable once PossibleNullReferenceException
+                var catalog = PropertyChecking(entity.Catalog);
+                entity.Catalog = catalog ?? throw new DataSourceException("Cannot find default note catalog.");
 
-            var savedRec = LookupRepo.GetEntity<HmmNote>(entity.Id);
+                entity.LastModifiedDate = DateTimeProvider.UtcNow;
+                UnitOfWork.Update(entity);
 
-            return savedRec;
+                var savedRec = LookupRepo.GetEntity<HmmNote>(entity.Id);
+
+                return savedRec;
+            }
+            catch (DataSourceException ex)
+            {
+                ProcessMessage.Success = false;
+                ProcessMessage.AddMessage(ex.Message, true);
+                return null;
+            }
         }
     }
 }

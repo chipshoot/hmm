@@ -2,7 +2,7 @@
 using DomainEntity.Misc;
 using Hmm.Utility.Misc;
 
-namespace Hmm.Contract
+namespace Hmm.Contract.Core
 {
     public interface IHmmNoteManager<T> where T : HmmNote
     {

@@ -1,149 +1,13 @@
 ﻿using DomainEntity.Misc;
 using DomainEntity.User;
-using Hmm.Dal.Data;
-using Hmm.Dal.Querys;
-using Hmm.Dal.Storage;
-using Hmm.Utility.Dal;
-using Hmm.Utility.Dal.Query;
-using Hmm.Utility.Misc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Moq;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using Hmm.Utility.TestHelp;
 using Xunit;
 
 namespace Hmm.Dal.Tests
 {
-    public class UserStorageTests : IDisposable
+    public class UserStorageTests : TestFixtureBase
     {
-        private List<User> _users;
-        private UserStorage _userStorage;
-        private NoteStorage _noteStorage;
-        private NoteRenderStorage _renderStorage;
-        private NoteCatalogStorage _catalogStorage;
-        private IHmmDataContext _dbContext;
-        private IEntityLookup _lookupRepo;
-        private readonly bool _isUsingMock;
-
-        public UserStorageTests()
-        {
-            var config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .Build();
-
-            var envSetting = config["TestEnvironment:UseMoc"];
-            if (!bool.TryParse(envSetting, out _isUsingMock))
-            {
-                throw new InvalidOperationException($"Cannot get environment setting UseMoc {envSetting}");
-            }
-
-            if (_isUsingMock)
-            {
-                SetMockEnvironment();
-            }
-            else
-            {
-                var connectString = config["ConnectionStrings:DefaultConnection"];
-                SetRealEnvironment(connectString);
-            }
-        }
-
-        public void Dispose()
-        {
-            if (_isUsingMock)
-            {
-                _users.Clear();
-            }
-            else
-            {
-                if (_dbContext is DbContext context)
-                {
-                    context.Reset();
-                }
-
-                var notes = _lookupRepo.GetEntities<HmmNote>();
-                foreach (var note in notes)
-                {
-                    _noteStorage.Delete(note);
-                }
-
-                var catalogs = _lookupRepo.GetEntities<NoteCatalog>();
-                foreach (var catalog in catalogs)
-                {
-                    _catalogStorage.Delete(catalog);
-                }
-
-                var renders = _lookupRepo.GetEntities<NoteRender>();
-                foreach (var render in renders)
-                {
-                    _renderStorage.Delete(render);
-                }
-
-                var users = _lookupRepo.GetEntities<User>();
-                foreach (var user in users)
-                {
-                    _userStorage.Delete(user);
-                }
-            }
-        }
-
-        private void SetMockEnvironment()
-        {
-            _users = new List<User>();
-
-            var lookupMoc = new Mock<IEntityLookup>();
-            lookupMoc.Setup(lk => lk.GetEntity<User>(It.IsAny<int>())).Returns((int id) =>
-            {
-                var recFound = _users.FirstOrDefault(c => c.Id == id);
-                return recFound;
-            });
-
-            // set up unit of work
-            var uowMock = new Mock<IUnitOfWork>();
-            uowMock.Setup(u => u.Add(It.IsAny<User>())).Returns((User user) =>
-                {
-                    user.Id = _users.GetNextId();
-                    _users.AddEntity(user);
-                    return user;
-                }
-            );
-            uowMock.Setup(u => u.Delete(It.IsAny<User>())).Callback((User user) =>
-            {
-                _users.Remove(user);
-            });
-            uowMock.Setup(u => u.Update(It.IsAny<User>())).Callback((User user) =>
-            {
-                var ordUser = _users.FirstOrDefault(c => c.Id == user.Id);
-                if (ordUser != null)
-                {
-                    _users.Remove(ordUser);
-                    _users.AddEntity(user);
-                }
-            });
-
-            // setup date time provider
-            var timeProviderMock = new Mock<IDateTimeProvider>();
-
-            // setup user storage
-            _userStorage = new UserStorage(uowMock.Object, lookupMoc.Object, timeProviderMock.Object);
-        }
-
-        private void SetRealEnvironment(string connectString)
-        {
-            var optBuilder = new DbContextOptionsBuilder()
-                .UseSqlServer(connectString);
-            _dbContext = new HmmDataContext(optBuilder.Options);
-            var uow = new EfUnitOfWork(_dbContext);
-            _lookupRepo = new EfEntityLookup(_dbContext);
-            var dateProvider = new DateTimeAdapter();
-            _userStorage = new UserStorage(uow, _lookupRepo, dateProvider);
-            _noteStorage = new NoteStorage(uow, _lookupRepo, dateProvider);
-            _renderStorage = new NoteRenderStorage(uow, _lookupRepo, dateProvider);
-            _catalogStorage = new NoteCatalogStorage(uow, _lookupRepo, dateProvider);
-        }
-
         [Fact]
         public void CanAddUserToDataSource()
         {
@@ -161,7 +25,7 @@ namespace Hmm.Dal.Tests
             };
 
             // Act
-            var savedRec = _userStorage.Add(user);
+            var savedRec = UserStorage.Add(user);
 
             // Assert
             Assert.NotNull(savedRec);
@@ -199,14 +63,14 @@ namespace Hmm.Dal.Tests
             };
 
             // Act
-            _userStorage.Add(userExists);
-            var savedUser = _userStorage.Add(user);
+            UserStorage.Add(userExists);
+            var savedUser = UserStorage.Add(user);
 
             // Assert
             Assert.Null(savedUser);
             Assert.True(user.Id < 0, "user.Id < 0");
-            Assert.False(_userStorage.ProcessMessage.Success);
-            Assert.Single(_userStorage.ProcessMessage.MessageList);
+            Assert.False(UserStorage.ProcessMessage.Success);
+            Assert.Single(UserStorage.ProcessMessage.MessageList);
         }
 
         [Fact]
@@ -225,10 +89,10 @@ namespace Hmm.Dal.Tests
                 IsActivated = true
             };
 
-            var savedUser = _userStorage.Add(user);
+            var savedUser = UserStorage.Add(user);
 
             // Act
-            var result = _userStorage.Delete(savedUser);
+            var result = UserStorage.Delete(savedUser);
 
             // Assert
             Assert.True(result);
@@ -250,7 +114,7 @@ namespace Hmm.Dal.Tests
                 IsActivated = true
             };
 
-            _userStorage.Add(user);
+            UserStorage.Add(user);
 
             var user2 = new User
             {
@@ -266,12 +130,12 @@ namespace Hmm.Dal.Tests
             };
 
             // Act
-            var result = _userStorage.Delete(user2);
+            var result = UserStorage.Delete(user2);
 
             // Assert
             Assert.False(result);
-            Assert.False(_userStorage.ProcessMessage.Success);
-            Assert.Single(_userStorage.ProcessMessage.MessageList);
+            Assert.False(UserStorage.ProcessMessage.Success);
+            Assert.Single(UserStorage.ProcessMessage.MessageList);
         }
 
         [Fact]
@@ -282,18 +146,20 @@ namespace Hmm.Dal.Tests
             {
                 Name = "DefaultRender",
                 Namespace = "NameSpace",
+                IsDefault = true,
                 Description = "Description"
             };
-            var savedRender = _renderStorage.Add(render);
+            var savedRender = RenderStorage.Add(render);
 
             var catalog = new NoteCatalog
             {
                 Name = "DefaultCatalog",
                 Render = savedRender,
                 Schema = "testScheme",
+                IsDefault = false,
                 Description = "Description"
             };
-            var savedCatalog = _catalogStorage.Add(catalog);
+            var savedCatalog = CatalogStorage.Add(catalog);
 
             var user = new User
             {
@@ -306,7 +172,7 @@ namespace Hmm.Dal.Tests
                 Description = "testing user",
                 IsActivated = true
             };
-            var savedUser = _userStorage.Add(user);
+            var savedUser = UserStorage.Add(user);
 
             var note = new HmmNote
             {
@@ -317,15 +183,15 @@ namespace Hmm.Dal.Tests
                 Author = savedUser,
                 Catalog = savedCatalog
             };
-            _noteStorage.Add(note);
+            NoteStorage.Add(note);
 
             // Act
-            var result = _userStorage.Delete(user);
+            var result = UserStorage.Delete(user);
 
             // Assert
             Assert.False(result, "Error: deleted user with note");
-            Assert.False(_userStorage.ProcessMessage.Success);
-            Assert.Single(_userStorage.ProcessMessage.MessageList);
+            Assert.False(UserStorage.ProcessMessage.Success);
+            Assert.Single(UserStorage.ProcessMessage.MessageList);
         }
 
         [Fact]
@@ -344,11 +210,11 @@ namespace Hmm.Dal.Tests
                 IsActivated = true
             };
 
-            _userStorage.Add(user);
+            UserStorage.Add(user);
             user.FirstName = "GasLog2";
 
             // Act
-            var result = _userStorage.Update(user);
+            var result = UserStorage.Update(user);
 
             // Assert
             Assert.NotNull(result);
@@ -358,7 +224,7 @@ namespace Hmm.Dal.Tests
             user.LastName = "new Last name";
 
             // Act
-            result = _userStorage.Update(user);
+            result = UserStorage.Update(user);
 
             // Arrange
             Assert.NotNull(result);
@@ -369,7 +235,7 @@ namespace Hmm.Dal.Tests
             user.BirthDay = newDay;
 
             // Act
-            result = _userStorage.Update(user);
+            result = UserStorage.Update(user);
 
             // Arrange
             Assert.NotNull(result);
@@ -379,7 +245,7 @@ namespace Hmm.Dal.Tests
             user.IsActivated = false;
 
             // Act
-            result = _userStorage.Update(user);
+            result = UserStorage.Update(user);
 
             // Arrange
             Assert.NotNull(result);
@@ -389,7 +255,7 @@ namespace Hmm.Dal.Tests
             user.Description = "new testing user";
 
             // Act
-            result = _userStorage.Update(user);
+            result = UserStorage.Update(user);
 
             // Assert
             Assert.NotNull(result);
@@ -412,11 +278,10 @@ namespace Hmm.Dal.Tests
                 IsActivated = true
             };
 
-            _userStorage.Add(user);
+            UserStorage.Add(user);
 
             var user2 = new User
             {
-                Id = 2,
                 FirstName = "Gas2",
                 LastName = "Log2",
                 AccountName = "glog2",
@@ -428,12 +293,12 @@ namespace Hmm.Dal.Tests
             };
 
             // Act
-            var result = _userStorage.Update(user2);
+            var result = UserStorage.Update(user2);
 
             // Assert
             Assert.Null(result);
-            Assert.False(_userStorage.ProcessMessage.Success);
-            Assert.Single(_userStorage.ProcessMessage.MessageList);
+            Assert.False(UserStorage.ProcessMessage.Success);
+            Assert.Single(UserStorage.ProcessMessage.MessageList);
         }
 
         [Fact]
@@ -451,7 +316,7 @@ namespace Hmm.Dal.Tests
                 Description = "testing user",
                 IsActivated = true
             };
-            _userStorage.Add(user);
+            UserStorage.Add(user);
 
             var user2 = new User
             {
@@ -464,17 +329,17 @@ namespace Hmm.Dal.Tests
                 Description = "testing user",
                 IsActivated = true
             };
-            _userStorage.Add(user2);
+            UserStorage.Add(user2);
 
             user.AccountName = user2.AccountName;
 
             // Act
-            var result = _userStorage.Update(user);
+            var result = UserStorage.Update(user);
 
             // Assert
             Assert.Null(result);
-            Assert.False(_userStorage.ProcessMessage.Success);
-            Assert.Single(_userStorage.ProcessMessage.MessageList);
+            Assert.False(UserStorage.ProcessMessage.Success);
+            Assert.Single(UserStorage.ProcessMessage.MessageList);
         }
     }
 }

@@ -1,71 +1,11 @@
 ﻿using DomainEntity.Misc;
-using DomainEntity.User;
-using Hmm.Dal.Storage;
-using Hmm.Utility.Dal;
-using Hmm.Utility.Dal.Query;
-using Hmm.Utility.Misc;
-using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Hmm.Utility.TestHelp;
 using Xunit;
 
 namespace Hmm.Dal.Tests
 {
-    public class NoteRenderStorageTests : IDisposable
+    public class NoteRenderStorageTests : TestFixtureBase
     {
-        private readonly List<NoteRender> _renders;
-        private readonly List<HmmNote> _notes;
-        private readonly NoteRenderStorage _renderStorage;
-
-        public NoteRenderStorageTests()
-        {
-            _renders = new List<NoteRender>();
-            _notes = new List<HmmNote>();
-
-            // set up look up repository
-            var lookupMoc = new Mock<IEntityLookup>();
-            lookupMoc.Setup(lk => lk.GetEntity<NoteRender>(It.IsAny<int>())).Returns((int id) =>
-            {
-                var recFound = _renders.FirstOrDefault(c => c.Id == id);
-                return recFound;
-            });
-
-            // set up unit of work
-            var uowMock = new Mock<IUnitOfWork>();
-            uowMock.Setup(u => u.Add(It.IsAny<NoteRender>())).Returns((NoteRender render) =>
-                {
-                    render.Id = _renders.GetNextId();
-                    _renders.AddEntity(render);
-                    return render;
-                }
-            );
-            uowMock.Setup(u => u.Delete(It.IsAny<NoteRender>())).Callback((NoteRender render) =>
-            {
-                _renders.Remove(render);
-            });
-            uowMock.Setup(u => u.Update(It.IsAny<NoteRender>())).Callback((NoteRender render) =>
-            {
-                var orgRender = _renders.FirstOrDefault(c => c.Id == render.Id);
-                if (orgRender != null)
-                {
-                    _renders.Remove(orgRender);
-                    _renders.AddEntity(render);
-                }
-            });
-
-            // set up date time provider
-            var timeProviderMock = new Mock<IDateTimeProvider>();
-
-            // set up render storage
-            _renderStorage = new NoteRenderStorage(uowMock.Object, lookupMoc.Object, timeProviderMock.Object);
-        }
-
-        public void Dispose()
-        {
-            _renders.Clear();
-        }
-
         [Fact]
         public void CanAddNoteRenderToDataSource()
         {
@@ -78,41 +18,13 @@ namespace Hmm.Dal.Tests
             };
 
             // Act
-            var savedRec = _renderStorage.Add(render);
+            var savedRec = RenderStorage.Add(render);
 
             // Assert
             Assert.NotNull(savedRec);
-            Assert.Equal(1, savedRec.Id);
-            Assert.Equal(1, render.Id);
-            Assert.Single(_renders);
-        }
-
-        [Fact]
-        public void CanNotAddAlreadyExistedNoteRenderToDataSource()
-        {
-            // Arrange
-            _renders.AddEntity(new NoteRender
-            {
-                Id = 1,
-                Name = "GasLog",
-                Namespace = "Note.GasLog",
-                Description = "testing note",
-            });
-
-            var render = new NoteRender
-            {
-                Name = "GasLog",
-                Namespace = "Note.GasLog",
-                Description = "testing note",
-            };
-
-            // Act
-            var savedRec = _renderStorage.Add(render);
-
-            // Assert
-            Assert.Null(savedRec);
-            Assert.Equal(0, render.Id);
-            Assert.Single(_renders);
+            Assert.True(savedRec.Id > 0, "savedRec.Id> 0");
+            Assert.True(render.Id == savedRec.Id, "render.Id == savedRec.Id");
+            Assert.True(RenderStorage.ProcessMessage.Success);
         }
 
         [Fact]
@@ -121,21 +33,19 @@ namespace Hmm.Dal.Tests
             // Arrange
             var render = new NoteRender
             {
-                Id = 1,
                 Name = "GasLog",
                 Namespace = "Note.GasLog",
                 Description = "testing note"
             };
 
-            _renders.AddEntity(render);
-            Assert.Single(_renders);
+            RenderStorage.Add(render);
 
             // Act
-            var result = _renderStorage.Delete(render);
+            var result = RenderStorage.Delete(render);
 
             // Assert
             Assert.True(result);
-            Assert.Empty(_renders);
+            Assert.True(RenderStorage.ProcessMessage.Success);
         }
 
         [Fact]
@@ -144,63 +54,58 @@ namespace Hmm.Dal.Tests
             // Arrange
             var render = new NoteRender
             {
-                Id = 1,
                 Name = "GasLog",
                 Namespace = "Note.GasLog",
                 Description = "testing note"
             };
 
-            _renders.AddEntity(render);
+            RenderStorage.Add(render);
 
             var render2 = new NoteRender
             {
-                Id = 2,
                 Name = "GasLog2",
                 Namespace = "Note.GasLog2",
                 Description = "testing note"
             };
 
             // Act
-            var result = _renderStorage.Delete(render2);
+            var result = RenderStorage.Delete(render2);
 
             // Assert
             Assert.False(result);
-            Assert.Single(_renders);
+            Assert.False(RenderStorage.ProcessMessage.Success);
+            Assert.Single(RenderStorage.ProcessMessage.MessageList);
         }
 
         [Fact]
-        public void CannotDeleteNoteRenderWithNoteAssociated()
+        public void CannotDeleteNoteRenderWithCatalogAssociated()
         {
             // Arrange
-            var catalog = new NoteRender
+            var render = new NoteRender
             {
-                Id = 1,
+                Name = "DefaultRender",
+                Namespace = "NameSpace",
+                IsDefault = true,
+                Description = "Description"
+            };
+            var savedRender = RenderStorage.Add(render);
+            var catalog = new NoteCatalog
+            {
                 Name = "GasLog",
-                Namespace = "Note.GasLog",
-                Description = "testing note"
+                Render = savedRender,
+                Schema = "Scheme",
+                IsDefault = true,
+                Description = "testing Catalog"
             };
-            _renders.AddEntity(catalog);
-
-            var note = new HmmNote
-            {
-                Id = 1,
-                Subject = string.Empty,
-                Content = string.Empty,
-                CreateDate = DateTime.Now,
-                LastModifiedDate = DateTime.Now,
-                Author = new User(),
-                Catalog = new NoteCatalog(),
-            };
-            _notes.AddEntity(note);
-            Assert.Single(_renders);
-            Assert.Single(_notes);
+            CatalogStorage.Add(catalog);
 
             // Act
-            var result = _renderStorage.Delete(catalog);
+            var result = RenderStorage.Delete(render);
 
             // Assert
-            Assert.False(result, "Error: deleted render with note attached to it");
-            Assert.Single(_renders);
+            Assert.False(result, "Error: deleted render with catalog attached to it");
+            Assert.False(RenderStorage.ProcessMessage.Success);
+            Assert.Single(RenderStorage.ProcessMessage.MessageList);
         }
 
         [Fact]
@@ -209,32 +114,31 @@ namespace Hmm.Dal.Tests
             // Arrange - update name
             var render = new NoteRender
             {
-                Id = 1,
                 Name = "GasLog",
                 Namespace = "Note.GasLog",
                 Description = "testing note"
             };
 
-            _renders.AddEntity(render);
+            RenderStorage.Add(render);
 
             render.Name = "GasLog2";
 
             // Act
-            var result = _renderStorage.Update(render);
+            var result = RenderStorage.Update(render);
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal("GasLog2", _renders[0].Name);
+            Assert.Equal("GasLog2", result.Name);
 
             // Arrange - update description
             render.Description = "new testing note";
 
             // Act
-            result = _renderStorage.Update(render);
+            result = RenderStorage.Update(render);
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal("new testing note", _renders[0].Description);
+            Assert.Equal("new testing note", result.Description);
         }
 
         [Fact]
@@ -243,29 +147,29 @@ namespace Hmm.Dal.Tests
             // Arrange
             var render = new NoteRender
             {
-                Id = 1,
                 Name = "GasLog",
                 Namespace = "Note.GasLog",
+                IsDefault = true,
                 Description = "testing note"
             };
 
-            _renders.AddEntity(render);
+            RenderStorage.Add(render);
 
             var render2 = new NoteRender
             {
-                Id = 2,
                 Name = "GasLog2",
                 Namespace = "Note.GasLog",
+                IsDefault = false,
                 Description = "testing note"
             };
 
             // Act
-            var result = _renderStorage.Update(render2);
+            var result = RenderStorage.Update(render2);
 
             // Assert
             Assert.Null(result);
-            Assert.Single(_renders);
-            Assert.Equal("GasLog", _renders[0].Name);
+            Assert.False(RenderStorage.ProcessMessage.Success);
+            Assert.Single(RenderStorage.ProcessMessage.MessageList);
         }
 
         [Fact]
@@ -274,30 +178,29 @@ namespace Hmm.Dal.Tests
             // Arrange
             var render = new NoteRender
             {
-                Id = 1,
                 Name = "GasLog",
+                IsDefault = true,
                 Description = "testing note"
             };
-            _renders.AddEntity(render);
+            RenderStorage.Add(render);
 
             var render2 = new NoteRender
             {
-                Id = 2,
                 Name = "GasLog2",
+                IsDefault = false,
                 Description = "testing note2"
             };
-            _renders.AddEntity(render2);
+            RenderStorage.Add(render2);
 
             render.Name = render2.Name;
 
             // Act
-            var result = _renderStorage.Update(render);
+            var result = RenderStorage.Update(render);
 
             // Assert
             Assert.Null(result);
-            Assert.Equal(2, _renders.Count);
-            Assert.Equal("GasLog", _renders[0].Name);
-            Assert.Equal("GasLog2", _renders[1].Name);
+            Assert.False(RenderStorage.ProcessMessage.Success);
+            Assert.Single(RenderStorage.ProcessMessage.MessageList);
         }
     }
 }

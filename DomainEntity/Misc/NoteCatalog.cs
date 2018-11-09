@@ -2,7 +2,7 @@
 
 namespace DomainEntity.Misc
 {
-    public class NoteCatalog : Entity
+    public class NoteCatalog : HasDefaultEntity
     {
         public string Name { get; set; }
 

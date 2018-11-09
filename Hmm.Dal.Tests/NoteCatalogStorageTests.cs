@@ -1,144 +1,93 @@
 ﻿using DomainEntity.Misc;
 using DomainEntity.User;
-using Hmm.Dal.Storage;
-using Hmm.Utility.Dal;
-using Hmm.Utility.Dal.Query;
-using Hmm.Utility.Misc;
-using Hmm.Utility.TestHelp;
-using Moq;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using Hmm.Utility.TestHelp;
 using Xunit;
 
 namespace Hmm.Dal.Tests
 {
-    public class NoteCatalogStorageTests : IDisposable
+    public class NoteCatalogStorageTests : TestFixtureBase
     {
-        private readonly List<NoteRender> _renders;
-        private readonly List<NoteCatalog> _catalogs;
-        private readonly List<HmmNote> _notes;
-        private readonly NoteCatalogStorage _catalogStorage;
+        private readonly NoteRender _render;
+        private readonly User _user;
 
         public NoteCatalogStorageTests()
         {
-            _renders = new List<NoteRender>();
-            _catalogs = new List<NoteCatalog>();
-            _notes = new List<HmmNote>();
-
-            // set up look up repository
-            IEntityLookup Lkp()
+            var render = new NoteRender
             {
-                var lookupMoc = new Mock<IEntityLookup>();
-                lookupMoc.Setup(lk => lk.GetEntity<NoteCatalog>(It.IsAny<int>())).Returns((int id) =>
-                {
-                    var recFound = _catalogs.FirstOrDefault(c => c.Id == id);
-                    return recFound;
-                });
+                Name = "TestRender",
+                Namespace = "TestNamespace",
+                Description = "Description"
+            };
 
-                return lookupMoc.Object;
-            }
+            _render = RenderStorage.Add(render);
 
-            // set up unit of work
-            IUnitOfWork Uowp()
+            var user = new User
             {
-                var uowMock = new Mock<IUnitOfWork>();
-                uowMock.Setup(u => u.Add(It.IsAny<NoteRender>())).Returns((NoteRender render) =>
-                    {
-                        render.Id = _renders.GetNextId();
-                        _renders.AddEntity(render);
-                        return render;
-                    }
-                );
-
-                uowMock.Setup(u => u.Add(It.IsAny<NoteCatalog>())).Returns((NoteCatalog cat) =>
-                    {
-                        cat.Id = _catalogs.GetNextId();
-                        _catalogs.AddEntity(cat);
-                        return cat;
-                    }
-                );
-
-                uowMock.Setup(u => u.Delete(It.IsAny<NoteCatalog>())).Callback((NoteCatalog cat) =>
-                {
-                    _catalogs.Remove(cat);
-                });
-
-                uowMock.Setup(u => u.Update(It.IsAny<NoteCatalog>())).Callback((NoteCatalog cat) =>
-                {
-                    var orgCat = _catalogs.FirstOrDefault(c => c.Id == cat.Id);
-                    if (orgCat != null)
-                    {
-                        _catalogs.Remove(orgCat);
-                        _catalogs.AddEntity(cat);
-                    }
-                });
-
-                return uowMock.Object;
-            }
-
-            // set up date time provider
-            IDateTimeProvider Dtp()
-            {
-                var timeProviderMock = new Mock<IDateTimeProvider>();
-                return timeProviderMock.Object;
-            }
-
-            var dsp = new DataSourceProvider(Lkp, Uowp, Dtp);
-
-            // set up catalog repository
-            _catalogStorage = new NoteCatalogStorage(dsp.UnitOfWork, dsp.Lookup, dsp.DateTimeAdapter);
-        }
-
-        public void Dispose()
-        {
-            _catalogs.Clear();
+                FirstName = "Chaoyang",
+                LastName = "Fang",
+                AccountName = "fchy",
+                BirthDay = new DateTime(1967, 3, 13),
+                Description = "Testing User",
+                IsActivated = true,
+                Password = "1234",
+                Salt = "5678"
+            };
+            _user = UserStorage.Add(user);
         }
 
         [Fact]
         public void CanAddNoteCatalogToDataSource()
         {
             // Arrange
-            var cat = new NoteCatalog
+            var catalog = new NoteCatalog
             {
                 Name = "GasLog",
+                Render = _render,
+                Schema = "TestSchema",
                 Description = "testing note",
             };
 
             // Act
-            var savedRec = _catalogStorage.Add(cat);
+            var savedRec = CatalogStorage.Add(catalog);
 
             // Assert
             Assert.NotNull(savedRec);
-            Assert.Equal(1, savedRec.Id);
-            Assert.Equal(1, cat.Id);
-            Assert.Single(_catalogs);
+            Assert.True(savedRec.Id > 0, "savedRec.Id > 0");
+            Assert.True(catalog.Id == savedRec.Id, "cat.Id == savedRec.Id");
+            Assert.True(CatalogStorage.ProcessMessage.Success);
         }
 
         [Fact]
         public void CanNotAddAlreadyExistedNoteCatalogToDataSource()
         {
             // Arrange
-            _catalogs.AddEntity(new NoteCatalog
+            CatalogStorage.Add(new NoteCatalog
             {
-                Id = 1,
                 Name = "GasLog",
+                Render = _render,
+                Schema = "TestSchema",
+                IsDefault = true,
                 Description = "testing note",
             });
 
             var cat = new NoteCatalog
             {
                 Name = "GasLog",
+                Render = _render,
+                Schema = "TestSchema",
+                IsDefault = false,
                 Description = "testing note",
             };
 
             // Act
-            var savedRec = _catalogStorage.Add(cat);
+            var savedRec = CatalogStorage.Add(cat);
 
             // Assert
             Assert.Null(savedRec);
-            Assert.Equal(0, cat.Id);
-            Assert.Single(_catalogs);
+            Assert.True(cat.Id <= 0, "cat.Id <=0");
+            Assert.False(CatalogStorage.ProcessMessage.Success);
+            Assert.Single(CatalogStorage.ProcessMessage.MessageList);
         }
 
         [Fact]
@@ -147,20 +96,21 @@ namespace Hmm.Dal.Tests
             // Arrange
             var catalog = new NoteCatalog
             {
-                Id = 1,
                 Name = "GasLog",
+                Render = _render,
+                Schema = "TestSchema",
+                IsDefault = true,
                 Description = "testing note"
             };
 
-            _catalogs.AddEntity(catalog);
-            Assert.Single(_catalogs);
+            CatalogStorage.Add(catalog);
 
             // Act
-            var result = _catalogStorage.Delete(catalog);
+            var result = CatalogStorage.Delete(catalog);
 
             // Assert
             Assert.True(result);
-            Assert.Empty(_catalogs);
+            Assert.True(CatalogStorage.ProcessMessage.Success);
         }
 
         [Fact]
@@ -169,26 +119,31 @@ namespace Hmm.Dal.Tests
             // Arrange
             var catalog = new NoteCatalog
             {
-                Id = 1,
                 Name = "GasLog",
+                Render = _render,
+                Schema = "TestSchema",
+                IsDefault = true,
                 Description = "testing note"
             };
 
-            _catalogs.AddEntity(catalog);
+            CatalogStorage.Add(catalog);
 
             var catalog2 = new NoteCatalog
             {
-                Id = 2,
                 Name = "GasLog2",
+                Render = _render,
+                Schema = "TestSchema",
+                IsDefault = false,
                 Description = "testing note"
             };
 
             // Act
-            var result = _catalogStorage.Delete(catalog2);
+            var result = CatalogStorage.Delete(catalog2);
 
             // Assert
             Assert.False(result);
-            Assert.Single(_catalogs);
+            Assert.False(CatalogStorage.ProcessMessage.Success);
+            Assert.Single(CatalogStorage.ProcessMessage.MessageList);
         }
 
         [Fact]
@@ -197,32 +152,32 @@ namespace Hmm.Dal.Tests
             // Arrange
             var catalog = new NoteCatalog
             {
-                Id = 1,
                 Name = "GasLog",
+                Render = _render,
+                Schema = "TestSchema",
+                IsDefault = true,
                 Description = "testing note"
             };
-            _catalogs.AddEntity(catalog);
+            var savedCatalog = CatalogStorage.Add(catalog);
 
             var note = new HmmNote
             {
-                Id = 1,
-                Subject = string.Empty,
-                Content = string.Empty,
+                Subject = "Testing subject",
+                Content = "Testing content",
                 CreateDate = DateTime.Now,
                 LastModifiedDate = DateTime.Now,
-                Author = new User(),
-                Catalog = _catalogs[0],
+                Author = _user,
+                Catalog = savedCatalog
             };
-            _notes.AddEntity(note);
-            Assert.Single(_catalogs);
-            Assert.Single(_notes);
+            NoteStorage.Add(note);
 
             // Act
-            var result = _catalogStorage.Delete(catalog);
+            var result = CatalogStorage.Delete(catalog);
 
             // Assert
             Assert.False(result, "Error: deleted catalog with note attached to it");
-            Assert.Single(_catalogs);
+            Assert.False(CatalogStorage.ProcessMessage.Success);
+            Assert.Single(CatalogStorage.ProcessMessage.MessageList);
         }
 
         [Fact]
@@ -231,31 +186,33 @@ namespace Hmm.Dal.Tests
             // Arrange - update name
             var catalog = new NoteCatalog
             {
-                Id = 1,
                 Name = "GasLog",
+                Render = _render,
+                Schema = "TestSchema",
+                IsDefault = true,
                 Description = "testing note"
             };
 
-            _catalogs.AddEntity(catalog);
+            CatalogStorage.Add(catalog);
 
             catalog.Name = "GasLog2";
 
             // Act
-            var result = _catalogStorage.Update(catalog);
+            var result = CatalogStorage.Update(catalog);
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal("GasLog2", _catalogs[0].Name);
+            Assert.Equal("GasLog2", result.Name);
 
             // Arrange - update description
             catalog.Description = "new testing note";
 
             // Act
-            result = _catalogStorage.Update(catalog);
+            result = CatalogStorage.Update(catalog);
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal("new testing note", _catalogs[0].Description);
+            Assert.Equal("new testing note", result.Description);
         }
 
         [Fact]
@@ -264,27 +221,31 @@ namespace Hmm.Dal.Tests
             // Arrange
             var catalog = new NoteCatalog
             {
-                Id = 1,
                 Name = "GasLog",
+                Render = _render,
+                Schema = "TestSchema",
+                IsDefault = true,
                 Description = "testing note"
             };
 
-            _catalogs.AddEntity(catalog);
+            CatalogStorage.Add(catalog);
 
             var catalog2 = new NoteCatalog
             {
-                Id = 2,
                 Name = "GasLog2",
+                Render = _render,
+                Schema = "TestSchema",
+                IsDefault = false,
                 Description = "testing note"
             };
 
             // Act
-            var result = _catalogStorage.Update(catalog2);
+            var result = CatalogStorage.Update(catalog2);
 
             // Assert
             Assert.Null(result);
-            Assert.Single(_catalogs);
-            Assert.Equal("GasLog", _catalogs[0].Name);
+            Assert.False(CatalogStorage.ProcessMessage.Success);
+            Assert.Single(CatalogStorage.ProcessMessage.MessageList);
         }
 
         [Fact]
@@ -293,30 +254,33 @@ namespace Hmm.Dal.Tests
             // Arrange
             var catalog = new NoteCatalog
             {
-                Id = 1,
                 Name = "GasLog",
+                Render = _render,
+                Schema = "TestSchema",
+                IsDefault = true,
                 Description = "testing note"
             };
-            _catalogs.AddEntity(catalog);
+            CatalogStorage.Add(catalog);
 
             var catalog2 = new NoteCatalog
             {
-                Id = 2,
                 Name = "GasLog2",
+                Render = _render,
+                Schema = "TestSchema",
+                IsDefault = false,
                 Description = "testing note2"
             };
-            _catalogs.AddEntity(catalog2);
+            CatalogStorage.Add(catalog2);
 
             catalog.Name = catalog2.Name;
 
             // Act
-            var result = _catalogStorage.Update(catalog);
+            var result = CatalogStorage.Update(catalog);
 
             // Assert
             Assert.Null(result);
-            Assert.Equal(2, _catalogs.Count);
-            Assert.Equal("GasLog", _catalogs[0].Name);
-            Assert.Equal("GasLog2", _catalogs[1].Name);
+            Assert.False(CatalogStorage.ProcessMessage.Success);
+            Assert.Single(CatalogStorage.ProcessMessage.MessageList);
         }
     }
 }

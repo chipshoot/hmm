@@ -1,18 +1,18 @@
-﻿using DomainEntity.Misc;
+﻿using System;
+using System.Linq;
+using System.Xml.Linq;
+using DomainEntity.Misc;
 using DomainEntity.User;
 using DomainEntity.Vehicle;
-using Hmm.Contract;
+using Hmm.Contract.Core;
 using Hmm.Contract.GasLogMan;
 using Hmm.Utility.Currency;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.MeasureUnit;
 using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
-using System;
-using System.Linq;
-using System.Xml.Linq;
 
-namespace Hmm.Core.Manager.GasLogMan
+namespace VehicleInfoManager.GasLogMan
 {
     public class GasLogManager : IGasLogManager
     {

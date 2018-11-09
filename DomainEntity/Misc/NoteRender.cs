@@ -2,7 +2,7 @@
 
 namespace DomainEntity.Misc
 {
-    public class NoteRender : Entity
+    public class NoteRender : HasDefaultEntity
     {
         public string Name { get; set; }
 

@@ -2,7 +2,23 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <ApplicationIcon />
+    <OutputType>Library</OutputType>
+    <StartupObject />
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Manager\GasLogMan\**" />
+    <Compile Remove="Manager\Validation\**" />
+    <EmbeddedResource Remove="Manager\GasLogMan\**" />
+    <EmbeddedResource Remove="Manager\Validation\**" />
+    <None Remove="Manager\GasLogMan\**" />
+    <None Remove="Manager\Validation\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Manager\Validation\UserValidator2.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DomainEntity\DomainEntity.csproj" />

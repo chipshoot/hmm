@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using Hmm.Contract.Core;
 
 namespace Hmm.Api.Areas.HmmNote.Controllers
 {

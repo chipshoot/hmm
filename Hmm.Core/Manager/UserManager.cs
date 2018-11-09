@@ -6,6 +6,7 @@ using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
 using System.Linq;
+using Hmm.Contract.Core;
 
 namespace Hmm.Core.Manager
 {
@@ -19,21 +20,21 @@ namespace Hmm.Core.Manager
             _dataSource = dataSource;
         }
 
-        public User Create(User userinfo)
+        public User Create(User userInfo)
         {
             // Get password salt
-            if (string.IsNullOrEmpty(userinfo.Salt))
+            if (string.IsNullOrEmpty(userInfo.Salt))
             {
-                userinfo.Salt = EncryptHelper.GenerateSalt();
+                userInfo.Salt = EncryptHelper.GenerateSalt();
             }
 
-            var pwd = EncryptHelper.EncodePassword(userinfo.Password, userinfo.Salt, false);
-            userinfo.Password = pwd;
+            var pwd = EncryptHelper.EncodePassword(userInfo.Password, userInfo.Salt, false);
+            userInfo.Password = pwd;
 
             try
             {
-                var addedusr = _dataSource.Add(userinfo);
-                return addedusr;
+                var addedUsr = _dataSource.Add(userInfo);
+                return addedUsr;
             }
             catch (Exception ex)
             {
@@ -47,8 +48,8 @@ namespace Hmm.Core.Manager
         {
             try
             {
-                var updatedusr = _dataSource.Update(userInfo);
-                return updatedusr;
+                var updatedUser = _dataSource.Update(userInfo);
+                return updatedUser;
             }
             catch (Exception ex)
             {

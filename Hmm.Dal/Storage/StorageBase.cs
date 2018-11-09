@@ -6,6 +6,7 @@ using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Hmm.Dal.Storage
 {
@@ -22,7 +23,6 @@ namespace Hmm.Dal.Storage
             UnitOfWork = uow;
             LookupRepo = lookupRepo;
             DateTimeProvider = dateTimeProvider;
-            ProcessMessage = new ProcessingResult();
         }
 
         protected IEntityLookup LookupRepo { get; }
@@ -42,9 +42,9 @@ namespace Hmm.Dal.Storage
             return LookupRepo.GetEntities<T>();
         }
 
-        public ProcessingResult ProcessMessage { get; }
+        public ProcessingResult ProcessMessage { get; } = new ProcessingResult();
 
-        protected TP PropertyChecking<TP>(TP property) where TP : Entity
+        protected TP PropertyChecking<TP>(TP property) where TP : HasDefaultEntity
         {
             var defaultNeeded = false;
             if (property == null)
@@ -65,7 +65,7 @@ namespace Hmm.Dal.Storage
                 return property;
             }
 
-            var defaultProp = LookupRepo.GetEntity<TP>(DefaultPropId);
+            var defaultProp = LookupRepo.GetEntities<TP>().FirstOrDefault(p=>p.IsDefault);
             return defaultProp;
         }
     }

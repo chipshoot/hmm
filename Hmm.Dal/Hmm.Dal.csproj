@@ -13,6 +13,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Querys\**" />
+    <Compile Remove="Validation\**" />
+    <EmbeddedResource Remove="Querys\**" />
+    <EmbeddedResource Remove="Validation\**" />
+    <None Remove="Querys\**" />
+    <None Remove="Validation\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Querys\EfEntityLookup.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FluentValidation" Version="8.0.100" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.Design" Version="1.1.6" />

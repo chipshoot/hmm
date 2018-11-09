@@ -1,7 +1,7 @@
 ﻿using System.Xml;
 using Hmm.Utility.Misc;
 
-namespace Hmm.Contract
+namespace Hmm.Contract.Core
 {
     public interface INoteSerializer
     {

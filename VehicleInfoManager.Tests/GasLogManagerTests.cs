@@ -1,21 +1,9 @@
-﻿//using DomainEntity.Misc;
-//using DomainEntity.User;
-//using DomainEntity.Vehicle;
-//using Hmm.Core.Manager;
-//using Hmm.Dal.Storage;
-//using Hmm.Dal.Validation;
-//using Hmm.Utility.Currency;
-//using Hmm.Utility.Dal;
-//using Hmm.Utility.Dal.Query;
-//using Hmm.Utility.MeasureUnit;
-//using Hmm.Utility.Misc;
-//using Moq;
-//using System;
+﻿//using System;
 //using System.Collections.Generic;
 //using System.Linq;
 //using Xunit;
 
-//namespace Hmm.Core.Tests
+//namespace VehicleInfoManager.Tests
 //{
 //    public class GasLogManagerTests : IDisposable
 //    {

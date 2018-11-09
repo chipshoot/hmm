@@ -3,6 +3,8 @@ using Hmm.Dal.Data;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
+using Hmm.Utility.Validation;
+using System;
 
 namespace Hmm.Dal.Storage
 {
@@ -17,6 +19,8 @@ namespace Hmm.Dal.Storage
 
         public override User Add(User entity)
         {
+            Guard.Against<ArgumentNullException>(entity == null, nameof(entity));
+
             try
             {
                 var newUser = UnitOfWork.Add(entity);
@@ -32,8 +36,18 @@ namespace Hmm.Dal.Storage
 
         public override User Update(User entity)
         {
+            Guard.Against<ArgumentNullException>(entity == null, nameof(entity));
+
             try
             {
+                // ReSharper disable once PossibleNullReferenceException
+                if (entity.Id <= 0)
+                {
+                    ProcessMessage.Success = false;
+                    ProcessMessage.AddMessage($"Can not update user with id {entity.Id}");
+                    return null;
+                }
+
                 UnitOfWork.Update(entity);
                 var updateUser = LookupRepo.GetEntity<User>(entity.Id);
                 return updateUser;
@@ -48,6 +62,8 @@ namespace Hmm.Dal.Storage
 
         public override bool Delete(User entity)
         {
+            Guard.Against<ArgumentNullException>(entity == null, nameof(entity));
+
             try
             {
                 UnitOfWork.Delete(entity);

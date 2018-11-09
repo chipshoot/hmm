@@ -6,6 +6,7 @@ using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
 using System.Xml.Linq;
+using Hmm.Contract.Core;
 
 namespace Hmm.Core.Manager
 {
