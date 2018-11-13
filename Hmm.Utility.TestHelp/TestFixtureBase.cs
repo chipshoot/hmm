@@ -152,6 +152,11 @@ namespace Hmm.Utility.TestHelp
                 {
                     UserStorage.Delete(user);
                 }
+
+                if (_dbContext is DbContext newContext)
+                {
+                    newContext.Reset();
+                }
             }
         }
 

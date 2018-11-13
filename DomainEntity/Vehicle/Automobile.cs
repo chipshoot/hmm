@@ -15,6 +15,8 @@ namespace DomainEntity.Vehicle
 
         public string Maker { get; set; }
 
+        public string Year { get; set; }
+
         public string Pin { get; set; }
     }
 }

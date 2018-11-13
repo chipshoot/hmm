@@ -108,17 +108,17 @@ namespace Hmm.Dal.Tests
             Assert.True(savedRec.Id == note.Id, "savedRec.Id==note.Id");
         }
 
-        //[Fact]
-        //public void CannotAddNullNote()
-        //{
-        //    // Arrange
-        //    HmmNote note = null;
+        [Fact]
+        public void CannotAddNullNote()
+        {
+            // Arrange
+            HmmNote note = null;
 
-        //    // Act
-        //    // Asset
-        //    // ReSharper disable once ExpressionIsAlwaysNull
-        //    Assert.Throws<ArgumentNullException>(() => NoteStorage.Add(note));
-        //}
+            // Act
+            // Asset
+            // ReSharper disable once ExpressionIsAlwaysNull
+            Assert.Throws<ArgumentNullException>(() => NoteStorage.Add(note));
+        }
 
         [Theory]
         [ClassData(typeof(UserTestData))]
@@ -294,6 +294,7 @@ namespace Hmm.Dal.Tests
             // Assert
             Assert.NotNull(savedRec);
             Assert.NotNull(savedRec.Catalog);
+            Assert.NotNull(note.Catalog);
             Assert.Equal("Gas Log", savedRec.Catalog.Name);
             Assert.Equal("Gas Log", note.Catalog.Name);
         }
@@ -334,44 +335,44 @@ namespace Hmm.Dal.Tests
             Assert.Equal("DefaultNoteCatalog", savedRec.Catalog.Name);
         }
 
-        //[Fact]
-        //public void CanUpdateNoteCatalogToNonExistsCatalogDefaultCatalogApplied()
-        //{
-        //    // Arrange - none exists catalog
-        //    var catalog = new NoteCatalog
-        //    {
-        //        Id = 200,
-        //        Name = "Gas Log",
-        //        Description = "Testing catalog"
-        //    };
+        [Fact]
+        public void CanUpdateNoteCatalogToNonExistsCatalogDefaultCatalogApplied()
+        {
+            // Arrange - none exists catalog
+            var catalog = new NoteCatalog
+            {
+                Id = 200,
+                Name = "Gas Log",
+                Description = "Testing catalog"
+            };
 
-        //    var xmldoc = new XmlDocument();
-        //    xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
-        //    var initialCatalog = CatalogStorage.GetEntities().FirstOrDefault(cat => !cat.IsDefault);
-        //    var note = new HmmNote
-        //    {
-        //        Author = _author,
-        //        Catalog = initialCatalog,
-        //        Description = "testing note",
-        //        CreateDate = DateTime.Now,
-        //        LastModifiedDate = DateTime.Now,
-        //        Subject = "testing note is here",
-        //        Content = xmldoc.InnerXml
-        //    };
-        //    NoteStorage.Add(note);
-        //    Assert.True(NoteStorage.ProcessMessage.Success);
+            var xmldoc = new XmlDocument();
+            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
+            var initialCatalog = CatalogStorage.GetEntities().FirstOrDefault(cat => !cat.IsDefault);
+            var note = new HmmNote
+            {
+                Author = _author,
+                Catalog = initialCatalog,
+                Description = "testing note",
+                CreateDate = DateTime.Now,
+                LastModifiedDate = DateTime.Now,
+                Subject = "testing note is here",
+                Content = xmldoc.InnerXml
+            };
+            NoteStorage.Add(note);
+            Assert.True(NoteStorage.ProcessMessage.Success);
 
-        //    note.Catalog = catalog;
+            note.Catalog = catalog;
 
-        //    // Act
-        //    var savedRec = NoteStorage.Update(note);
+            // Act
+            var savedRec = NoteStorage.Update(note);
 
-        //    // Assert
-        //    Assert.True(NoteStorage.ProcessMessage.Success);
-        //    Assert.NotNull(savedRec);
-        //    Assert.NotNull(savedRec.Catalog);
-        //    Assert.Equal("DefaultNoteCatalog", savedRec.Catalog.Name);
-        //}
+            // Assert
+            Assert.True(NoteStorage.ProcessMessage.Success);
+            Assert.NotNull(savedRec);
+            Assert.NotNull(savedRec.Catalog);
+            Assert.Equal("DefaultNoteCatalog", savedRec.Catalog.Name);
+        }
 
         [Fact]
         public void CanUpdateNoteCatalogToCatalogWithInvalidIdDefaultCatalogApplied()
@@ -420,7 +421,6 @@ namespace Hmm.Dal.Tests
             xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
             var note = new HmmNote
             {
-                Id = 1,
                 Author = _author,
                 Catalog = _catalog,
                 Description = "testing note2",

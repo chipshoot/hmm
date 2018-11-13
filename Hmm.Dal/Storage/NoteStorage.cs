@@ -5,6 +5,7 @@ using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
+using Hmm.Utility.Dal.Exceptions;
 
 namespace Hmm.Dal.Storage
 {
@@ -36,7 +37,7 @@ namespace Hmm.Dal.Storage
             catch (DataSourceException ex)
             {
                 ProcessMessage.Success = false;
-                ProcessMessage.AddMessage(ex.Message, true);
+                ProcessMessage.AddMessage(ex.GetAllMessage(), true);
                 return null;
             }
         }
@@ -53,7 +54,7 @@ namespace Hmm.Dal.Storage
             catch (DataSourceException ex)
             {
                 ProcessMessage.Success = false;
-                ProcessMessage.AddMessage(ex.Message, true);
+                ProcessMessage.AddMessage(ex.GetAllMessage(), true);
                 return false;
             }
         }
@@ -79,7 +80,7 @@ namespace Hmm.Dal.Storage
             catch (DataSourceException ex)
             {
                 ProcessMessage.Success = false;
-                ProcessMessage.AddMessage(ex.Message, true);
+                ProcessMessage.AddMessage(ex.GetAllMessage(), true);
                 return null;
             }
         }

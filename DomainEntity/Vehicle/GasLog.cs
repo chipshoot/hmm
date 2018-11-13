@@ -13,6 +13,8 @@ namespace DomainEntity.Vehicle
             Subject = "GasLog";
         }
 
+        public Automobile Car { get; set; }
+
         public Dimension Distance { get; set; }
 
         public Volume Gas { get; set; }
