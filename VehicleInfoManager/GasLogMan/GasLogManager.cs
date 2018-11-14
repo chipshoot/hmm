@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Xml.Linq;
-using DomainEntity.Misc;
+﻿using DomainEntity.Misc;
 using DomainEntity.User;
 using DomainEntity.Vehicle;
 using Hmm.Contract.Core;
@@ -11,10 +8,13 @@ using Hmm.Utility.Dal.Query;
 using Hmm.Utility.MeasureUnit;
 using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
+using System;
+using System.Linq;
+using System.Xml.Linq;
 
 namespace VehicleInfoManager.GasLogMan
 {
-    public class GasLogManager : IGasLogManager
+    public class GasLogManager : ManagerBase<GasLog>, IGasLogManager
     {
         private readonly IHmmNoteManager<HmmNote> _noteManager;
         private readonly IEntityLookup _lookupRepo;
@@ -37,22 +37,22 @@ namespace VehicleInfoManager.GasLogMan
                 return null;
             }
 
-            var gasLog = GetLogFromNote(note);
+            var gasLog = GetEntityFromNote(note);
             return gasLog;
         }
 
         public GasLog CreateLog(GasLog log)
         {
-            var cat = _lookupRepo.GetEntities<NoteCatalog>().FirstOrDefault(c => c.Name == "gasLog");
+            var cat = _lookupRepo.GetEntities<NoteCatalog>().FirstOrDefault(c => c.Name == "GasLog");
             if (cat != null)
             {
                 log.Catalog = cat;
             }
 
-            SetGasLogContent(log);
+            SetEntityContent(log);
             var note = _noteManager.Create(log);
 
-            var newLog = GetLogFromNote(note);
+            var newLog = GetEntityFromNote(note);
             return newLog;
         }
 
@@ -71,9 +71,9 @@ namespace VehicleInfoManager.GasLogMan
             return newLog;
         }
 
-        private void SetGasLogContent(GasLog gasLog)
+        protected override void SetEntityContent(GasLog gasLog)
         {
-            var xml = new XElement("gasLog",
+            var xml = new XElement("GasLog",
                 new XElement("Date", gasLog.CreateDate.ToString("O")),
                 new XElement("Distance", gasLog.Distance.Measure2Xml(_noteManager.ContentNamespace)),
                 new XElement("Gas", gasLog.Gas.Measure2Xml(_noteManager.ContentNamespace)),
@@ -96,7 +96,7 @@ namespace VehicleInfoManager.GasLogMan
             gasLog.Content = xml.ToString(SaveOptions.DisableFormatting);
         }
 
-        private GasLog GetLogFromNote(HmmNote note)
+        protected override GasLog GetEntityFromNote(HmmNote note)
         {
             if (note == null)
             {
@@ -106,7 +106,7 @@ namespace VehicleInfoManager.GasLogMan
             var noteStr = note.Content;
             var noteXml = XDocument.Parse(noteStr);
             var ns = noteXml.Root?.GetDefaultNamespace();
-            var logRoot = noteXml.Root?.Element(ns + "Content")?.Element(ns + "gasLog");
+            var logRoot = noteXml.Root?.Element(ns + "Content")?.Element(ns + "GasLog");
             if (logRoot == null)
             {
                 return null;

@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using System.Collections.Generic;
+using System.Xml.Linq;
 using DomainEntity.Misc;
 using Hmm.Utility.Misc;
 
@@ -8,12 +9,14 @@ namespace Hmm.Contract.Core
     {
         T GetNoteById(int id);
 
+        IEnumerable<T> GetNotes();
+
         T Create(T note);
 
         T Update(T note);
 
         XNamespace ContentNamespace { get; }
 
-        ProcessingResult ErrorMessage { get; }
+        ProcessingResult ProcessResult { get; }
     }
 }

@@ -1,12 +1,12 @@
 ﻿using DomainEntity.Misc;
-using Hmm.Contract;
+using Hmm.Contract.Core;
 using Hmm.Utility.Dal.DataStore;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
+using System.Collections.Generic;
 using System.Xml.Linq;
-using Hmm.Contract.Core;
 
 namespace Hmm.Core.Manager
 {
@@ -37,31 +37,36 @@ namespace Hmm.Core.Manager
 
         public HmmNote Update(HmmNote note)
         {
-            var xmlContent = GetNoteContent(note);
+            var xmlContent = GetNoteContent(note, true);
             note.Content = xmlContent.ToString(SaveOptions.DisableFormatting);
             var ret = _noteStorage.Update(note);
 
             return ret;
         }
 
-        HmmNote IHmmNoteManager<HmmNote>.GetNoteById(int id)
+        public HmmNote GetNoteById(int id)
         {
             var note = _lookup.GetEntity<HmmNote>(id);
             return note;
         }
 
-        public XNamespace ContentNamespace  => "http://schema.hmm.com/2017";
+        public IEnumerable<HmmNote> GetNotes()
+        {
+            var notes = _noteStorage.GetEntities();
+            return notes;
+        }
 
-        public ProcessingResult ErrorMessage { get; } = new ProcessingResult();
+        public XNamespace ContentNamespace => "http://schema.hmm.com/2017";
 
-        private XDocument GetNoteContent(HmmNote note, bool isXmlConent = false)
+        public ProcessingResult ProcessResult { get; } = new ProcessingResult();
+
+        private XDocument GetNoteContent(HmmNote note, bool isXmlContent = false)
         {
             var xml = new XDocument(
                 new XDeclaration("1.0", "utf-16", "yes"),
-                new XElement("Note",
-                    new XElement("Content", "")));
+                new XElement("Note", new XElement("Content", "")));
 
-            if (isXmlConent)
+            if (isXmlContent)
             {
                 var innerElement = XElement.Parse(note.Content);
                 xml.Root?.Element("Content")?.Add(innerElement);
@@ -72,7 +77,9 @@ namespace Hmm.Core.Manager
             }
             else
             {
+                // ReSharper disable PossibleNullReferenceException
                 xml.Root.Element("Content").Value = note.Content;
+                // ReSharper restore PossibleNullReferenceException
             }
 
             return xml;

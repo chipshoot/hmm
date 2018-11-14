@@ -1,0 +1,55 @@
+{
+  "Users": [
+    {
+      "FirstName": "Jack",
+      "LastName": "Fang",
+      "AccountName": "jfang",
+      "BirthDay": "1977-05-21",
+      "Password": "lucky1",
+      "Salt": "passwordSalt",
+      "IsActivated": true,
+      "Description": "testing user"
+    },
+
+    {
+      "FirstName": "Amy",
+      "LastName": "Wang",
+      "AccountName": "awang",
+      "BirthDay": "1977-05-21",
+      "Password": "lucky1",
+      "Salt": "passwordSalt",
+      "IsActivated": true,
+      "Description": "testing user"
+    }
+  ],
+  "Renders": [
+
+    {
+      "Name": "DefaultNoteRender",
+      "Namespace": "Hmm.Renders",
+      "IsDefault": true,
+      "Description": "Testing default note render"
+    },
+    {
+      "Name": "GasLog",
+      "Namespace": "Hmm.Renders",
+      "Description": "Testing default note render"
+    }
+  ],
+  "NoteCatalogs": [
+
+    {
+      "Name": "DefaultNoteCatalog",
+      "Schema": "DefaultSchema",
+      "Render": 0,
+      "IsDefault": true,
+      "Description": "Testing catalog"
+    },
+    {
+      "Name": "Gas Log",
+      "Schema": "GasLogSchema",
+      "Render": 1,
+      "Description": "Testing catalog"
+    }
+  ]
+} 

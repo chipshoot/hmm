@@ -1,5 +1,7 @@
 ﻿using DomainEntity.Misc;
 using DomainEntity.User;
+using Hmm.Contract.Core;
+using Hmm.Core.Manager;
 using Hmm.Dal.Data;
 using Hmm.Dal.Querys;
 using Hmm.Dal.Storage;
@@ -59,6 +61,8 @@ namespace Hmm.Utility.TestHelp
 
         protected IEntityLookup LookupRepo { get; private set; }
 
+        protected IHmmNoteManager<HmmNote> NoteManager { get; private set; }
+
         protected void SetupRecords(
             IEnumerable<User> users,
             IEnumerable<NoteRender> renders,
@@ -103,7 +107,7 @@ namespace Hmm.Utility.TestHelp
                     }
                     else
                     {
-                        throw new InvalidDataException($"Cannot find default render from data source");
+                        throw new InvalidDataException("Cannot find default render from data source");
                     }
                 }
 
@@ -322,6 +326,7 @@ namespace Hmm.Utility.TestHelp
             NoteStorage = new NoteStorage(uow, LookupRepo, dateProvider);
             RenderStorage = new NoteRenderStorage(uow, LookupRepo, dateProvider);
             CatalogStorage = new NoteCatalogStorage(uow, LookupRepo, dateProvider);
+            NoteManager = new HmmNoteManager(NoteStorage, LookupRepo);
         }
     }
 }
