@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Hmm.Api.Areas.GaslogNote.Models
+namespace Hmm.Api.Areas.GasLogNote.Models
 {
     public class ApiGasLog : ApiEntity, IValidatableObject
     {

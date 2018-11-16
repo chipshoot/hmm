@@ -41,22 +41,22 @@ namespace VehicleInfoManager.GasLogMan
             return gasLog;
         }
 
-        public GasLog CreateLog(GasLog log)
+        public GasLog CreateLog(GasLog gasLog)
         {
-            var cat = _lookupRepo.GetEntities<NoteCatalog>().FirstOrDefault(c => c.Name == "GasLog");
-            if (cat != null)
+            var catalog = _lookupRepo.GetEntities<NoteCatalog>().FirstOrDefault(c => c.Name == "GasLog");
+            if (catalog != null)
             {
-                log.Catalog = cat;
+                gasLog.Catalog = catalog;
             }
 
-            SetEntityContent(log);
-            var note = _noteManager.Create(log);
+            SetEntityContent(gasLog);
+            var note = _noteManager.Create(gasLog);
 
-            var newLog = GetEntityFromNote(note);
-            return newLog;
+            var newGasLog = GetEntityFromNote(note);
+            return newGasLog;
         }
 
-        public GasLog CreateLogForAuthor(int authorId, GasLog log)
+        public GasLog CreateLogForAuthor(int authorId, GasLog gasLog)
         {
             var author = _lookupRepo.GetEntity<User>(authorId);
             if (author == null)
@@ -66,14 +66,15 @@ namespace VehicleInfoManager.GasLogMan
                 return null;
             }
 
-            log.Author = author;
-            var newLog = CreateLog(log);
+            gasLog.Author = author;
+            var newLog = CreateLog(gasLog);
             return newLog;
         }
 
         protected override void SetEntityContent(GasLog gasLog)
         {
             var xml = new XElement("GasLog",
+                new XElement("Automobile", gasLog.Car.Id),
                 new XElement("Date", gasLog.CreateDate.ToString("O")),
                 new XElement("Distance", gasLog.Distance.Measure2Xml(_noteManager.ContentNamespace)),
                 new XElement("Gas", gasLog.Gas.Measure2Xml(_noteManager.ContentNamespace)),
@@ -112,6 +113,10 @@ namespace VehicleInfoManager.GasLogMan
                 return null;
             }
 
+            var carIdStr = logRoot.Element(ns + "Automobile")?.Value;
+            int.TryParse(carIdStr, out var carId);
+            var car = _lookupRepo.GetEntity<Automobile>(carId);
+
             var gas = new GasLog
             {
                 Id = note.Id,
@@ -119,6 +124,7 @@ namespace VehicleInfoManager.GasLogMan
                 Catalog = note.Catalog,
                 CreateDate = note.CreateDate,
                 LastModifiedDate = note.LastModifiedDate,
+                Car = car,
                 Content = note.Content,
                 GasStation = logRoot.Element(ns + "GasStation")?.Value,
                 Description = note.Description,

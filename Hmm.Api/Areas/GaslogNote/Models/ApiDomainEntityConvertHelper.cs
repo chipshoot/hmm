@@ -5,7 +5,7 @@ using Hmm.Api.Areas.HmmNote.Models;
 using Hmm.Utility.Currency;
 using Hmm.Utility.MeasureUnit;
 
-namespace Hmm.Api.Areas.GaslogNote.Models
+namespace Hmm.Api.Areas.GasLogNote.Models
 {
     public static class ApiDomainEntityConvertHelper
     {

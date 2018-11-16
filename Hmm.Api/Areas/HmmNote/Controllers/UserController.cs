@@ -2,7 +2,6 @@
 using DomainEntity.User;
 using Hmm.Api.Areas.HmmNote.Models;
 using Hmm.Api.Models;
-using Hmm.Contract;
 using Hmm.Utility.Validation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;

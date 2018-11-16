@@ -7,9 +7,9 @@ namespace Hmm.Contract.GasLogMan
     {
         GasLog FindGasLog(int id);
 
-        GasLog CreateLog(GasLog log);
+        GasLog CreateLog(GasLog gasLog);
 
-        GasLog CreateLogForAuthor(int authorId, GasLog log);
+        GasLog CreateLogForAuthor(int authorId, GasLog gasLog);
 
         ProcessingResult ProcessResult { get; }
     }

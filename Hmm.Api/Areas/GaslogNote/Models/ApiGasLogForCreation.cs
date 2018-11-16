@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Hmm.Api.Models;
 
-namespace Hmm.Api.Areas.GaslogNote.Models
+namespace Hmm.Api.Areas.GasLogNote.Models
 {
     public class ApiGasLogForCreation : ApiEntity
     {
