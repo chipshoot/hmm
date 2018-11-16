@@ -40,6 +40,13 @@ namespace Hmm.Core.Manager
             var xmlContent = GetNoteContent(note, true);
             note.Content = xmlContent.ToString(SaveOptions.DisableFormatting);
             var ret = _noteStorage.Update(note);
+            if (ret == null)
+            {
+                ProcessResult.Rest();
+                ProcessResult.Success = _noteStorage.ProcessMessage.Success;
+                ProcessResult.MessageList.AddRange(_noteStorage.ProcessMessage.MessageList);
+                return null;
+            }
 
             return ret;
         }

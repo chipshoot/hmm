@@ -8,25 +8,29 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using Hmm.Contract;
+using Hmm.Utility.Dal.Query;
 
 namespace VehicleInfoManager.GasLogMan
 {
     public class AutomobileManager : ManagerBase<Automobile>, IAutomobileManager
     {
-        private const string AutoMobileRecordSubject = "Automobile";
         private readonly IHmmNoteManager<HmmNote> _noteManager;
+        private readonly IEntityLookup _lookupRepo;
 
-        public AutomobileManager(IHmmNoteManager<HmmNote> noteManager)
+        public AutomobileManager(IHmmNoteManager<HmmNote> noteManager, IEntityLookup lookupRepo)
         {
             Guard.Against<ArgumentNullException>(noteManager == null, nameof(noteManager));
+            Guard.Against<ArgumentNullException>(lookupRepo == null, nameof(lookupRepo));
 
             _noteManager = noteManager;
+            _lookupRepo = lookupRepo;
         }
 
         public IEnumerable<Automobile> GetAutomobiles()
         {
             var cars = _noteManager.GetNotes()
-                .Where(n => n.Subject == AutoMobileRecordSubject)
+                .Where(n => n.Subject == AppConstant.AutoMobileRecordSubject)
                 .Select(GetEntityFromNote).ToList();
             return cars;
         }
@@ -35,8 +39,19 @@ namespace VehicleInfoManager.GasLogMan
         {
             Guard.Against<ArgumentNullException>(car == null, nameof(car));
 
+            var carCatalog  = _lookupRepo.GetEntities<NoteCatalog>().FirstOrDefault(c=>c.Name == AppConstant.AutoMobileRecordSubject);
+            if (carCatalog == null)
+            {
+                ProcessResult.Rest();
+                ProcessResult.Success = false;
+                ProcessResult.AddMessage("Cannot find automobile from data source");
+                return null;
+            }
+
             // ReSharper disable once PossibleNullReferenceException
-            car.Subject = AutoMobileRecordSubject;
+            car.Subject = AppConstant.AutoMobileRecordSubject;
+            car.Catalog = carCatalog;
+
             SetEntityContent(car);
             var savedCar = _noteManager.Create(car);
 
@@ -74,7 +89,7 @@ namespace VehicleInfoManager.GasLogMan
 
         protected override void SetEntityContent(Automobile automobile)
         {
-            var xml = new XElement("Automobile",
+            var xml = new XElement(AppConstant.AutoMobileRecordSubject,
                 new XElement("Date", automobile.CreateDate.ToString("O")),
                 new XElement("MeterReading", automobile.MeterReading),
                 new XElement("Brand", automobile.Brand),
@@ -97,7 +112,7 @@ namespace VehicleInfoManager.GasLogMan
             var noteStr = note.Content;
             var noteXml = XDocument.Parse(noteStr);
             var ns = noteXml.Root?.GetDefaultNamespace();
-            var automobileRoot = noteXml.Root?.Element(ns + "Content")?.Element(ns + "Automobile");
+            var automobileRoot = noteXml.Root?.Element(ns + "Content")?.Element(ns + AppConstant.AutoMobileRecordSubject);
             if (automobileRoot == null)
             {
                 return null;

@@ -121,10 +121,10 @@ namespace Hmm.Utility.Currency
 
         #region public methods
 
-        public static Money FromXml(XElement xmlcontent)
+        public static Money FromXml(XElement xmlContent)
         {
-            var ns = xmlcontent.GetDefaultNamespace();
-            var doc = new XDocument(xmlcontent);
+            var ns = xmlContent.GetDefaultNamespace();
+            var doc = new XDocument(xmlContent);
             var root = GetXElement("Money", doc, ns);
             if (root == null)
             {
@@ -442,9 +442,9 @@ namespace Hmm.Utility.Currency
 
         #region private methods
 
-        private static XElement GetXElement(string ename, XContainer content, XNamespace ns)
+        private static XElement GetXElement(string eName, XContainer content, XNamespace ns)
         {
-            return ns != null ? content?.Element(ns + ename) : content?.Element(ename);
+            return ns != null ? content?.Element(ns + eName) : content?.Element(eName);
         }
 
         #endregion private methods

@@ -63,6 +63,85 @@ namespace Hmm.Utility.TestHelp
 
         protected IHmmNoteManager<HmmNote> NoteManager { get; private set; }
 
+        protected void InsertSeedRecords()
+        {
+            var authors = new List<User>
+            {
+                new User
+                {
+                    FirstName = "Jack",
+                    LastName = "Fang",
+                    AccountName = "jfang",
+                    BirthDay = new DateTime(1977, 05, 21),
+                    Password = "lucky1",
+                    Salt = "passwordSalt",
+                    IsActivated = true,
+                    Description = "testing user"
+                },
+                new User
+                {
+                    FirstName = "Amy",
+                    LastName = "Wang",
+                    AccountName = "awang",
+                    BirthDay = new DateTime(1977, 05, 21),
+                    Password = "lucky1",
+                    Salt = "passwordSalt",
+                    IsActivated = true,
+                    Description = "testing user"
+                }
+            };
+            var renders = new List<NoteRender>
+            {
+                new NoteRender
+                {
+                    Name = "DefaultNoteRender",
+                    Namespace = "Hmm.Renders",
+                    IsDefault = true,
+                    Description = "Testing default note render"
+                },
+                new NoteRender
+                {
+                    Name = "GasLog",
+                    Namespace = "Hmm.Renders",
+                    Description = "Testing default note render"
+                }
+            };
+            var catalogs = new List<NoteCatalog>
+            {
+                new NoteCatalog
+                {
+                    Name = "DefaultNoteCatalog",
+                    Schema = "DefaultSchema",
+                    Render = renders[0],
+                    IsDefault = true,
+                    Description = "Testing catalog"
+                },
+                new NoteCatalog
+                {
+                    Name = "Gas Log",
+                    Schema = "GasLogSchema",
+                    Render = renders[1],
+                    Description = "Testing catalog"
+                },
+                new NoteCatalog
+                {
+                    Name = "Automobile",
+                    Schema = "AutomobileSchema",
+                    Render = renders[0],
+                    Description = "Testing automobile note"
+                },
+                new NoteCatalog
+                {
+                    Name = "GasDiscount",
+                    Schema = "GasDiscount",
+                    Render = renders[0],
+                    Description = "Testing discount note"
+                }
+            };
+
+            SetupRecords(authors, renders, catalogs);
+        }
+
         protected void SetupRecords(
             IEnumerable<User> users,
             IEnumerable<NoteRender> renders,
