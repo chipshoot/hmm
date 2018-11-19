@@ -2,6 +2,7 @@
 using DomainEntity.Vehicle;
 using Hmm.Contract.GasLogMan;
 using Hmm.Utility.Currency;
+using Hmm.Utility.MeasureUnit;
 using Hmm.Utility.TestHelp;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,8 +49,9 @@ namespace VehicleInfoManager.Tests
         public void CanUpdateDiscount()
         {
             // Arrange
-            var ids = SetupEnvironment();
-            var discount = _manager.GetDiscountById(ids.Min());
+            var discounts = SetupEnvironment();
+            var discount = discounts.OrderByDescending(d => d.Id).FirstOrDefault();
+            Assert.NotNull(discount);
 
             // Act
             discount.Program = "Petro-Canada";
@@ -80,21 +82,42 @@ namespace VehicleInfoManager.Tests
         public void CanGetDiscountById()
         {
             //Arrange
-            var ids = SetupEnvironment();
+            var discounts = SetupEnvironment();
 
             // Act
-            var savedDiscount = _manager.GetDiscountById(ids.Max());
+            var savedDiscount = _manager.GetDiscountById(discounts.Select(d => d.Id).Max());
 
             // Assert
             Assert.True(_manager.ProcessResult.Success);
             Assert.NotNull(savedDiscount);
             Assert.True(savedDiscount.Id >= 1, "savedDiscount.Id >= 1");
+            Assert.Equal(GasDiscountType.PreLiter, savedDiscount.DiscountType);
             Assert.Equal("Petro-Canada membership", savedDiscount.Program);
         }
 
-        private List<int> SetupEnvironment()
+        [Fact]
+        public void CanGetDiscountInfos()
         {
-            var ids = new List<int>();
+            // Arrange
+            var gasLog = GetGasLogsForDiscountInfo().FirstOrDefault();
+            Assert.NotNull(gasLog);
+
+            // Act
+            var discountInfos = _manager.GetDiscountInfos(gasLog).ToList();
+
+            // Assert
+            Assert.NotNull(discountInfos);
+            Assert.True(discountInfos.Any());
+            var discountInfo = discountInfos.FirstOrDefault();
+            Assert.NotNull(discountInfo);
+            Assert.True(discountInfo.Amount.Amount == 5m, "discountInfo.Amount.Amount == 5m");
+            Assert.True(discountInfo.Program.DiscountType == GasDiscountType.PreLiter, "discountInfo.Program.DiscountType == GasDiscountType.PreLiter");
+            Assert.True(discountInfo.Program.Program == "Costco membership", "discountInfo.Program.Program == 'Costco membership'");
+        }
+
+        private List<GasDiscount> SetupEnvironment()
+        {
+            var discounts = new List<GasDiscount>();
 
             var user = UserStorage.GetEntities().FirstOrDefault();
             var discount = new GasDiscount
@@ -107,7 +130,7 @@ namespace VehicleInfoManager.Tests
                 IsActive = true,
             };
             _manager.CreateDiscount(discount);
-            ids.Add(discount.Id);
+            discounts.Add(discount);
 
             discount = new GasDiscount
             {
@@ -120,9 +143,58 @@ namespace VehicleInfoManager.Tests
             };
 
             _manager.CreateDiscount(discount);
-            ids.Add(discount.Id);
+            discounts.Add(discount);
 
-            return ids;
+            NoTrackingEntities();
+
+            return discounts;
+        }
+
+        private IEnumerable<GasLog> GetGasLogsForDiscountInfo()
+        {
+            var gasLogs = new List<GasLog>();
+
+            // insert new discount
+            SetupEnvironment();
+
+            // insert sample car
+            var user = UserStorage.GetEntities().FirstOrDefault();
+            var carMan = new AutomobileManager(NoteManager, LookupRepo);
+
+            carMan.CreateAutomobile(new Automobile
+            {
+                Author = user,
+                Brand = "AutoBack",
+                Maker = "Subaru",
+                Content = "Blue",
+                MeterReading = 100,
+                Year = "2018",
+                Pin = "1234",
+                Description = "Testing car"
+            });
+
+            // insert sample gas log
+            var logMan = new GasLogManager(NoteManager, carMan, _manager, LookupRepo);
+            var gasLog = logMan.CreateLog(new GasLog
+            {
+                Author = user,
+                Car = carMan.GetAutomobiles().FirstOrDefault(),
+                Distance = Dimension.FromKilometre(400),
+                Gas = Volume.FromLiter(41),
+                GasStation = "Costco",
+                Price = new Money(40),
+                Discounts = new List<GasDiscountInfo>
+                {
+                    new GasDiscountInfo
+                    {
+                        Amount = new Money(5),
+                        Program = _manager.GetDiscounts().FirstOrDefault()
+                    }
+                }
+            });
+
+            gasLogs.Add(gasLog);
+            return gasLogs;
         }
     }
 }

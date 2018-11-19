@@ -90,5 +90,20 @@ namespace Hmm.Utility.TestHelp
                 }
             }
         }
+
+        public static void NoTracking(this DbContext context)
+        {
+            var entries = context.ChangeTracker
+                .Entries()
+                .Where(e => e.State == EntityState.Added ||
+                            e.State == EntityState.Modified ||
+                            e.State == EntityState.Deleted)
+                .ToArray();
+
+            foreach (var entry in entries)
+            {
+                entry.State = EntityState.Detached;
+            }
+        }
     }
 }

@@ -1,10 +1,13 @@
-﻿using DomainEntity.Misc;
+﻿using DomainEntity.Enumerations;
+using DomainEntity.Misc;
 using DomainEntity.User;
+using DomainEntity.Vehicle;
 using Hmm.Contract.Core;
 using Hmm.Core.Manager;
 using Hmm.Dal.Data;
 using Hmm.Dal.Querys;
 using Hmm.Dal.Storage;
+using Hmm.Utility.Currency;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
@@ -16,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using VehicleInfoManager.GasLogMan;
 
 namespace Hmm.Utility.TestHelp
 {
@@ -63,7 +67,7 @@ namespace Hmm.Utility.TestHelp
 
         protected IHmmNoteManager<HmmNote> NoteManager { get; private set; }
 
-        protected void InsertSeedRecords()
+        protected void InsertSeedRecords(bool isSetupDiscount = false, bool isSetupAutomobile = false)
         {
             var authors = new List<User>
             {
@@ -139,13 +143,57 @@ namespace Hmm.Utility.TestHelp
                 }
             };
 
-            SetupRecords(authors, renders, catalogs);
+            var discounts = isSetupDiscount
+                ? new List<GasDiscount>
+                {
+                    new GasDiscount
+                    {
+                        Author = authors[0],
+                        Program = "Costco membership",
+                        Amount = new Money(0.6),
+                        DiscountType = GasDiscountType.PreLiter,
+                        Comment = "Test Discount",
+                        IsActive = true,
+                    },
+
+                    new GasDiscount
+                    {
+                        Author = authors[0],
+                        Program = "Petro-Canada membership",
+                        Amount = new Money(0.2),
+                        DiscountType = GasDiscountType.PreLiter,
+                        Comment = "Test Discount 2",
+                        IsActive = true,
+                    }
+                }
+                : new List<GasDiscount>();
+
+            var cars = isSetupAutomobile
+                ? new List<Automobile>
+                {
+                    new Automobile
+                    {
+                        Author = authors[0],
+                        Brand = "AutoBack",
+                        Maker = "Subaru",
+                        Content = "Blue",
+                        MeterReading = 100,
+                        Year = "2018",
+                        Pin = "1234",
+                        Description = "Testing car"
+                    }
+                }
+                : new List<Automobile>();
+
+            SetupRecords(authors, renders, catalogs, discounts, cars);
         }
 
         protected void SetupRecords(
             IEnumerable<User> users,
             IEnumerable<NoteRender> renders,
-            IEnumerable<NoteCatalog> catalogs)
+            IEnumerable<NoteCatalog> catalogs,
+            IEnumerable<GasDiscount> discounts,
+            IEnumerable<Automobile> cars)
         {
             Guard.Against<ArgumentNullException>(users == null, nameof(users));
             Guard.Against<ArgumentNullException>(renders == null, nameof(users));
@@ -193,7 +241,33 @@ namespace Hmm.Utility.TestHelp
                 CatalogStorage.Add(catalog);
             }
 
+            var discountMan = new DiscountManager(NoteManager, LookupRepo);
+            foreach (var discount in discounts)
+            {
+                var user = LookupRepo.GetEntities<User>().OrderBy(u => u.Id).FirstOrDefault();
+                discount.Author = user;
+
+                discountMan.CreateDiscount(discount);
+            }
+
+            var autoMan = new AutomobileManager(NoteManager, LookupRepo);
+            foreach (var car in cars)
+            {
+                var user = LookupRepo.GetEntities<User>().OrderBy(u => u.Id).FirstOrDefault();
+                car.Author = user;
+
+                autoMan.CreateAutomobile(car);
+            }
+
             // ReSharper restore PossibleNullReferenceException
+        }
+
+        protected void NoTrackingEntities()
+        {
+            if (_dbContext is DbContext context)
+            {
+                context.NoTracking();
+            }
         }
 
         public void Dispose()

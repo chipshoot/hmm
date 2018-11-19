@@ -1,8 +1,11 @@
-﻿using DomainEntity.Misc;
+﻿using DomainEntity.Enumerations;
+using DomainEntity.Misc;
 using DomainEntity.Vehicle;
 using Hmm.Contract;
 using Hmm.Contract.Core;
 using Hmm.Contract.GasLogMan;
+using Hmm.Utility.Currency;
+using Hmm.Utility.Dal.Exceptions;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
@@ -29,14 +32,69 @@ namespace VehicleInfoManager.GasLogMan
 
         public IEnumerable<GasDiscount> GetDiscounts()
         {
-            var discounts = _noteManager.GetNotes().Where(n => n.Subject == AppConstant.GasDiscountRecordSubject);
-            return discounts.Cast<GasDiscount>().AsEnumerable();
+            var discounts = _noteManager.GetNotes()
+                .Where(n => n.Subject == AppConstant.GasDiscountRecordSubject)
+                .Select(GetEntityFromNote).ToList();
+            return discounts;
         }
 
         public GasDiscount GetDiscountById(int id)
         {
             return GetDiscounts().FirstOrDefault(d => d.Id == id);
         }
+
+        public IEnumerable<GasDiscountInfo> GetDiscountInfos(GasLog gasLog)
+        {
+            var infos = new List<GasDiscountInfo>();
+
+            var content = gasLog.Content;
+            if (!IsNoteContentValid(content, out var noteXml))
+            {
+                return infos;
+            }
+
+            var ns = noteXml.Root?.GetDefaultNamespace();
+            var discountRoot = noteXml.Root?.Element(ns + "Content")?.Element(ns + "GasLog")?.Element(ns + "Discounts");
+            if (discountRoot == null)
+            {
+                ProcessResult.AddMessage("Cannot find discounts element");
+                return infos;
+            }
+
+            foreach (var element in discountRoot.Elements())
+            {
+                var amountNode = element.Element(ns + "Amount")?.Element(ns + "Money");
+                if (amountNode == null)
+                {
+                    ProcessResult.AddMessage("Cannot found money information from discount string");
+                    continue;
+                }
+
+                var money = Money.FromXml(amountNode);
+                var discountIdStr = element.Element(ns + "Program")?.Value;
+                if (!int.TryParse(discountIdStr, out var discountId))
+                {
+                    ProcessResult.AddMessage($"Cannot found valid discount id from string {discountIdStr}");
+                    continue;
+                }
+
+                var discount = GetDiscountById(discountId);
+                if (discount == null)
+                {
+                    ProcessResult.AddMessage($"Cannot found discount id : {discountId} from data source");
+                    continue;
+                }
+
+                infos.Add(new GasDiscountInfo
+                {
+                    Amount = money,
+                    Program = discount
+                });
+            }
+
+            return infos;
+        }
+
 
         public GasDiscount CreateDiscount(GasDiscount discount)
         {
@@ -107,7 +165,66 @@ namespace VehicleInfoManager.GasLogMan
 
         protected override GasDiscount GetEntityFromNote(HmmNote note)
         {
-            throw new System.NotImplementedException();
+            if (note == null)
+            {
+                return null;
+            }
+
+            var noteStr = note.Content;
+            if (string.IsNullOrEmpty(noteStr))
+            {
+            }
+            var noteXml = XDocument.Parse(noteStr);
+            var ns = noteXml.Root?.GetDefaultNamespace();
+            var discountRoot = noteXml.Root?.Element(ns + "Content")?.Element(ns + AppConstant.GasDiscountRecordSubject);
+            if (discountRoot == null)
+            {
+                return null;
+            }
+
+            bool.TryParse(discountRoot.Element(ns + "IsActive")?.Value, out var isActive);
+            Enum.TryParse<GasDiscountType>(discountRoot.Element(ns + "DiscountType")?.Value, out var discType);
+            var discount = new GasDiscount
+            {
+                Id = note.Id,
+                Author = note.Author,
+                Catalog = note.Catalog,
+                CreateDate = note.CreateDate,
+                LastModifiedDate = note.LastModifiedDate,
+                Content = note.Content,
+                Program = discountRoot.Element(ns + "Program")?.Value,
+                Amount = Money.FromXml(discountRoot.Element(ns + "Amount")?.Element(ns + "Money")),
+                DiscountType = discType,
+                IsActive = isActive,
+                Comment = discountRoot.Element(ns + "Comment")?.Value,
+                Description = note.Description,
+            };
+
+            return discount;
+        }
+
+        private bool IsNoteContentValid(string noteContent, out XDocument noteXml)
+        {
+            if (string.IsNullOrEmpty(noteContent))
+            {
+                ProcessResult.Success = false;
+                ProcessResult.AddMessage("Null or empty note content found", true);
+                noteXml = null;
+                return false;
+            }
+
+            try
+            {
+                noteXml = XDocument.Parse(noteContent);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                ProcessResult.Success = false;
+                ProcessResult.AddMessage(ex.GetAllMessage(), true);
+                noteXml = null;
+                return false;
+            }
         }
     }
 }

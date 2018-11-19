@@ -1,6 +1,7 @@
 ﻿using DomainEntity.Misc;
 using DomainEntity.User;
 using DomainEntity.Vehicle;
+using Hmm.Contract;
 using Hmm.Contract.Core;
 using Hmm.Contract.GasLogMan;
 using Hmm.Utility.Currency;
@@ -17,14 +18,46 @@ namespace VehicleInfoManager.GasLogMan
     public class GasLogManager : ManagerBase<GasLog>, IGasLogManager
     {
         private readonly IHmmNoteManager<HmmNote> _noteManager;
+        private readonly IAutomobileManager _carManager;
+        private readonly IDiscountManager _discountManager;
         private readonly IEntityLookup _lookupRepo;
 
-        public GasLogManager(IHmmNoteManager<HmmNote> noteManager, IEntityLookup lookupRepo)
+        public GasLogManager(
+            IHmmNoteManager<HmmNote> noteManager,
+            IAutomobileManager carManager,
+            IDiscountManager discountManager,
+            IEntityLookup lookupRepo)
         {
             Guard.Against<ArgumentNullException>(noteManager == null, nameof(noteManager));
+            Guard.Against<ArgumentNullException>(carManager == null, nameof(carManager));
+            Guard.Against<ArgumentNullException>(discountManager == null, nameof(discountManager));
             Guard.Against<ArgumentNullException>(lookupRepo == null, nameof(lookupRepo));
+
             _noteManager = noteManager;
+            _carManager = carManager;
+            _discountManager = discountManager;
             _lookupRepo = lookupRepo;
+        }
+
+        public GasLog UpdateGasLog(GasLog gasLog)
+        {
+            var catalog = _lookupRepo.GetEntities<NoteCatalog>().FirstOrDefault(c => c.Name == AppConstant.GasLogCatalogName);
+            if (catalog != null)
+            {
+                gasLog.Catalog = catalog;
+            }
+
+            SetEntityContent(gasLog);
+            var note = _noteManager.Update(gasLog);
+
+            if (note == null)
+            {
+                SetProcessResult(_noteManager.ProcessResult);
+                return null;
+            }
+
+            var updatedGasLog = GetEntityFromNote(note);
+            return updatedGasLog;
         }
 
         public ProcessingResult ProcessResult { get; } = new ProcessingResult();
@@ -34,6 +67,7 @@ namespace VehicleInfoManager.GasLogMan
             var note = _noteManager.GetNoteById(id);
             if (note == null)
             {
+                SetProcessResult(_noteManager.ProcessResult);
                 return null;
             }
 
@@ -43,7 +77,7 @@ namespace VehicleInfoManager.GasLogMan
 
         public GasLog CreateLog(GasLog gasLog)
         {
-            var catalog = _lookupRepo.GetEntities<NoteCatalog>().FirstOrDefault(c => c.Name == "GasLog");
+            var catalog = _lookupRepo.GetEntities<NoteCatalog>().FirstOrDefault(c => c.Name == AppConstant.GasLogCatalogName);
             if (catalog != null)
             {
                 gasLog.Catalog = catalog;
@@ -51,6 +85,12 @@ namespace VehicleInfoManager.GasLogMan
 
             SetEntityContent(gasLog);
             var note = _noteManager.Create(gasLog);
+
+            if (note == null)
+            {
+                SetProcessResult(_noteManager.ProcessResult);
+                return null;
+            }
 
             var newGasLog = GetEntityFromNote(note);
             return newGasLog;
@@ -87,9 +127,15 @@ namespace VehicleInfoManager.GasLogMan
             {
                 foreach (var disc in gasLog.Discounts)
                 {
+                    if (disc.Amount == null || disc.Program == null)
+                    {
+                        ProcessResult.AddMessage("Cannot found valid discount information, amount or discount program is missing");
+                        continue;
+                    }
+
                     var discElement = new XElement("Discount",
-                        new XElement("Amount", disc.Amount.Measure2Xml(_noteManager.ContentNamespace)),
-                        new XElement("Program", disc.Program));
+                        new XElement("Amount", disc.Amount?.Measure2Xml(_noteManager.ContentNamespace)),
+                        new XElement("Program", disc.Program?.Id));
                     xml.Element("Discounts")?.Add(discElement);
                 }
             }
@@ -113,9 +159,10 @@ namespace VehicleInfoManager.GasLogMan
                 return null;
             }
 
+            // get automobile information
             var carIdStr = logRoot.Element(ns + "Automobile")?.Value;
             int.TryParse(carIdStr, out var carId);
-            var car = _lookupRepo.GetEntity<Automobile>(carId);
+            var car = _carManager.GetAutomobiles().FirstOrDefault(c => c.Id == carId);
 
             var gas = new GasLog
             {
@@ -133,7 +180,20 @@ namespace VehicleInfoManager.GasLogMan
                 Price = Money.FromXml(logRoot.Element(ns + "Price")?.Element(ns + "Money"))
             };
 
+            gas.Discounts = _discountManager.GetDiscountInfos(gas).ToList();
             return gas;
+        }
+
+        private void SetProcessResult(ProcessingResult innerProcessResult)
+        {
+            if (innerProcessResult == null)
+            {
+                return;
+            }
+
+            ProcessResult.Rest();
+            ProcessResult.Success = innerProcessResult.Success;
+            ProcessResult.MessageList.AddRange(innerProcessResult.MessageList);
         }
     }
 }

@@ -18,6 +18,7 @@
     <ProjectReference Include="..\Hmm.Core\Hmm.Core.csproj" />
     <ProjectReference Include="..\Hmm.Dal\Hmm.Dal.csproj" />
     <ProjectReference Include="..\Hmm.Utility\Hmm.Utility.csproj" />
+    <ProjectReference Include="..\VehicleInfoManager\VehicleInfoManager.csproj" />
   </ItemGroup>
 
 </Project>

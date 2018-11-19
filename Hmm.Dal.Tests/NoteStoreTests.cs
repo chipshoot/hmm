@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
+using DomainEntity.Vehicle;
 using Hmm.Utility.TestHelp;
 using Xunit;
 
@@ -77,7 +78,7 @@ namespace Hmm.Dal.Tests
                 }
             };
 
-            SetupRecords(authors, renders, catalogs);
+            SetupRecords(authors, renders, catalogs, new List<GasDiscount>(), new List<Automobile>());
 
             _author = UserStorage.GetEntities().FirstOrDefault();
             _catalog = CatalogStorage.GetEntities().FirstOrDefault(cat => cat.IsDefault);
