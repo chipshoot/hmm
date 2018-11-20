@@ -5,6 +5,7 @@ using Hmm.Utility.Encrypt;
 using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Hmm.Contract.Core;
 
@@ -38,8 +39,8 @@ namespace Hmm.Core.Manager
             }
             catch (Exception ex)
             {
-                ErrorMessage.Success = false;
-                ErrorMessage.MessageList.Add(ex.Message);
+                ProcessResult.Success = false;
+                ProcessResult.MessageList.Add(ex.Message);
                 return null;
             }
         }
@@ -53,16 +54,23 @@ namespace Hmm.Core.Manager
             }
             catch (Exception ex)
             {
-                ErrorMessage.Success = false;
-                ErrorMessage.MessageList.Add(ex.Message);
+                ProcessResult.Success = false;
+                ProcessResult.MessageList.Add(ex.Message);
                 return null;
             }
         }
 
         public User FindUser(int id)
         {
-            var user = _dataSource.GetEntities().FirstOrDefault(u => u.Id == id);
+            var user = GetUsers().FirstOrDefault(u => u.Id == id);
             return user;
+        }
+
+        public IEnumerable<User> GetUsers()
+        {
+            var users = _dataSource.GetEntities();
+
+            return users;
         }
 
         public void Delete(int id)
@@ -70,9 +78,9 @@ namespace Hmm.Core.Manager
             var user = _dataSource.GetEntities().FirstOrDefault(u => u.Id == id && u.IsActivated);
             if (user == null)
             {
-                ErrorMessage.Rest();
-                ErrorMessage.Success = false;
-                ErrorMessage.AddMessage($"Cannot find user with id : {id}");
+                ProcessResult.Rest();
+                ProcessResult.Success = false;
+                ProcessResult.AddMessage($"Cannot find user with id : {id}");
             }
             else
             {
@@ -83,13 +91,13 @@ namespace Hmm.Core.Manager
                 }
                 catch (Exception ex)
                 {
-                    ErrorMessage.Success = false;
-                    ErrorMessage.AddMessage(ex.Message);
-                    ErrorMessage.AddMessage(ex.InnerException.Message);
+                    ProcessResult.Success = false;
+                    ProcessResult.AddMessage(ex.Message);
+                    ProcessResult.AddMessage(ex.InnerException.Message);
                 }
             }
         }
 
-        public ProcessingResult ErrorMessage { get; } = new ProcessingResult();
+        public ProcessingResult ProcessResult { get; } = new ProcessingResult();
     }
 }

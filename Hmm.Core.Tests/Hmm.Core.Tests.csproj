@@ -25,6 +25,7 @@
     <ProjectReference Include="..\DomainEntity\DomainEntity.csproj" />
     <ProjectReference Include="..\Hmm.Core\Hmm.Core.csproj" />
     <ProjectReference Include="..\Hmm.Dal\Hmm.Dal.csproj" />
+    <ProjectReference Include="..\Hmm.Utility.TestHelp\Hmm.Utility.TestHelp.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +33,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="xunit.runner.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

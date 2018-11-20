@@ -87,7 +87,7 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
                 var apiNewUser = _userManager.Update(curUsr);
                 if (apiNewUser == null)
                 {
-                    return BadRequest(_userManager.ErrorMessage.MessageList);
+                    return BadRequest(_userManager.ProcessResult.MessageList);
                 }
 
                 return NoContent();
@@ -122,7 +122,7 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
                 var newUser = _userManager.Update(curUsr);
                 if (newUser == null)
                 {
-                    return BadRequest(_userManager.ErrorMessage.MessageList);
+                    return BadRequest(_userManager.ProcessResult.MessageList);
                 }
 
                 return NoContent();
@@ -138,12 +138,12 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
         public ActionResult Delete(int id)
         {
             _userManager.Delete(id);
-            if (_userManager.ErrorMessage.Success)
+            if (_userManager.ProcessResult.Success)
             {
                 return NoContent();
             }
 
-            if (_userManager.ErrorMessage.MessageList.Contains($"Cannot find user with id : {id}"))
+            if (_userManager.ProcessResult.MessageList.Contains($"Cannot find user with id : {id}"))
             {
                 return NotFound();
             }

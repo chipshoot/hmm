@@ -1,71 +1,87 @@
-﻿//using DomainEntity.User;
-//using Hmm.Contract;
-//using Hmm.Core.Manager;
-//using Hmm.Dal.Storage;
-//using Hmm.Utility.Dal;
-//using Hmm.Utility.Dal.Query;
-//using Hmm.Utility.Misc;
-//using Hmm.Utility.Validation;
-//using Moq;
-//using System;
-//using System.Collections.Generic;
-//using Hmm.Contract.Core;
-//using Xunit;
+﻿using DomainEntity.User;
+using Hmm.Contract.Core;
+using Hmm.Core.Manager;
+using Hmm.Utility.TestHelp;
+using System;
+using System.Linq;
+using FluentValidation.TestHelper;
+using Hmm.Core.Manager.Validation;
+using Xunit;
 
-//namespace Hmm.Core.Tests
-//{
-//    public class UserManagerTests : IDisposable
-//    {
-//        #region private fields
+namespace Hmm.Core.Tests
+{
+    public class UserManagerTests : TestFixtureBase
+    {
+        #region private fields
 
-//        private readonly List<User> _users;
-//        private readonly IUserManager _usrmanager;
+        private readonly IUserManager _usrManager;
 
-//        #endregion private fields
+        #endregion private fields
 
-//        public UserManagerTests()
-//        {
-//            _users = new List<User>();
-//            var uowmoc = new Mock<IUnitOfWork>();
-//            uowmoc.Setup(d => d.Add(It.IsAny<User>())).Returns((User usr) =>
-//              {
-//                  usr.Id = _users.GetNextId();
-//                  _users.Add(usr);
-//                  return usr;
-//              });
-//            var lookupMoc = new Mock<IEntityLookup>();
-//            var timeAdp = new Mock<IDateTimeProvider>();
-//            var data = new UserStorage(uowmoc.Object, lookupMoc.Object, timeAdp.Object);
+        public UserManagerTests()
+        {
+            InsertSeedRecords(isSetupDiscount: true, isSetupAutomobile: true);
+            _usrManager = new UserManager(UserStorage);
+        }
 
-//            _usrmanager = new UserManager(data);
-//        }
+        [Fact]
+        public void Can_Add_Valid_User()
+        {
+            // Arrange
+            var user = new User
+            {
+                AccountName = "jfang2",
+                FirstName = "Jack",
+                LastName = "Fang",
+                BirthDay = new DateTime(2016, 2, 15),
+                IsActivated = true,
+                Password = "1235",
+            };
 
-//        public void Dispose()
-//        {
-//            _users.Clear();
-//        }
+            // Act
+            var newUsr = _usrManager.Create(user);
 
-//        [Fact]
-//        public void Can_Add_Valid_User()
-//        {
-//            // Arrange
-//            var user = new User
-//            {
-//                AccountName = "jfang",
-//                FirstName = "Jack",
-//                LastName = "Fang",
-//                BirthDay = new DateTime(2016, 2, 15),
-//                IsActivated = true,
-//                Password = "1235",
-//            };
+            // Assert
+            Assert.True(_usrManager.ProcessResult.Success);
+            Assert.NotNull(newUsr);
+            Assert.True(newUsr.Id >= 1, "newUsr.Id >= 1");
+            Assert.NotNull(newUsr.Salt);
+        }
 
-//            // Act
-//            var newUsr = _usrmanager.Create(user);
+        //[Theory]
+        //[InlineData("jfang", "Duplicated account name")]
+        //public void Cannot_Add_Invalid_User(string accountName, string errorMessage)
+        //{
+        //    //    Arrange
+        //    var user = new User
+        //    {
+        //        AccountName = accountName,
+        //        FirstName = "Jack",
+        //        LastName = "Fang",
+        //        BirthDay = new DateTime(2016, 2, 15),
+        //        IsActivated = true,
+        //        Password = "1235",
+        //    };
 
-//            // Assert
-//            Assert.NotNull(newUsr);
-//            Assert.True(newUsr.Id > 0);
-//            Assert.NotNull(newUsr.Salt);
-//        }
-//    }
-//}
+        //    //   Act
+        //    var newUsr = _usrManager.Create(user);
+
+        //    //  Assert
+        //    Assert.False(_usrManager.ProcessResult.Success);
+        //    Assert.True(_usrManager.ProcessResult.MessageList.FirstOrDefault()?.Contains(errorMessage));
+        //    Assert.Null(newUsr);
+        //}
+
+        [Theory]
+        [InlineData("jfang")]
+        [InlineData("")]
+        public void UserAccountNameValidationTests(string accountName)
+        {
+            // Arrange
+            var validator = new UserValidator(_usrManager);
+
+            // Act
+            validator.ShouldHaveValidationErrorFor(u => u.AccountName, accountName);
+        }
+    }
+}

@@ -1,50 +1,40 @@
-﻿using DomainEntity.User;
-using Hmm.Utility.Dal.Query;
-using Hmm.Utility.Validation;
+﻿using System;
 using System.Linq;
+using DomainEntity.User;
+using FluentValidation;
+using Hmm.Contract.Core;
+using Hmm.Utility.Validation;
 
-namespace Hmm.Dal.Validation
+namespace Hmm.Core.Manager.Validation
 {
-    public class UserValidator : ValidatorBase<User>
+    public class UserValidator : AbstractValidator<User>
     {
-        public UserValidator(IEntityLookup lookupRepo) : base(lookupRepo)
+        private readonly IUserManager _userManager;
+
+        public UserValidator(IUserManager userManager)
         {
+            Guard.Against<ArgumentNullException>(userManager == null, nameof(userManager));
+            _userManager = userManager;
+
+            RuleFor(u => u.FirstName).NotNull().Length(100);
+            RuleFor(u => u.LastName).NotNull().Length(100);
+            RuleFor(u => u.BirthDay).NotNull();
+            RuleFor(u => u.AccountName).NotNull().Length(256).Must(UniqueAccountName);
+            RuleFor(u => u.Password).NotNull().Length(128);
+            RuleFor(u => u.Description).Length(1000);
         }
 
-        public override bool IsValid(User entity, bool isNewEntity)
+        private bool UniqueAccountName(User user, string accountName)
         {
-            // validating when try to create a new entity
-            if (isNewEntity)
+            var savedUser = _userManager.FindUser(user.Id);
+
+            // create new user, make sure account name is unique
+            if (savedUser == null)
             {
-                var saveduser = LookupRepo.GetEntities<User>().FirstOrDefault(u => u.AccountName == entity.AccountName);
-                if (saveduser != null)
+                var acc = accountName.Trim().ToLower();
+                var sameAccountUser = _userManager.GetUsers().FirstOrDefault(u => u.AccountName.ToLower() == acc);
+                if (sameAccountUser != null)
                 {
-                    ValidationErrors.Add($"The account name {entity.AccountName} exists in data source");
-                    return false;
-                }
-            }
-
-            // validating for existing entity
-            else
-            {
-                if (entity.Id <= 0)
-                {
-                    ValidationErrors.Add($"The user does not contains valid identity {entity.Id}");
-                    return false;
-                }
-
-                var savedEntity = LookupRepo.GetEntity<User>(entity.Id);
-                if (savedEntity == null)
-                {
-                    ValidationErrors.Add($"The user with Id {entity.Id} does not exists in data source");
-                    return false;
-                }
-
-                var exuserWithSameAccount = LookupRepo.GetEntities<User>()
-                    .FirstOrDefault(u => u.AccountName == entity.AccountName);
-                if (exuserWithSameAccount != null && exuserWithSameAccount.Id != entity.Id)
-                {
-                    ValidationErrors.Add($"Duplicated account name : {entity.AccountName} found");
                     return false;
                 }
             }

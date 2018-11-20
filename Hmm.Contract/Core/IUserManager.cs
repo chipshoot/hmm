@@ -1,4 +1,5 @@
-﻿using DomainEntity.User;
+﻿using System.Collections.Generic;
+using DomainEntity.User;
 using Hmm.Utility.Misc;
 
 namespace Hmm.Contract.Core
@@ -25,8 +26,10 @@ namespace Hmm.Contract.Core
 
         User FindUser(int id);
 
+        IEnumerable<User> GetUsers();
+
         void Delete(int id);
 
-        ProcessingResult ErrorMessage { get; }
+        ProcessingResult ProcessResult { get; }
     }
 }
