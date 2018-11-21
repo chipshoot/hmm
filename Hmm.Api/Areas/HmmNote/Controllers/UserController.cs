@@ -2,12 +2,13 @@
 using DomainEntity.User;
 using Hmm.Api.Areas.HmmNote.Models;
 using Hmm.Api.Models;
+using Hmm.Contract.Core;
 using Hmm.Utility.Validation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using Hmm.Contract.Core;
+using System.Linq;
 
 namespace Hmm.Api.Areas.HmmNote.Controllers
 {
@@ -37,7 +38,7 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            var user = _userManager.FindUser(id);
+            var user = _userManager.GetUsers().FirstOrDefault(u => u.Id == id);
             var ret = _mapper.Map<User, ApiUser>(user);
             return Ok(ret);
         }
@@ -77,7 +78,7 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
 
             try
             {
-                var curUsr = _userManager.FindUser(id);
+                var curUsr = _userManager.GetUsers().FirstOrDefault(u => u.Id == id);
                 if (curUsr == null)
                 {
                     return NotFound();
@@ -109,7 +110,7 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
 
             try
             {
-                var curUsr = _userManager.FindUser(id);
+                var curUsr = _userManager.GetUsers().FirstOrDefault(u => u.Id == id);
                 if (curUsr == null)
                 {
                     return NotFound();
@@ -137,7 +138,7 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
         [HttpDelete("{id}")]
         public ActionResult Delete(int id)
         {
-            _userManager.Delete(id);
+            _userManager.DeActivate(id);
             if (_userManager.ProcessResult.Success)
             {
                 return NoContent();

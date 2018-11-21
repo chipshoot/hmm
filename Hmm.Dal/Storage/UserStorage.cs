@@ -28,8 +28,7 @@ namespace Hmm.Dal.Storage
             }
             catch (DataSourceException ex)
             {
-                ProcessMessage.Success = false;
-                ProcessMessage.AddMessage(ex.Message, true);
+                ProcessMessage.WrapException(ex);
                 return null;
             }
         }
@@ -54,8 +53,7 @@ namespace Hmm.Dal.Storage
             }
             catch (DataSourceException ex)
             {
-                ProcessMessage.Success = false;
-                ProcessMessage.AddMessage(ex.Message, true);
+                ProcessMessage.WrapException(ex);
                 return null;
             }
         }
@@ -71,8 +69,7 @@ namespace Hmm.Dal.Storage
             }
             catch (DataSourceException ex)
             {
-                ProcessMessage.Success = false;
-                ProcessMessage.AddMessage(ex.Message, true);
+                ProcessMessage.WrapException(ex);
                 return false;
             }
         }

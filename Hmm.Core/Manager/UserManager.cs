@@ -1,5 +1,6 @@
 ﻿using DomainEntity.User;
-using Hmm.Contract;
+using Hmm.Contract.Core;
+using Hmm.Core.Manager.Validation;
 using Hmm.Utility.Dal.DataStore;
 using Hmm.Utility.Encrypt;
 using Hmm.Utility.Misc;
@@ -7,22 +8,28 @@ using Hmm.Utility.Validation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Hmm.Contract.Core;
 
 namespace Hmm.Core.Manager
 {
     public class UserManager : IUserManager
     {
         private readonly IDataStore<User> _dataSource;
+        private readonly UserValidator _validator;
 
         public UserManager(IDataStore<User> dataSource)
         {
             Guard.Against<ArgumentNullException>(dataSource == null, nameof(dataSource));
             _dataSource = dataSource;
+            _validator = new UserValidator(_dataSource);
         }
 
         public User Create(User userInfo)
         {
+            if (!IsValidEntity(userInfo))
+            {
+                return null;
+            }
+
             // Get password salt
             if (string.IsNullOrEmpty(userInfo.Salt))
             {
@@ -39,8 +46,7 @@ namespace Hmm.Core.Manager
             }
             catch (Exception ex)
             {
-                ProcessResult.Success = false;
-                ProcessResult.MessageList.Add(ex.Message);
+                ProcessResult.WrapException(ex);
                 return null;
             }
         }
@@ -49,38 +55,48 @@ namespace Hmm.Core.Manager
         {
             try
             {
+                if (!IsValidEntity(userInfo))
+                {
+                    return null;
+                }
+
                 var updatedUser = _dataSource.Update(userInfo);
+                if (updatedUser == null)
+                {
+                    ProcessResult.PropagandaResult(_dataSource.ProcessMessage);
+                }
+
                 return updatedUser;
             }
             catch (Exception ex)
             {
-                ProcessResult.Success = false;
-                ProcessResult.MessageList.Add(ex.Message);
+                ProcessResult.WrapException(ex);
                 return null;
             }
         }
 
-        public User FindUser(int id)
-        {
-            var user = GetUsers().FirstOrDefault(u => u.Id == id);
-            return user;
-        }
-
         public IEnumerable<User> GetUsers()
         {
-            var users = _dataSource.GetEntities();
+            try
+            {
+                var users = _dataSource.GetEntities();
 
-            return users;
+                return users;
+            }
+            catch (Exception ex)
+            {
+                ProcessResult.WrapException(ex);
+                return null;
+            }
         }
 
-        public void Delete(int id)
+        public void DeActivate(int id)
         {
             var user = _dataSource.GetEntities().FirstOrDefault(u => u.Id == id && u.IsActivated);
             if (user == null)
             {
-                ProcessResult.Rest();
                 ProcessResult.Success = false;
-                ProcessResult.AddMessage($"Cannot find user with id : {id}");
+                ProcessResult.AddMessage($"Cannot find user with id : {id}", true);
             }
             else
             {
@@ -91,13 +107,26 @@ namespace Hmm.Core.Manager
                 }
                 catch (Exception ex)
                 {
-                    ProcessResult.Success = false;
-                    ProcessResult.AddMessage(ex.Message);
-                    ProcessResult.AddMessage(ex.InnerException.Message);
+                    ProcessResult.WrapException(ex);
                 }
             }
         }
 
         public ProcessingResult ProcessResult { get; } = new ProcessingResult();
+
+        private bool IsValidEntity(User user)
+        {
+            Guard.Against<ArgumentNullException>(user == null, nameof(user));
+
+            var result = _validator.Validate(user);
+            if (result.IsValid)
+            {
+                return true;
+            }
+
+            ProcessResult.Success = false;
+            ProcessResult.MessageList.AddRange(result.Errors.Select(e => $"{e.PropertyName} : {e.ErrorMessage}"));
+            return false;
+        }
     }
 }

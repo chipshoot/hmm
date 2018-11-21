@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Hmm.Utility.Dal.Exceptions;
 
 namespace Hmm.Utility.Misc
 {
@@ -12,7 +14,7 @@ namespace Hmm.Utility.Misc
 
         public bool Success { get; set; }
 
-        public List<string> MessageList { get; private set; }
+        public List<string> MessageList { get; }
 
         public void Rest()
         {
@@ -28,6 +30,20 @@ namespace Hmm.Utility.Misc
             }
 
             MessageList.Add(message);
+        }
+
+        public void PropagandaResult(ProcessingResult innerResult)
+        {
+            Rest();
+            Success = innerResult.Success;
+            MessageList.AddRange(innerResult.MessageList);
+        }
+
+        public void WrapException(Exception ex)
+        {
+            Rest();
+            Success = false;
+            AddMessage(ex.GetAllMessage());
         }
     }
 }

@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using DomainEntity.User;
+﻿using DomainEntity.User;
 using Hmm.Utility.Misc;
+using System.Collections.Generic;
 
 namespace Hmm.Contract.Core
 {
@@ -23,12 +23,9 @@ namespace Hmm.Contract.Core
         ///  null </returns>
         User Update(User userInfo);
 
-
-        User FindUser(int id);
-
         IEnumerable<User> GetUsers();
 
-        void Delete(int id);
+        void DeActivate(int id);
 
         ProcessingResult ProcessResult { get; }
     }
