@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Hmm.Core.Manager.Validation
 {
-    public class UserValidator : AbstractValidator<User>
+    public class UserValidator : ValidatorBase<User>
     {
         private readonly IDataStore<User> _dataSource;
 

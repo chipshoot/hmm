@@ -22,7 +22,7 @@ namespace Hmm.Core.Tests
         public UserManagerTests()
         {
             InsertSeedRecords(isSetupDiscount: true, isSetupAutomobile: true);
-            _userManager = new UserManager(UserStorage);
+            _userManager = new UserManager(UserStorage, new UserValidator(UserStorage));
         }
 
         [Fact]

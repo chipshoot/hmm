@@ -11,6 +11,8 @@ namespace Hmm.Api.Models
             CreateMap<ApiUser, User>()
                 .ForMember(dest=>dest.Id, opt=>opt.Ignore());
             CreateMap<User, ApiUser>();
+            CreateMap<ApiUserForCreate, User>();
+            CreateMap<ApiUserForUpdate, User>();
         }
     }
 }

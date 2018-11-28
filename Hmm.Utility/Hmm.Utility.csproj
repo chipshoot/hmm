@@ -9,4 +9,10 @@
     <Folder Include="Validation\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="FluentValidation">
+      <HintPath>C:\Users\Chaoyang\.nuget\packages\fluentvalidation\8.0.100\lib\netstandard2.0\FluentValidation.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

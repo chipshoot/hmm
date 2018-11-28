@@ -14,7 +14,5 @@ namespace Hmm.Api.Areas.HmmNote.Models
         public string AccountName { get; set; }
 
         public string Password { get; set; }
-
-        public bool IsActivated { get; set; }
     }
 }

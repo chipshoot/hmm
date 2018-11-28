@@ -3,7 +3,7 @@ using System;
 
 namespace Hmm.Api.Areas.HmmNote.Models
 {
-    public class ApiUser : ApiEntity
+    public class ApiUserForUpdate : ApiEntity
     {
         public string FirstName { get; set; }
 
@@ -13,6 +13,6 @@ namespace Hmm.Api.Areas.HmmNote.Models
 
         public string AccountName { get; set; }
 
-        public bool IsActivated { get; set; }
+        public string Password { get; set; }
     }
 }

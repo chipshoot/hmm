@@ -16,16 +16,17 @@ namespace Hmm.Core.Manager
         private readonly IDataStore<User> _dataSource;
         private readonly UserValidator _validator;
 
-        public UserManager(IDataStore<User> dataSource)
+        public UserManager(IDataStore<User> dataSource, UserValidator validator)
         {
             Guard.Against<ArgumentNullException>(dataSource == null, nameof(dataSource));
+            Guard.Against<ArgumentNullException>(validator == null, nameof(validator));
             _dataSource = dataSource;
-            _validator = new UserValidator(_dataSource);
+            _validator = validator;
         }
 
         public User Create(User userInfo)
         {
-            if (!IsValidEntity(userInfo))
+            if (!_validator.IsValidEntity(userInfo, ProcessResult))
             {
                 return null;
             }
@@ -55,7 +56,7 @@ namespace Hmm.Core.Manager
         {
             try
             {
-                if (!IsValidEntity(userInfo))
+                if (!_validator.IsValidEntity(userInfo, ProcessResult))
                 {
                     return null;
                 }
@@ -113,20 +114,5 @@ namespace Hmm.Core.Manager
         }
 
         public ProcessingResult ProcessResult { get; } = new ProcessingResult();
-
-        private bool IsValidEntity(User user)
-        {
-            Guard.Against<ArgumentNullException>(user == null, nameof(user));
-
-            var result = _validator.Validate(user);
-            if (result.IsValid)
-            {
-                return true;
-            }
-
-            ProcessResult.Success = false;
-            ProcessResult.MessageList.AddRange(result.Errors.Select(e => $"{e.PropertyName} : {e.ErrorMessage}"));
-            return false;
-        }
     }
 }

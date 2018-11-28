@@ -1,34 +1,27 @@
-﻿using Hmm.Utility.Dal.Query;
+﻿using FluentValidation;
+using Hmm.Utility.Misc;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 
 namespace Hmm.Utility.Validation
 {
-    public abstract class ValidatorBase<T> : IValidator<T> where T : class
+    public abstract class ValidatorBase<T> : AbstractValidator<T>
     {
-        #region constructor
-
-        protected ValidatorBase(IEntityLookup lookupRepo)
+        public bool IsValidEntity(T entity, ProcessingResult processResult)
         {
-            Guard.Against<ArgumentNullException>(lookupRepo == null, "lookupRepo");
-            LookupRepo = lookupRepo;
+            Guard.Against<ArgumentNullException>(entity == null, nameof(entity));
+            Guard.Against<ArgumentNullException>(processResult == null, nameof(processResult));
+
+            var result = Validate(entity);
+            if (result.IsValid)
+            {
+                return true;
+            }
+
+            // ReSharper disable once PossibleNullReferenceException
+            processResult.Success = false;
+            processResult.MessageList.AddRange(result.Errors.Select(e => $"{e.PropertyName} : {e.ErrorMessage}"));
+            return false;
         }
-
-        #endregion constructor
-
-        #region protected properties
-
-        protected IEntityLookup LookupRepo { get; }
-
-        #endregion protected properties
-
-        public List<string> ValidationErrors { get; } = new List<string>();
-
-        public void Reset()
-        {
-            ValidationErrors.Clear();
-        }
-
-        public abstract bool IsValid(T entity, bool isNewEntity);
     }
 }

@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Hmm.Core.Manager.Validation;
 using VehicleInfoManager.GasLogMan;
 
 namespace Hmm.Utility.TestHelp
@@ -479,7 +480,7 @@ namespace Hmm.Utility.TestHelp
             NoteStorage = new NoteStorage(uow, LookupRepo, dateProvider);
             RenderStorage = new NoteRenderStorage(uow, LookupRepo, dateProvider);
             CatalogStorage = new NoteCatalogStorage(uow, LookupRepo, dateProvider);
-            NoteManager = new HmmNoteManager(NoteStorage, LookupRepo);
+            NoteManager = new HmmNoteManager(NoteStorage, LookupRepo, new NoteValidator(NoteStorage));
         }
     }
 }

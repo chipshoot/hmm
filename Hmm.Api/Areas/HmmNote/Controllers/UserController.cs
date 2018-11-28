@@ -50,16 +50,17 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
             try
             {
                 var usr = _mapper.Map<ApiUserForCreate, User>(user);
-                var newusr = _userManager.Create(usr);
+                usr.IsActivated = true;
+                var newUser = _userManager.Create(usr);
 
-                if (newusr == null)
+                if (newUser == null)
                 {
                     return BadRequest();
                 }
 
-                var apinewusr = _mapper.Map<User, ApiUser>(newusr);
+                var apiNewUser = _mapper.Map<User, ApiUser>(newUser);
 
-                return Ok(apinewusr);
+                return Ok(apiNewUser);
             }
             catch (Exception)
             {
@@ -69,7 +70,7 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
 
         // PUT api/users/5
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody]ApiUser user)
+        public IActionResult Put(int id, [FromBody]ApiUserForUpdate user)
         {
             if (user == null || id <= 0)
             {

@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="Manager\Validation\NoteValidator.cs" />
     <Compile Include="Manager\Validation\UserValidator.cs" />
   </ItemGroup>
 

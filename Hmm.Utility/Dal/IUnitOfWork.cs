@@ -36,6 +36,7 @@ namespace Hmm.Utility.Dal
         /// <returns>The instance of <see cref="IGenericTransaction"/></returns>
         IGenericTransaction BeginTransaction();
 
+
         /// <summary>
         /// Refreshes the data to database.
         /// </summary>

@@ -4,6 +4,7 @@ using DomainEntity.User;
 using Hmm.Contract.Core;
 using Hmm.Contract.GasLogMan;
 using Hmm.Core.Manager;
+using Hmm.Core.Manager.Validation;
 using Hmm.Dal.Data;
 using Hmm.Dal.Querys;
 using Hmm.Dal.Storage;
@@ -43,6 +44,8 @@ namespace Hmm.Api
             services.AddScoped<IUserManager, UserManager>();
             services.AddScoped<IHmmNoteManager<HmmNote>, HmmNoteManager>();
             services.AddScoped<IGasLogManager, GasLogManager>();
+            services.AddScoped<UserValidator, UserValidator>();
+            services.AddScoped<NoteValidator, NoteValidator>();
             services.AddMvc();
             services.AddAutoMapper();
         }

@@ -7,6 +7,7 @@ using Hmm.Utility.TestHelp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Hmm.Core.Manager.Validation;
 using VehicleInfoManager.GasLogMan;
 using Xunit;
 
@@ -21,7 +22,7 @@ namespace VehicleInfoManager.Tests
         public GasLogManagerTests()
         {
             InsertSeedRecords(isSetupDiscount: true, isSetupAutomobile: true);
-            var noteManager = new HmmNoteManager(NoteStorage, LookupRepo);
+            var noteManager = new HmmNoteManager(NoteStorage, LookupRepo, new NoteValidator(NoteStorage));
             _carManager = new AutomobileManager(noteManager, LookupRepo);
             _discountManager = new DiscountManager(noteManager, LookupRepo);
             _manager = new GasLogManager(noteManager, _carManager, _discountManager, LookupRepo);
