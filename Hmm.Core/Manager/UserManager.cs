@@ -32,14 +32,7 @@ namespace Hmm.Core.Manager
             }
 
             // Get password salt
-            if (string.IsNullOrEmpty(userInfo.Salt))
-            {
-                userInfo.Salt = EncryptHelper.GenerateSalt();
-            }
-
-            var pwd = EncryptHelper.EncodePassword(userInfo.Password, userInfo.Salt, false);
-            userInfo.Password = pwd;
-
+            GetPassword(userInfo);
             try
             {
                 var addedUsr = _dataSource.Add(userInfo);
@@ -76,7 +69,43 @@ namespace Hmm.Core.Manager
             }
         }
 
-        public IEnumerable<User> GetUsers()
+        public bool ResetPassword(int userId, string newPassword)
+        {
+            try
+            {
+                var user = GetEntities().FirstOrDefault(u => u.Id == userId);
+                if (user == null)
+                {
+                    ProcessResult.Success = false;
+                    ProcessResult.AddMessage($"Cannot find user with id {userId}");
+                    return false;
+                }
+
+                user.Password = newPassword;
+                if (!_validator.IsValidEntity(user, ProcessResult))
+                {
+                    return false;
+                }
+
+                GetPassword(user);
+                var updatedUser = _dataSource.Update(user);
+                if (updatedUser == null)
+                {
+                    ProcessResult.PropagandaResult(_dataSource.ProcessMessage);
+                    return false;
+                }
+
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                ProcessResult.WrapException(ex);
+                return false;
+            }
+        }
+
+        public IEnumerable<User> GetEntities()
         {
             try
             {
@@ -114,5 +143,16 @@ namespace Hmm.Core.Manager
         }
 
         public ProcessingResult ProcessResult { get; } = new ProcessingResult();
+
+        private static void GetPassword(User userInfo)
+        {
+            if (string.IsNullOrEmpty(userInfo.Salt))
+            {
+                userInfo.Salt = EncryptHelper.GenerateSalt();
+            }
+
+            var pwd = EncryptHelper.EncodePassword(userInfo.Password, userInfo.Salt, false);
+            userInfo.Password = pwd;
+        }
     }
 }

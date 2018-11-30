@@ -29,7 +29,7 @@ namespace Hmm.Core.Tests
         public void Can_Get_User()
         {
             // Act
-            var users = _userManager.GetUsers().ToList();
+            var users = _userManager.GetEntities().ToList();
 
             // Assert
             Assert.True(_userManager.ProcessResult.Success);
@@ -146,7 +146,7 @@ namespace Hmm.Core.Tests
         public void Can_Deactivate_User()
         {
             // Arrange
-            var user = _userManager.GetUsers().FirstOrDefault();
+            var user = _userManager.GetEntities().FirstOrDefault();
             Assert.NotNull(user);
             Assert.True(user.IsActivated);
 

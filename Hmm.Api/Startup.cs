@@ -41,11 +41,17 @@ namespace Hmm.Api
             services.AddScoped<IHmmDataContext, HmmDataContext>();
             services.AddScoped<IEntityLookup, EfEntityLookup>();
             services.AddScoped<IDataStore<User>, UserStorage>();
+            services.AddScoped<IDataStore<NoteRender>, NoteRenderStorage>();
+            services.AddScoped<IDataStore<NoteCatalog>, NoteCatalogStorage>();
             services.AddScoped<IUserManager, UserManager>();
             services.AddScoped<IHmmNoteManager<HmmNote>, HmmNoteManager>();
+            services.AddScoped<INoteRenderManager, NoteRenderManager>();
+            services.AddScoped<INoteCatalogManager, NoteCatalogManager>();
             services.AddScoped<IGasLogManager, GasLogManager>();
             services.AddScoped<UserValidator, UserValidator>();
             services.AddScoped<NoteValidator, NoteValidator>();
+            services.AddScoped<NoteRenderValidator, NoteRenderValidator>();
+            services.AddScoped<NoteCatalogValidator, NoteCatalogValidator>();
             services.AddMvc();
             services.AddAutoMapper();
         }

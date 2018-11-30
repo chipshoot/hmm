@@ -38,7 +38,7 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            var user = _userManager.GetUsers().FirstOrDefault(u => u.Id == id);
+            var user = _userManager.GetEntities().FirstOrDefault(u => u.Id == id);
             var ret = _mapper.Map<User, ApiUser>(user);
             return Ok(ret);
         }
@@ -68,6 +68,28 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
             }
         }
 
+        // todo: add reset password method for user account
+        [HttpPost("{id}/password")]
+        public IActionResult ResetPassword(string userId, [FromBody] string newPassword)
+        {
+            try
+            {
+
+                var successful = _userManager.ResetPassword(1, newPassword);
+
+                if (!successful)
+                {
+                    return BadRequest();
+                }
+
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
         // PUT api/users/5
         [HttpPut("{id}")]
         public IActionResult Put(int id, [FromBody]ApiUserForUpdate user)
@@ -79,7 +101,7 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
 
             try
             {
-                var curUsr = _userManager.GetUsers().FirstOrDefault(u => u.Id == id);
+                var curUsr = _userManager.GetEntities().FirstOrDefault(u => u.Id == id);
                 if (curUsr == null)
                 {
                     return NotFound();
@@ -102,7 +124,7 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
 
         // PATCH api/users/5
         [HttpPatch("{id}")]
-        public IActionResult Patch(int id, [FromBody] JsonPatchDocument<ApiUser> patchDoc)
+        public IActionResult Patch(int id, [FromBody] JsonPatchDocument<ApiUserForUpdate> patchDoc)
         {
             if (patchDoc == null || id <= 0)
             {
@@ -111,13 +133,13 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
 
             try
             {
-                var curUsr = _userManager.GetUsers().FirstOrDefault(u => u.Id == id);
+                var curUsr = _userManager.GetEntities().FirstOrDefault(u => u.Id == id);
                 if (curUsr == null)
                 {
                     return NotFound();
                 }
 
-                var user2Update = _mapper.Map<ApiUser>(curUsr);
+                var user2Update = _mapper.Map<ApiUserForUpdate>(curUsr);
                 patchDoc.ApplyTo(user2Update);
                 _mapper.Map(user2Update, curUsr);
 

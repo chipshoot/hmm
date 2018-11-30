@@ -1,32 +1,20 @@
 ﻿using DomainEntity.User;
-using Hmm.Utility.Misc;
-using System.Collections.Generic;
 
 namespace Hmm.Contract.Core
 {
-    public interface IUserManager
+    public interface IUserManager : IEntityManager<User>
     {
-        /// <summary>
-        /// Creates the specified user with user information.
-        /// </summary>
-        /// <param name="userInfo">The <see cref="User"/> object which contains all
-        /// new user information except user id.</param>
-        /// <returns>if user successfully be created, return the user with unique id,
-        /// otherwise return null</returns>
-        User Create(User userInfo);
+        /// <summary>Update the user account password, because we encrypt the password before save it
+        /// to table, so we cannot just update password with other information</summary>
+        /// <param name="userId">The user id whose password need to be changed</param>
+        /// <param name="newPassword">the new password to be set</param>
+        bool ResetPassword(int userId, string newPassword);
 
         /// <summary>
-        /// Updates the specified user with new information.
+        /// Set the flag to de-activate user to make it invisible for system.
+        /// user may associated with note so we not want to delete everything
         /// </summary>
-        /// <param name="userInfo">The <see cref="User"/> with update information and id </param>
-        /// <returns>if use has been updated successfully, return updated user, otherwise return
-        ///  null </returns>
-        User Update(User userInfo);
-
-        IEnumerable<User> GetUsers();
-
+        /// <param name="id">The id of user whose activate flag will be set</param>
         void DeActivate(int id);
-
-        ProcessingResult ProcessResult { get; }
     }
 }

@@ -12,7 +12,5 @@ namespace Hmm.Api.Areas.HmmNote.Models
         public DateTime BirthDay { get; set; }
 
         public string AccountName { get; set; }
-
-        public string Password { get; set; }
     }
 }
