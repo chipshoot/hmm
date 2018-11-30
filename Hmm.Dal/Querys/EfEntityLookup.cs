@@ -4,6 +4,7 @@ using Hmm.Dal.Data;
 using Hmm.Utility.Dal.DataEntity;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Validation;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,7 +41,7 @@ namespace Hmm.Dal.Querys
                 entity = _dataContext.Catalogs.Find(id) as T;
             }
 
-        return entity;
+            return entity;
         }
 
         public IEnumerable<T> GetEntities<T>() where T : Entity
@@ -60,7 +61,9 @@ namespace Hmm.Dal.Querys
             }
             else if (typeof(T) == typeof(NoteCatalog))
             {
-                entities = _dataContext.Catalogs.Cast<T>().ToList();
+                entities = _dataContext.Catalogs
+                    .Include(c => c.Render).Cast<T>()
+                    .ToList();
             }
 
             return entities;

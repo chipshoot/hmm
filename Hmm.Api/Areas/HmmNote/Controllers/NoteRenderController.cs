@@ -38,7 +38,7 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            var render = _renderManager.GetEntities().FirstOrDefault(u => u.Id == id);
+            var render = _renderManager.GetEntities().FirstOrDefault(r => r.Id == id);
             var ret = _mapper.Map<NoteRender, ApiNoteRender>(render);
             return Ok(ret);
         }
@@ -78,7 +78,7 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
 
             try
             {
-                var curRender = _renderManager.GetEntities().FirstOrDefault(u => u.Id == id);
+                var curRender = _renderManager.GetEntities().FirstOrDefault(r => r.Id == id);
                 if (curRender == null)
                 {
                     return NotFound();
@@ -110,7 +110,7 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
 
             try
             {
-                var curRender = _renderManager.GetEntities().FirstOrDefault(u => u.Id == id);
+                var curRender = _renderManager.GetEntities().FirstOrDefault(r => r.Id == id);
                 if (curRender == null)
                 {
                     return NotFound();

@@ -12,8 +12,6 @@ namespace Hmm.Dal.Storage
 {
     public abstract class StorageBase<T> : IDataStore<T> where T : Entity
     {
-        private const int DefaultPropId = 1;
-
         protected StorageBase(IUnitOfWork uow, IEntityLookup lookupRepo, IDateTimeProvider dateTimeProvider)
         {
             Guard.Against<ArgumentNullException>(uow == null, nameof(uow));
@@ -65,7 +63,7 @@ namespace Hmm.Dal.Storage
                 return property;
             }
 
-            var defaultProp = LookupRepo.GetEntities<TP>().FirstOrDefault(p=>p.IsDefault);
+            var defaultProp = LookupRepo.GetEntities<TP>().FirstOrDefault(p => p.IsDefault);
             return defaultProp;
         }
     }

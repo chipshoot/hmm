@@ -6,8 +6,6 @@ namespace Hmm.Api.Areas.HmmNote.Models
     {
         public string Name { get; set; }
 
-        public ApiNoteRender Render { get; set; }
-
         public string Schema { get; set; }
 
         public bool IsDefault { get; set; }

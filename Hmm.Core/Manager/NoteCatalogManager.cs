@@ -33,6 +33,10 @@ namespace Hmm.Core.Manager
             try
             {
                 var addedCatalog = _dataSource.Add(catalog);
+                if (addedCatalog == null)
+                {
+                    ProcessResult.PropagandaResult(_dataSource.ProcessMessage);
+                }
                 return addedCatalog;
             }
             catch (Exception ex)

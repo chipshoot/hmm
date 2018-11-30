@@ -4,6 +4,8 @@ namespace Hmm.Api.Areas.HmmNote.Models
 {
     public class ApiNoteCatalog : ApiEntity
     {
+        public int Id { get; set; }
+
         public string Name { get; set; }
 
         public ApiNoteRender Render { get; set; }
