@@ -12,5 +12,7 @@ namespace Hmm.Api.Areas.GasLogNote.Models
         public GasDiscountType DiscountType { get; set; }
 
         public decimal Amount { get; set; }
+
+        public bool IsActive { get; set; }
     }
 }

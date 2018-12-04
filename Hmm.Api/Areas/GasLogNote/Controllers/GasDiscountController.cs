@@ -8,6 +8,7 @@ using Hmm.Utility.Validation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Hmm.Api.Areas.GasLogNote.Controllers
@@ -31,23 +32,30 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
         }
 
         // GET api/automobiles/gaslogs/discounts/
-        public IActionResult Get()
+        [HttpGet]
+        public IActionResult GetDiscountsForAuthor(int authorId, bool getAll = false)
         {
-            var discounts = _discountManager.GetDiscounts().ToList();
-            var config = ApiDomainEntityConvertHelper.DomainEntity2Api();
-            var mapper = config.CreateMapper();
-            var apiDiscountInfos = mapper.Map<ApiDiscountInfo>(discounts);
-
-            return Ok(apiDiscountInfos);
+            try
+            {
+                var discounts = getAll
+                    ? _discountManager.GetDiscounts().Where(d => d.Author.Id == authorId).ToList()
+                    : _discountManager.GetDiscounts().Where(d => d.Author.Id == authorId && d.IsActive).ToList();
+                var apiDiscountInfos = discounts.Select(d => _mapper.Map<ApiDiscountInfo>(d)).ToList();
+                return Ok(apiDiscountInfos);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         // GET api/automobiles/gaslogs/discounts/1
         [HttpGet("{id}")]
-        public IActionResult Get(int discountId)
+        public IActionResult Get(int id)
         {
             try
             {
-                var discount = _discountManager.GetDiscounts().FirstOrDefault(d => d.Id == discountId);
+                var discount = _discountManager.GetDiscounts().FirstOrDefault(d => d.Id == id);
                 if (discount == null)
                 {
                     return StatusCode(StatusCodes.Status404NotFound);
@@ -62,15 +70,15 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
             }
         }
 
-        // GET api/automobiles/gaslogs/discounts/1
+        // post api/automobiles/gaslogs/discounts?authorId=1
         [HttpPost]
-        public IActionResult Post(int authorId, [FromBody] ApiDiscountForCreate apiDiscount)
+        public IActionResult Post(int authorId, [FromBody] ApiDiscountForCreate[] apiDiscounts)
         {
             try
             {
-                if (apiDiscount == null)
+                if (apiDiscounts == null || !apiDiscounts.Any())
                 {
-                    return BadRequest(new ApiBadRequestResponse("null discount found"));
+                    return BadRequest(new ApiBadRequestResponse("null or empty discounts found"));
                 }
 
                 var author = _userManager.GetEntities().FirstOrDefault(u => u.Id == authorId);
@@ -79,17 +87,22 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
                     return BadRequest(new ApiBadRequestResponse("Cannot find author in data source"));
                 }
 
-                var discount = _mapper.Map<GasDiscount>(apiDiscount);
-                discount.Author = author;
-                var newDiscount = _discountManager.Create(discount);
-                if (newDiscount == null)
+                var newDiscounts = new List<ApiDiscountInfo>();
+                foreach (var apiDiscount in apiDiscounts)
                 {
-                    return StatusCode(StatusCodes.Status500InternalServerError);
+                    var discount = _mapper.Map<GasDiscount>(apiDiscount);
+                    discount.Author = author;
+                    var newDiscount = _discountManager.Create(discount);
+                    if (newDiscount == null)
+                    {
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                    }
+
+                    var apiNewDiscount = _mapper.Map<ApiDiscountInfo>(newDiscount);
+                    newDiscounts.Add(apiNewDiscount);
                 }
 
-                var apiNewDiscount = _mapper.Map<ApiDiscountInfo>(newDiscount);
-
-                return Ok(apiNewDiscount);
+                return Ok(newDiscounts);
             }
             catch (Exception)
             {
@@ -129,5 +142,31 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
             }
         }
 
+        // DELETE api/automobiles/gaslogs/discount/1
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                var discount = _discountManager.GetDiscounts().FirstOrDefault(d => d.Id == id);
+                if (discount == null)
+                {
+                    return BadRequest(new ApiBadRequestResponse($"Cannot find discount with id : {id}"));
+                }
+
+                discount.IsActive = false;
+                var updatedDiscount = _discountManager.Update(discount);
+                if (updatedDiscount == null)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError);
+                }
+
+                return Ok(true);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
     }
 }
