@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace Hmm.Api.Areas.GasLogNote.Controllers
 {
-    [Route("api/authors/{authorId}/gaslogs")]
+    [Route("api/automobile/gaslogs")]
     [ValidationModel]
     public class GasLogController : Controller
     {
@@ -23,9 +23,9 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
             _gasLogManager = gasLogManager;
         }
 
-        // GET api/gaslogs/5
+        // GET api/automobiles/gaslogs/5
         [HttpGet("{id}")]
-        public IActionResult Get(int authorId, int gasLogId)
+        public IActionResult Get(int gasLogId)
         {
             var gasLog = _gasLogManager.FindGasLog(gasLogId);
             var config = ApiDomainEntityConvertHelper.DomainEntity2Api();
@@ -35,7 +35,7 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
             return Ok(apiGasLog);
         }
 
-        // POST api/gaslogs
+        // POST api/automobiles/gaslogs
         [HttpPost]
         public IActionResult Post(int authorId, [FromBody] ApiGasLogForCreation apiGasLog)
         {
@@ -65,14 +65,38 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
             }
         }
 
-        // PUT api/gaslogs/5
+        // PUT api/automobiles/gaslogs/5
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody]string gasLog)
+        public IActionResult Put(int id, [FromBody]ApiGasLogForUpdate apiGasLog)
         {
-            throw new NotImplementedException();
+            //if (apiGasLog == null)
+            //{
+            //    return BadRequest(new ApiBadRequestResponse("null gas log found"));
+            //}
+
+            //var config = ApiDomainEntityConvertHelper.Api2DomainEntity();
+            //var mapper = config.CreateMapper();
+            //var gasLog = mapper.Map<GasLog>(apiGasLog);
+            //var result = _gasLogManager.CreateLogForAuthor(authorId, gasLog);
+            //switch (result)
+            //{
+            //    case null when _gasLogManager.ProcessResult.MessageList.Contains("Cannot found author with Id"):
+            //        return NotFound();
+
+            //    case null:
+            //        throw new Exception(_gasLogManager.ProcessResult.MessageList.FirstOrDefault());
+
+            //    default:
+            //        config = ApiDomainEntityConvertHelper.DomainEntity2Api();
+            //        mapper = config.CreateMapper();
+            //        var newGasLog = mapper.Map<ApiGasLog>(result);
+
+            //        return Ok(new ApiOkResponse(newGasLog));
+            //}
+            return Ok();
         }
 
-        // DELETE api/gaslogs/5
+        // DELETE api/automobiles/gaslogs/5
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {

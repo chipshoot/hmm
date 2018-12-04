@@ -22,7 +22,7 @@ namespace VehicleInfoManager.Tests
         public GasLogManagerTests()
         {
             InsertSeedRecords(isSetupDiscount: true, isSetupAutomobile: true);
-            var noteManager = new HmmNoteManager(NoteStorage, LookupRepo, new NoteValidator(NoteStorage));
+            var noteManager = new HmmNoteManager(NoteStorage, new NoteValidator(NoteStorage));
             _carManager = new AutomobileManager(noteManager, LookupRepo);
             _discountManager = new DiscountManager(noteManager, LookupRepo);
             _manager = new GasLogManager(noteManager, _carManager, _discountManager, LookupRepo);

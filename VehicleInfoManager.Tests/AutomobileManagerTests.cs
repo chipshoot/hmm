@@ -35,7 +35,7 @@ namespace VehicleInfoManager.Tests
             };
 
             // Act
-            var savedCar = _manager.CreateAutomobile(car);
+            var savedCar = _manager.Create(car);
 
             // Assert
             Assert.True(_manager.ProcessResult.Success);
@@ -65,7 +65,7 @@ namespace VehicleInfoManager.Tests
 
             // Act
             car.Brand = "AutoBack1";
-            var savedCar = _manager.UpdateAutomobile(car);
+            var savedCar = _manager.Update(car);
 
             // Assert
             Assert.True(_manager.ProcessResult.Success);
@@ -107,7 +107,7 @@ namespace VehicleInfoManager.Tests
 
         private void SetupEnvironment(Automobile car)
         {
-            _manager.CreateAutomobile(car);
+            _manager.Create(car);
         }
     }
 }

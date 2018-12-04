@@ -35,7 +35,7 @@ namespace VehicleInfoManager.GasLogMan
             return cars;
         }
 
-        public Automobile CreateAutomobile(Automobile car)
+        public Automobile Create(Automobile car)
         {
             Guard.Against<ArgumentNullException>(car == null, nameof(car));
 
@@ -53,36 +53,35 @@ namespace VehicleInfoManager.GasLogMan
             car.Catalog = carCatalog;
 
             SetEntityContent(car);
-            var savedCar = _noteManager.Create(car);
+            var savedNote = _noteManager.Create(car);
 
             if (!_noteManager.ProcessResult.Success)
             {
-                ProcessResult.Rest();
-                ProcessResult.Success = false;
-                ProcessResult.MessageList.AddRange(_noteManager.ProcessResult.MessageList);
+                ProcessResult.PropagandaResult(_noteManager.ProcessResult);
                 return null;
             }
 
-            return savedCar as Automobile;
+            var savedCar = GetEntityFromNote(savedNote);
+            return savedCar;
         }
 
-        public Automobile UpdateAutomobile(Automobile car)
+        public Automobile Update(Automobile car)
         {
             Guard.Against<ArgumentNullException>(car == null, nameof(car));
 
             // ReSharper disable once PossibleNullReferenceException
             SetEntityContent(car);
-            var savedCar = _noteManager.Update(car);
+            
+            var savedNote = _noteManager.Update(car);
 
             if (!_noteManager.ProcessResult.Success)
             {
-                ProcessResult.Rest();
-                ProcessResult.Success = false;
-                ProcessResult.MessageList.AddRange(_noteManager.ProcessResult.MessageList);
+                ProcessResult.PropagandaResult(_noteManager.ProcessResult);
                 return null;
             }
 
-            return savedCar as Automobile;
+            var savedCar = GetEntityFromNote(savedNote);
+            return savedCar;
         }
 
         public ProcessingResult ProcessResult { get; } = new ProcessingResult();

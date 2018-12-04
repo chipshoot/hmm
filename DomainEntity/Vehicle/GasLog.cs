@@ -1,4 +1,5 @@
 ﻿using DomainEntity.Misc;
+using Hmm.Contract;
 using Hmm.Utility.Currency;
 using Hmm.Utility.MeasureUnit;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace DomainEntity.Vehicle
         public GasLog()
         {
             // set catalog and render for gas log
-            Subject = "GasLog";
+            Subject = AppConstant.GasLogRecordSubject;
         }
 
         public Automobile Car { get; set; }

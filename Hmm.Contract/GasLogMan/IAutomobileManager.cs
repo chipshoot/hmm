@@ -8,9 +8,9 @@ namespace Hmm.Contract.GasLogMan
     {
         IEnumerable<Automobile> GetAutomobiles();
 
-        Automobile CreateAutomobile(Automobile car);
+        Automobile Create(Automobile car);
 
-        Automobile UpdateAutomobile(Automobile car);
+        Automobile Update(Automobile car);
 
         ProcessingResult ProcessResult { get; }
     }

@@ -2,11 +2,11 @@
 using Hmm.Contract.Core;
 using Hmm.Core.Manager.Validation;
 using Hmm.Utility.Dal.DataStore;
-using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Linq;
 
 namespace Hmm.Core.Manager
@@ -16,18 +16,15 @@ namespace Hmm.Core.Manager
         #region private fields
 
         private readonly IDataStore<HmmNote> _noteStorage;
-        private readonly IEntityLookup _lookup;
         private readonly NoteValidator _validator;
 
         #endregion private fields
 
-        public HmmNoteManager(IDataStore<HmmNote> storage, IEntityLookup lookup, NoteValidator validator)
+        public HmmNoteManager(IDataStore<HmmNote> storage, NoteValidator validator)
         {
             Guard.Against<ArgumentNullException>(storage == null, nameof(storage));
-            Guard.Against<ArgumentNullException>(lookup == null, nameof(lookup));
             Guard.Against<ArgumentNullException>(validator == null, nameof(validator));
             _noteStorage = storage;
-            _lookup = lookup;
             _validator = validator;
         }
 
@@ -57,7 +54,10 @@ namespace Hmm.Core.Manager
 
             var xmlContent = GetNoteContent(note, true);
             note.Content = xmlContent.ToString(SaveOptions.DisableFormatting);
-            var ret = _noteStorage.Update(note);
+
+            // make sure not update note which get cached in current session
+            var adjustNote = GetCachedNote(note);
+            var ret = _noteStorage.Update(adjustNote);
             if (ret == null)
             {
                 ProcessResult.PropagandaResult(_noteStorage.ProcessMessage);
@@ -68,7 +68,7 @@ namespace Hmm.Core.Manager
 
         public HmmNote GetNoteById(int id)
         {
-            var note = _lookup.GetEntity<HmmNote>(id);
+            var note = GetNotes().FirstOrDefault(n => n.Id == id);
             return note;
         }
 
@@ -114,6 +114,35 @@ namespace Hmm.Core.Manager
             }
 
             return xml;
+        }
+
+        /// <summary>
+        /// The method is used to mapped changed note to cached note in current context to avoid
+        /// data source throw exception of already getting tracking note with same id
+        /// </summary>
+        /// <param name="note">The note need to be updated</param>
+        /// <returns>
+        /// If there is cached note, return it with updated content, otherwise return current note
+        /// </returns>
+        private HmmNote GetCachedNote(HmmNote note)
+        {
+            if (note == null)
+            {
+                return null;
+            }
+
+            var cachedNote = _noteStorage.GetEntities().FirstOrDefault(n => n.Id == note.Id);
+            if (cachedNote == null)
+            {
+                return note;
+            }
+
+            cachedNote.Subject = note.Subject;
+            cachedNote.Content = note.Content;
+            cachedNote.Catalog = note.Catalog;
+            cachedNote.LastModifiedDate = note.LastModifiedDate;
+
+            return cachedNote;
         }
     }
 }

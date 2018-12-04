@@ -1,13 +1,10 @@
 ﻿using Hmm.Api.Models;
-using System;
 using System.Collections.Generic;
 
 namespace Hmm.Api.Areas.GasLogNote.Models
 {
-    public class ApiGasLogForCreation : ApiEntity
+    public class ApiGasLogForUpdate : ApiEntity
     {
-        public DateTime CreateDate { get; set; }
-
         public float Distance { get; set; }
 
         public float Gas { get; set; }

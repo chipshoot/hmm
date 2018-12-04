@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
 using DomainEntity.Misc;
 using DomainEntity.User;
+using DomainEntity.Vehicle;
+using Hmm.Api.Areas.GasLogNote.Models;
 using Hmm.Api.Areas.HmmNote.Models;
+using Hmm.Utility.Currency;
 
 namespace Hmm.Api.Models
 {
@@ -26,6 +29,17 @@ namespace Hmm.Api.Models
             CreateMap<ApiNoteCatalogForCreate, NoteCatalog>();
             CreateMap<ApiNoteCatalogForUpdate, NoteCatalog>();
             CreateMap<NoteCatalog, ApiNoteCatalogForUpdate>();
+
+            // setup gas discount mapping
+            CreateMap<ApiDiscountForCreate, GasDiscount>()
+                .ForMember(d => d.Amount, opt => opt.MapFrom(src => new Money(src.Amount, CurrencyCodeType.Cad)));
+            CreateMap<ApiDiscountForUpdate, GasDiscount>()
+                .ForMember(d => d.Amount, opt => opt.MapFrom(src => new Money(src.Amount, CurrencyCodeType.Cad)));
+            CreateMap<GasDiscount, ApiDiscountInfo>()
+                .ForMember(d => d.Amount, opt => opt.MapFrom(s => s.Amount.Amount));
+            CreateMap<ApiAutomobile, Automobile>();
+            CreateMap<ApiAutomobileForCreate, Automobile>();
+            CreateMap<Automobile, ApiAutomobile>();
         }
     }
 }

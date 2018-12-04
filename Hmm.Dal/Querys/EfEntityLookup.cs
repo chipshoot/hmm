@@ -57,7 +57,9 @@ namespace Hmm.Dal.Querys
             }
             else if (typeof(T) == typeof(HmmNote))
             {
-                entities = _dataContext.Notes.Cast<T>().ToList();
+                entities = _dataContext.Notes
+                    .Include(n=>n.Author).Cast<T>()
+                    .ToList();
             }
             else if (typeof(T) == typeof(NoteCatalog))
             {

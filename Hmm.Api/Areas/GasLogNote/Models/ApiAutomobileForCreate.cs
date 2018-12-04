@@ -1,15 +1,9 @@
-﻿using DomainEntity.Misc;
-using Hmm.Contract;
+﻿using Hmm.Api.Models;
 
-namespace DomainEntity.Vehicle
+namespace Hmm.Api.Areas.GasLogNote.Models
 {
-    public class Automobile : HmmNote
+    public class ApiAutomobileForCreate : ApiEntity
     {
-        public Automobile()
-        {
-            Subject = AppConstant.AutoMobileRecordSubject;
-        }
-
         public int MeterReading { get; set; }
 
         public string Brand { get; set; }

@@ -37,7 +37,7 @@ namespace VehicleInfoManager.Tests
             };
 
             // Act
-            var savedDisc = _manager.CreateDiscount(discount);
+            var savedDisc = _manager.Create(discount);
 
             // Assert
             Assert.NotNull(savedDisc);
@@ -55,7 +55,7 @@ namespace VehicleInfoManager.Tests
 
             // Act
             discount.Program = "Petro-Canada";
-            var savedDiscount = _manager.UpdateDiscount(discount);
+            var savedDiscount = _manager.Update(discount);
 
             // Assert
             Assert.True(_manager.ProcessResult.Success);
@@ -129,7 +129,7 @@ namespace VehicleInfoManager.Tests
                 Comment = "Test Discount",
                 IsActive = true,
             };
-            _manager.CreateDiscount(discount);
+            _manager.Create(discount);
             discounts.Add(discount);
 
             discount = new GasDiscount
@@ -142,7 +142,7 @@ namespace VehicleInfoManager.Tests
                 IsActive = true,
             };
 
-            _manager.CreateDiscount(discount);
+            _manager.Create(discount);
             discounts.Add(discount);
 
             NoTrackingEntities();
@@ -161,7 +161,7 @@ namespace VehicleInfoManager.Tests
             var user = UserStorage.GetEntities().FirstOrDefault();
             var carMan = new AutomobileManager(NoteManager, LookupRepo);
 
-            carMan.CreateAutomobile(new Automobile
+            carMan.Create(new Automobile
             {
                 Author = user,
                 Brand = "AutoBack",

@@ -5,7 +5,6 @@ using Hmm.Contract;
 using Hmm.Contract.Core;
 using Hmm.Contract.GasLogMan;
 using Hmm.Utility.Currency;
-using Hmm.Utility.Dal.Exceptions;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
@@ -95,8 +94,7 @@ namespace VehicleInfoManager.GasLogMan
             return infos;
         }
 
-
-        public GasDiscount CreateDiscount(GasDiscount discount)
+        public GasDiscount Create(GasDiscount discount)
         {
             Guard.Against<ArgumentNullException>(discount == null, nameof(discount));
 
@@ -114,36 +112,34 @@ namespace VehicleInfoManager.GasLogMan
             discount.Catalog = discountCatalog;
 
             SetEntityContent(discount);
-            var savedDiscount = _noteManager.Create(discount);
+            var savedNote = _noteManager.Create(discount);
 
             if (!_noteManager.ProcessResult.Success)
             {
-                ProcessResult.Rest();
-                ProcessResult.Success = false;
-                ProcessResult.MessageList.AddRange(_noteManager.ProcessResult.MessageList);
+                ProcessResult.PropagandaResult(_noteManager.ProcessResult);
                 return null;
             }
 
-            return savedDiscount as GasDiscount;
+            var savedDiscount = GetEntityFromNote(savedNote);
+            return savedDiscount;
         }
 
-        public GasDiscount UpdateDiscount(GasDiscount discount)
+        public GasDiscount Update(GasDiscount discount)
         {
             Guard.Against<ArgumentNullException>(discount == null, nameof(discount));
 
             // ReSharper disable once PossibleNullReferenceException
             SetEntityContent(discount);
-            var savedDiscount = _noteManager.Update(discount);
+            var savedNote = _noteManager.Update(discount);
 
             if (!_noteManager.ProcessResult.Success)
             {
-                ProcessResult.Rest();
-                ProcessResult.Success = false;
-                ProcessResult.MessageList.AddRange(_noteManager.ProcessResult.MessageList);
+                ProcessResult.PropagandaResult(_noteManager.ProcessResult);
                 return null;
             }
 
-            return savedDiscount as GasDiscount;
+            var savedDiscount = GetEntityFromNote(savedNote);
+            return savedDiscount;
         }
 
         public ProcessingResult ProcessResult { get; } = new ProcessingResult();
@@ -220,8 +216,7 @@ namespace VehicleInfoManager.GasLogMan
             }
             catch (Exception ex)
             {
-                ProcessResult.Success = false;
-                ProcessResult.AddMessage(ex.GetAllMessage(), true);
+                ProcessResult.WrapException(ex);
                 noteXml = null;
                 return false;
             }

@@ -21,7 +21,7 @@ namespace Hmm.Core.Tests
         {
             InsertSeedRecords();
             _user = UserStorage.GetEntities().FirstOrDefault();
-            _manager = new HmmNoteManager(NoteStorage, LookupRepo, new NoteValidator(NoteStorage));
+            _manager = new HmmNoteManager(NoteStorage, new NoteValidator(NoteStorage));
         }
 
         [Fact]

@@ -1,5 +1,7 @@
-﻿using DomainEntity.Enumerations;
+﻿using System;
+using DomainEntity.Enumerations;
 using DomainEntity.Misc;
+using Hmm.Contract;
 using Hmm.Utility.Currency;
 
 namespace DomainEntity.Vehicle
@@ -14,7 +16,7 @@ namespace DomainEntity.Vehicle
     {
         public GasDiscount()
         {
-            Subject = "Discount";
+            Subject = AppConstant.GasDiscountRecordSubject;
         }
 
         public string Program { get; set; }

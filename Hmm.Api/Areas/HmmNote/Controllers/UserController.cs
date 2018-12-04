@@ -55,7 +55,7 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
 
                 if (newUser == null)
                 {
-                    return BadRequest();
+                    return BadRequest(new ApiBadRequestResponse("null user found"));
                 }
 
                 var apiNewUser = _mapper.Map<User, ApiUser>(newUser);
@@ -74,7 +74,6 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
         {
             try
             {
-
                 var successful = _userManager.ResetPassword(1, newPassword);
 
                 if (!successful)

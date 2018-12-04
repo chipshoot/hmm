@@ -48,6 +48,8 @@ namespace Hmm.Api
             services.AddScoped<INoteRenderManager, NoteRenderManager>();
             services.AddScoped<INoteCatalogManager, NoteCatalogManager>();
             services.AddScoped<IGasLogManager, GasLogManager>();
+            services.AddScoped<IAutomobileManager, AutomobileManager>();
+            services.AddScoped<IDiscountManager, DiscountManager>();
             services.AddScoped<UserValidator, UserValidator>();
             services.AddScoped<NoteValidator, NoteValidator>();
             services.AddScoped<NoteRenderValidator, NoteRenderValidator>();

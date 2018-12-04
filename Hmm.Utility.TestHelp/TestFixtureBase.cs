@@ -248,7 +248,7 @@ namespace Hmm.Utility.TestHelp
                 var user = LookupRepo.GetEntities<User>().OrderBy(u => u.Id).FirstOrDefault();
                 discount.Author = user;
 
-                discountMan.CreateDiscount(discount);
+                discountMan.Create(discount);
             }
 
             var autoMan = new AutomobileManager(NoteManager, LookupRepo);
@@ -257,7 +257,7 @@ namespace Hmm.Utility.TestHelp
                 var user = LookupRepo.GetEntities<User>().OrderBy(u => u.Id).FirstOrDefault();
                 car.Author = user;
 
-                autoMan.CreateAutomobile(car);
+                autoMan.Create(car);
             }
 
             // ReSharper restore PossibleNullReferenceException
@@ -480,7 +480,7 @@ namespace Hmm.Utility.TestHelp
             NoteStorage = new NoteStorage(uow, LookupRepo, dateProvider);
             RenderStorage = new NoteRenderStorage(uow, LookupRepo, dateProvider);
             CatalogStorage = new NoteCatalogStorage(uow, LookupRepo, dateProvider);
-            NoteManager = new HmmNoteManager(NoteStorage, LookupRepo, new NoteValidator(NoteStorage));
+            NoteManager = new HmmNoteManager(NoteStorage, new NoteValidator(NoteStorage));
         }
     }
 }

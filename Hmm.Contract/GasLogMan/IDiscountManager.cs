@@ -25,9 +25,9 @@ namespace Hmm.Contract.GasLogMan
 
         GasDiscount GetDiscountById(int id);
 
-        GasDiscount CreateDiscount(GasDiscount discount);
+        GasDiscount Create(GasDiscount discount);
 
-        GasDiscount UpdateDiscount(GasDiscount discount);
+        GasDiscount Update(GasDiscount discount);
 
         ProcessingResult ProcessResult { get; }
     }
