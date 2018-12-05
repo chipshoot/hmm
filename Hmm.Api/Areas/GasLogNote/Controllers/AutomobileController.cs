@@ -83,11 +83,11 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
 
         // POST api/automobiles
         [HttpPost]
-        public IActionResult Post(int authorId, [FromBody] ApiAutomobileForCreate apiCar)
+        public IActionResult Post(int authorId, [FromBody] ApiAutomobileForCreate[] apiCars)
         {
-            if (apiCar == null)
+            if (apiCars == null || !apiCars.Any())
             {
-                return BadRequest(new ApiBadRequestResponse("null automobile found"));
+                return BadRequest(new ApiBadRequestResponse("null or empty automobile list found"));
             }
 
             try
@@ -98,17 +98,22 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
                     return BadRequest(new ApiBadRequestResponse($"Cannot find user with id : {authorId}"));
                 }
 
-                var car = _mapper.Map<Automobile>(apiCar);
-                car.Author = user;
-                var newCar = _automobileManager.Create(car);
-
-                if (newCar == null)
+                var newApiCars = new List<ApiAutomobile>();
+                foreach (var apiCar in apiCars)
                 {
-                    return BadRequest(new ApiBadRequestResponse("Cannot create automobile"));
-                }
+                    var car = _mapper.Map<Automobile>(apiCar);
+                    car.Author = user;
+                    var newCar = _automobileManager.Create(car);
 
-                var apiNewCar = _mapper.Map<ApiAutomobile>(newCar);
-                return Ok(apiNewCar);
+                    if (newCar == null)
+                    {
+                        return BadRequest(new ApiBadRequestResponse("Cannot create automobile"));
+                    }
+
+                    var apiNewCar = _mapper.Map<ApiAutomobile>(newCar);
+                    newApiCars.Add(apiNewCar);
+                }
+                return Ok(newApiCars);
             }
             catch (Exception)
             {

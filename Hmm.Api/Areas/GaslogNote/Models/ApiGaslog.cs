@@ -19,7 +19,7 @@ namespace Hmm.Api.Areas.GasLogNote.Models
 
         public decimal Price { get; set; }
 
-        public List<ApiDiscountInfo> Discounts { get; set; }
+        public List<ApiDiscountInfo> DiscountInfos { get; set; }
 
         public string GasStation { get; set; }
 

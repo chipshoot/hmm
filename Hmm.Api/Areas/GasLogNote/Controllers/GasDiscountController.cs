@@ -40,7 +40,7 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
                 var discounts = getAll
                     ? _discountManager.GetDiscounts().Where(d => d.Author.Id == authorId).ToList()
                     : _discountManager.GetDiscounts().Where(d => d.Author.Id == authorId && d.IsActive).ToList();
-                var apiDiscountInfos = discounts.Select(d => _mapper.Map<ApiDiscountInfo>(d)).ToList();
+                var apiDiscountInfos = discounts.Select(d => _mapper.Map<ApiDiscount>(d)).ToList();
                 return Ok(apiDiscountInfos);
             }
             catch (Exception)
@@ -61,7 +61,7 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
                     return StatusCode(StatusCodes.Status404NotFound);
                 }
 
-                var apiDiscount = _mapper.Map<ApiDiscountInfo>(discount);
+                var apiDiscount = _mapper.Map<ApiDiscount>(discount);
                 return Ok(apiDiscount);
             }
             catch (Exception)
@@ -87,7 +87,7 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
                     return BadRequest(new ApiBadRequestResponse("Cannot find author in data source"));
                 }
 
-                var newDiscounts = new List<ApiDiscountInfo>();
+                var newDiscounts = new List<ApiDiscount>();
                 foreach (var apiDiscount in apiDiscounts)
                 {
                     var discount = _mapper.Map<GasDiscount>(apiDiscount);
@@ -98,7 +98,7 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
                         return StatusCode(StatusCodes.Status500InternalServerError);
                     }
 
-                    var apiNewDiscount = _mapper.Map<ApiDiscountInfo>(newDiscount);
+                    var apiNewDiscount = _mapper.Map<ApiDiscount>(newDiscount);
                     newDiscounts.Add(apiNewDiscount);
                 }
 
@@ -133,7 +133,7 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
                     return BadRequest(new ApiBadRequestResponse("Cannot update gas discount"));
                 }
 
-                var newApiDiscount = _mapper.Map<ApiDiscountInfo>(newDiscount);
+                var newApiDiscount = _mapper.Map<ApiDiscount>(newDiscount);
                 return Ok(new ApiOkResponse(newApiDiscount));
             }
             catch (Exception)

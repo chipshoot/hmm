@@ -30,7 +30,7 @@ namespace Hmm.Api.Areas.GasLogNote.Models
                     .ForMember(dest => dest.Price, opt => opt.MapFrom(src => new Money(src.Price)))
                     .ForMember(dest => dest.LastModifiedDate, opt => opt.MapFrom(src => src.CreateDate));
 
-                cfg.CreateMap<ApiDiscountInfo, GasDiscountInfo>()
+                cfg.CreateMap<ApiDiscount, GasDiscountInfo>()
                     .ForMember(dest => dest.Amount, opt => opt.MapFrom(src => new Money(src.Amount)));
             });
 
@@ -47,7 +47,7 @@ namespace Hmm.Api.Areas.GasLogNote.Models
                     .ForMember(dest => dest.Distance, opt => opt.MapFrom(src => src.Distance.TotalKilometre))
                     .ForMember(dest => dest.Gas, opt => opt.MapFrom(src => src.Gas.TotalLiter))
                     .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price.Amount));
-                cfg.CreateMap<GasDiscountInfo, ApiDiscountInfo>()
+                cfg.CreateMap<GasDiscountInfo, ApiDiscount>()
                     .ForMember(dest => dest.Amount, opt => opt.MapFrom(src => src.Amount));
             });
 

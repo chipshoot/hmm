@@ -2,7 +2,7 @@
 {
     public static class AppConstant
     {
-        public const string GasLogCatalogName = "Gas Log";
+        public const string GasLogCatalogName = "GasLog";
 
         public const string AutoMobileRecordSubject = "Automobile";
 

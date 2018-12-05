@@ -5,6 +5,7 @@ using DomainEntity.Vehicle;
 using Hmm.Api.Areas.GasLogNote.Models;
 using Hmm.Api.Areas.HmmNote.Models;
 using Hmm.Utility.Currency;
+using Hmm.Utility.MeasureUnit;
 
 namespace Hmm.Api.Models
 {
@@ -35,11 +36,25 @@ namespace Hmm.Api.Models
                 .ForMember(d => d.Amount, opt => opt.MapFrom(src => new Money(src.Amount, CurrencyCodeType.Cad)));
             CreateMap<ApiDiscountForUpdate, GasDiscount>()
                 .ForMember(d => d.Amount, opt => opt.MapFrom(src => new Money(src.Amount, CurrencyCodeType.Cad)));
-            CreateMap<GasDiscount, ApiDiscountInfo>()
+            CreateMap<GasDiscount, ApiDiscount>()
+                .ForMember(d => d.Amount, opt => opt.MapFrom(s => s.Amount.Amount));
+            CreateMap<GasDiscountInfo, ApiDiscountInfo>()
+                .ForMember(d => d.DiscountId, opt => opt.MapFrom(s => s.Program.Id))
                 .ForMember(d => d.Amount, opt => opt.MapFrom(s => s.Amount.Amount));
             CreateMap<ApiAutomobile, Automobile>();
             CreateMap<ApiAutomobileForCreate, Automobile>();
             CreateMap<Automobile, ApiAutomobile>();
+            CreateMap<ApiGasLogForCreation, GasLog>()
+                .ForMember(d=>d.Distance, opt=>opt.MapFrom(s=>Dimension.FromKilometre(s.Distance)))
+                .ForMember(d=>d.Gas, opt=>opt.MapFrom(s=>Volume.FromLiter(s.Gas)))
+                .ForMember(d=>d.Price, opt=>opt.MapFrom(s=>new Money(s.Price)))
+                .ForMember(d => d.Discounts, opt => opt.Ignore())
+                .ForMember(d => d.Car, opt => opt.Ignore());
+            CreateMap<GasLog, ApiGasLog>()
+                .ForMember(d => d.Distance, opt => opt.MapFrom(s => s.Distance.TotalKilometre))
+                .ForMember(d => d.Gas, opt => opt.MapFrom(s => s.Gas.TotalLiter))
+                .ForMember(d => d.Price, opt => opt.MapFrom(s => s.Price.Amount))
+                .ForMember(d => d.DiscountInfos, opt => opt.MapFrom(s => s.Discounts));
         }
     }
 }
