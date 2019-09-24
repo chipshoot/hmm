@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -13,21 +13,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Querys\**" />
+    <Compile Remove="Queries\**" />
     <Compile Remove="Validation\**" />
-    <EmbeddedResource Remove="Querys\**" />
+    <EmbeddedResource Remove="Queries\**" />
     <EmbeddedResource Remove="Validation\**" />
-    <None Remove="Querys\**" />
+    <None Remove="Queries\**" />
     <None Remove="Validation\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="Querys\EfEntityLookup.cs" />
+    <Compile Include="Queries\EfEntityLookup.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentValidation" Version="8.0.101" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.4" />
+    <PackageReference Include="FluentValidation" Version="8.4.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.Design" Version="1.1.6" />
   </ItemGroup>
 

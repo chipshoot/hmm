@@ -1,5 +1,4 @@
-﻿using DomainEntity.Misc;
-using Hmm.Utility.Dal.DataEntity;
+﻿using Hmm.Utility.Dal.DataEntity;
 using Hmm.Utility.Misc;
 using System.Collections.Generic;
 

@@ -6,7 +6,7 @@ using Hmm.Contract.GasLogMan;
 using Hmm.Core.Manager;
 using Hmm.Core.Manager.Validation;
 using Hmm.Dal.Data;
-using Hmm.Dal.Querys;
+using Hmm.Dal.Queries;
 using Hmm.Dal.Storage;
 using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.DataStore;
@@ -55,7 +55,7 @@ namespace Hmm.Api
             services.AddScoped<NoteRenderValidator, NoteRenderValidator>();
             services.AddScoped<NoteCatalogValidator, NoteCatalogValidator>();
             services.AddMvc();
-            services.AddAutoMapper();
+            services.AddAutoMapper(typeof(Startup));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

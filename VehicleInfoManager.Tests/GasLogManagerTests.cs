@@ -39,7 +39,7 @@ namespace VehicleInfoManager.Tests
             {
                 Author = user,
                 Car = car,
-                GasStation = "Costco",
+                Station = "Costco",
                 Gas = Volume.FromLiter(40),
                 Price = new Money(40.0),
                 Distance = Dimension.FromKilometre(300),
@@ -98,7 +98,7 @@ namespace VehicleInfoManager.Tests
 
             // Assert
             Assert.NotNull(gasLog);
-            Assert.Equal("Costco", gasLog.GasStation);
+            Assert.Equal("Costco", gasLog.Station);
             Assert.NotNull(gasLog.Car);
             Assert.NotNull(gasLog.Discounts);
             Assert.True(gasLog.Discounts.Any());
@@ -116,7 +116,7 @@ namespace VehicleInfoManager.Tests
             {
                 Author = user,
                 Car = car,
-                GasStation = "Costco",
+                Station = "Costco",
                 Gas = Volume.FromLiter(40),
                 Price = new Money(40.0),
                 Distance = Dimension.FromKilometre(300),

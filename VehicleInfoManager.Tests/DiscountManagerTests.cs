@@ -181,7 +181,7 @@ namespace VehicleInfoManager.Tests
                 Car = carMan.GetAutomobiles().FirstOrDefault(),
                 Distance = Dimension.FromKilometre(400),
                 Gas = Volume.FromLiter(41),
-                GasStation = "Costco",
+                Station = "Costco",
                 Price = new Money(40),
                 Discounts = new List<GasDiscountInfo>
                 {

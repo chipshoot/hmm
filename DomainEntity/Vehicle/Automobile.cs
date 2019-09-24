@@ -1,5 +1,4 @@
 ﻿using DomainEntity.Misc;
-using Hmm.Contract;
 
 namespace DomainEntity.Vehicle
 {

@@ -5,7 +5,7 @@ using DomainEntity.Vehicle;
 using Hmm.Contract.Core;
 using Hmm.Core.Manager;
 using Hmm.Dal.Data;
-using Hmm.Dal.Querys;
+using Hmm.Dal.Queries;
 using Hmm.Dal.Storage;
 using Hmm.Utility.Currency;
 using Hmm.Utility.Dal;

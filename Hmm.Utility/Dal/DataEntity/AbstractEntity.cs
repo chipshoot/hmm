@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace Hmm.Utility.Dal.DataEntity
+﻿namespace Hmm.Utility.Dal.DataEntity
 {
     /// <summary>
     /// The base class of domain entity
@@ -39,7 +37,7 @@ namespace Hmm.Utility.Dal.DataEntity
         /// </remarks>
         public virtual bool Equals(IGenericEntity<TIdentity> other)
         {
-            if (null == other || !GetType().IsInstanceOfType(other))
+            if (other == null || !GetType().IsInstanceOfType(other))
             {
                 return false;
             }
@@ -56,7 +54,7 @@ namespace Hmm.Utility.Dal.DataEntity
                 return ReferenceEquals(other, this);
             }
 
-            return other.Id.Equals(Id);
+            return other.Id != null && other.Id.Equals(Id);
         }
 
         /// <summary>
@@ -100,7 +98,7 @@ namespace Hmm.Utility.Dal.DataEntity
         /// <returns>
         ///   <c>true</c> if this instance is transient; otherwise, <c>false</c>.
         /// </returns>
-        protected bool IsTransient()
+        private bool IsTransient()
         {
             return Equals(Id, default(TIdentity));
         }

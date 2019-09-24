@@ -1,4 +1,4 @@
-﻿namespace Hmm.Contract
+﻿namespace DomainEntity.Misc
 {
     public static class AppConstant
     {

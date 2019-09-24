@@ -1,7 +1,6 @@
 ﻿using DomainEntity.Misc;
 using DomainEntity.User;
 using DomainEntity.Vehicle;
-using Hmm.Contract;
 using Hmm.Contract.Core;
 using Hmm.Contract.GasLogMan;
 using Hmm.Utility.Currency;
@@ -102,7 +101,7 @@ namespace VehicleInfoManager.GasLogMan
             if (author == null)
             {
                 ProcessResult.Success = false;
-                ProcessResult.AddMessage($"Cannot found author with Id {authorId}");
+                ProcessResult.AddErrorMessage($"Cannot found author with Id {authorId}");
                 return null;
             }
 
@@ -119,7 +118,7 @@ namespace VehicleInfoManager.GasLogMan
                 new XElement("Distance", gasLog.Distance.Measure2Xml(_noteManager.ContentNamespace)),
                 new XElement("Gas", gasLog.Gas.Measure2Xml(_noteManager.ContentNamespace)),
                 new XElement("Price", gasLog.Price.Measure2Xml(_noteManager.ContentNamespace)),
-                new XElement("GasStation", gasLog.GasStation),
+                new XElement("GasStation", gasLog.Station),
                 new XElement("Discounts", "")
             );
 
@@ -129,7 +128,7 @@ namespace VehicleInfoManager.GasLogMan
                 {
                     if (disc.Amount == null || disc.Program == null)
                     {
-                        ProcessResult.AddMessage("Cannot found valid discount information, amount or discount program is missing");
+                        ProcessResult.AddErrorMessage("Cannot found valid discount information, amount or discount program is missing");
                         continue;
                     }
 
@@ -173,7 +172,7 @@ namespace VehicleInfoManager.GasLogMan
                 LastModifiedDate = note.LastModifiedDate,
                 Car = car,
                 Content = note.Content,
-                GasStation = logRoot.Element(ns + "GasStation")?.Value,
+                Station = logRoot.Element(ns + "GasStation")?.Value,
                 Description = note.Description,
                 Distance = Dimension.FromXml(logRoot.Element(ns + "Distance")?.Element(ns + "Dimension")),
                 Gas = Volume.FromXml(logRoot.Element(ns + "Gas")?.Element(ns + "Volume")),

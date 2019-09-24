@@ -20,7 +20,12 @@ namespace Hmm.Utility.Validation
 
             // ReSharper disable once PossibleNullReferenceException
             processResult.Success = false;
-            processResult.MessageList.AddRange(result.Errors.Select(e => $"{e.PropertyName} : {e.ErrorMessage}"));
+            processResult.MessageList.AddRange(result.Errors.Select(e =>
+               new ReturnMessage
+               {
+                   Message = $"{e.PropertyName} : {e.ErrorMessage}",
+                   Type = MessageType.Error
+               }));
             return false;
         }
     }

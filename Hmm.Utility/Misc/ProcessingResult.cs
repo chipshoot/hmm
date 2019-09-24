@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Hmm.Utility.Dal.Exceptions;
+using System;
 using System.Collections.Generic;
-using Hmm.Utility.Dal.Exceptions;
 
 namespace Hmm.Utility.Misc
 {
@@ -9,12 +9,12 @@ namespace Hmm.Utility.Misc
         public ProcessingResult()
         {
             Success = true;
-            MessageList = new List<string>();
+            MessageList = new List<ReturnMessage>();
         }
 
         public bool Success { get; set; }
 
-        public List<string> MessageList { get; }
+        public List<ReturnMessage> MessageList { get; }
 
         public void Rest()
         {
@@ -22,14 +22,14 @@ namespace Hmm.Utility.Misc
             MessageList.Clear();
         }
 
-        public void AddMessage(string message, bool clearOldMessage = false)
+        public void AddErrorMessage(string message, bool clearOldMessage = false)
         {
             if (clearOldMessage)
             {
                 MessageList.Clear();
             }
 
-            MessageList.Add(message);
+            MessageList.Add(new ReturnMessage { Message = message, Type = MessageType.Error });
         }
 
         public void PropagandaResult(ProcessingResult innerResult)
@@ -43,7 +43,7 @@ namespace Hmm.Utility.Misc
         {
             Rest();
             Success = false;
-            AddMessage(ex.GetAllMessage());
+            AddErrorMessage(ex.GetAllMessage());
         }
     }
 }

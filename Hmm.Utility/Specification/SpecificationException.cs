@@ -24,7 +24,7 @@ namespace Hmm.Utility.Specification
         /// </summary>
         /// <param name="errorMessage">The error message.</param>
         /// <param name="innerException">The inner exception.</param>
-        public SpecificationException(string errorMessage, System.Exception innerException)
+        public SpecificationException(string errorMessage, Exception innerException)
             : base(errorMessage, innerException)
         {
         }

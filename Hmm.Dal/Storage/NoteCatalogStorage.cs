@@ -41,7 +41,7 @@ namespace Hmm.Dal.Storage
             if (entity.Id <= 0)
             {
                 ProcessMessage.Success = false;
-                ProcessMessage.AddMessage($"Can not update NoteCatalog with id {entity.Id}", true);
+                ProcessMessage.AddErrorMessage($"Can not update NoteCatalog with id {entity.Id}", true);
                 return null;
             }
 
@@ -51,7 +51,7 @@ namespace Hmm.Dal.Storage
                 var render = PropertyChecking(entity.Render);
                 const string message = "Cannot find default note render.";
                 ProcessMessage.Success = false;
-                ProcessMessage.AddMessage(message, true);
+                ProcessMessage.AddErrorMessage(message, true);
                 entity.Render = render ?? throw new DataSourceException(message);
 
                 UnitOfWork.Update(entity);

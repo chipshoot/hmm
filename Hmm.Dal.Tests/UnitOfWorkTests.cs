@@ -10,7 +10,7 @@ namespace Hmm.Dal.Tests
 {
     public class UnitOfWorkTests : IDisposable
     {
-        private readonly IHmmDataContext _dbcontext;
+        private readonly IHmmDataContext _dbContext;
 
         public UnitOfWorkTests()
         {
@@ -19,15 +19,15 @@ namespace Hmm.Dal.Tests
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 
             var configuration = builder.Build();
-            var connstr = configuration.GetConnectionString("DefaultConnection");
-            var optBuilder = new DbContextOptionsBuilder<HmmDataContext>().UseSqlServer(connstr);
+            var connStr = configuration.GetConnectionString("DefaultConnection");
+            var optBuilder = new DbContextOptionsBuilder<HmmDataContext>().UseSqlServer(connStr);
             var options = optBuilder.Options;
-            _dbcontext = new HmmDataContext(options);
+            _dbContext = new HmmDataContext(options);
         }
 
         public void Dispose()
         {
-            var context = _dbcontext as DbContext;
+            var context = _dbContext as DbContext;
             context?.Dispose();
         }
 
@@ -46,14 +46,14 @@ namespace Hmm.Dal.Tests
                 Salt = "81C70F747E094C05B6EEB4457B3A40D1"
             };
 
-            var uow = new EfUnitOfWork(_dbcontext);
+            var uow = new EfUnitOfWork(_dbContext);
 
             // Act
-            var newusr = uow.Add(usr);
+            var newUser = uow.Add(usr);
 
             // Assert
-            Assert.NotNull(newusr);
-            Assert.True(newusr.Id > 0);
+            Assert.NotNull(newUser);
+            Assert.True(newUser.Id > 0);
         }
     }
 }

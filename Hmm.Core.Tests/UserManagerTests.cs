@@ -7,6 +7,7 @@ using Hmm.Utility.TestHelp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Hmm.Utility.Misc;
 using Xunit;
 
 namespace Hmm.Core.Tests

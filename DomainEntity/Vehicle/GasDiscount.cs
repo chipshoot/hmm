@@ -1,7 +1,5 @@
-﻿using System;
-using DomainEntity.Enumerations;
+﻿using DomainEntity.Enumerations;
 using DomainEntity.Misc;
-using Hmm.Contract;
 using Hmm.Utility.Currency;
 
 namespace DomainEntity.Vehicle

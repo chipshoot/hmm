@@ -1,5 +1,4 @@
 ﻿using DomainEntity.Misc;
-using Hmm.Contract;
 using Hmm.Utility.Currency;
 using Hmm.Utility.MeasureUnit;
 using System.Collections.Generic;
@@ -24,6 +23,6 @@ namespace DomainEntity.Vehicle
 
         public List<GasDiscountInfo> Discounts { get; set; }
 
-        public string GasStation { get; set; }
+        public string Station { get; set; }
     }
 }

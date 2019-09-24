@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Hmm.Dal.Querys
+namespace Hmm.Dal.Queries
 {
     public class EfEntityLookup : IEntityLookup
     {
@@ -23,7 +23,7 @@ namespace Hmm.Dal.Querys
 
         public T GetEntity<T>(int id) where T : Entity
         {
-            T entity = null;
+            T entity;
             if (typeof(T) == typeof(User))
             {
                 entity = _dataContext.Users.Find(id) as T;
@@ -40,13 +40,17 @@ namespace Hmm.Dal.Querys
             {
                 entity = _dataContext.Catalogs.Find(id) as T;
             }
+            else
+            {
+                throw new DataSourceException($"{typeof(T)} is not support");
+            }
 
             return entity;
         }
 
         public IEnumerable<T> GetEntities<T>() where T : Entity
         {
-            List<T> entities = null;
+            List<T> entities;
             if (typeof(T) == typeof(User))
             {
                 entities = _dataContext.Users.Cast<T>().ToList();
@@ -66,6 +70,10 @@ namespace Hmm.Dal.Querys
                 entities = _dataContext.Catalogs
                     .Include(c => c.Render).Cast<T>()
                     .ToList();
+            }
+            else
+            {
+                throw new DataSourceException($"{typeof(T)} is not support");
             }
 
             return entities;

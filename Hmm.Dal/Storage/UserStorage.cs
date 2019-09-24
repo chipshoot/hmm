@@ -43,7 +43,7 @@ namespace Hmm.Dal.Storage
                 if (entity.Id <= 0)
                 {
                     ProcessMessage.Success = false;
-                    ProcessMessage.AddMessage($"Can not update user with id {entity.Id}");
+                    ProcessMessage.AddErrorMessage($"Can not update user with id {entity.Id}");
                     return null;
                 }
 

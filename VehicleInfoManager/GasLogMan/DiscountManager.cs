@@ -1,7 +1,6 @@
 ﻿using DomainEntity.Enumerations;
 using DomainEntity.Misc;
 using DomainEntity.Vehicle;
-using Hmm.Contract;
 using Hmm.Contract.Core;
 using Hmm.Contract.GasLogMan;
 using Hmm.Utility.Currency;
@@ -56,7 +55,7 @@ namespace VehicleInfoManager.GasLogMan
             var discountRoot = noteXml.Root?.Element(ns + "Content")?.Element(ns + "GasLog")?.Element(ns + "Discounts");
             if (discountRoot == null)
             {
-                ProcessResult.AddMessage("Cannot find discounts element");
+                ProcessResult.AddErrorMessage("Cannot find discounts element");
                 return infos;
             }
 
@@ -65,7 +64,7 @@ namespace VehicleInfoManager.GasLogMan
                 var amountNode = element.Element(ns + "Amount")?.Element(ns + "Money");
                 if (amountNode == null)
                 {
-                    ProcessResult.AddMessage("Cannot found money information from discount string");
+                    ProcessResult.AddErrorMessage("Cannot found money information from discount string");
                     continue;
                 }
 
@@ -73,14 +72,14 @@ namespace VehicleInfoManager.GasLogMan
                 var discountIdStr = element.Element(ns + "Program")?.Value;
                 if (!int.TryParse(discountIdStr, out var discountId))
                 {
-                    ProcessResult.AddMessage($"Cannot found valid discount id from string {discountIdStr}");
+                    ProcessResult.AddErrorMessage($"Cannot found valid discount id from string {discountIdStr}");
                     continue;
                 }
 
                 var discount = GetDiscountById(discountId);
                 if (discount == null)
                 {
-                    ProcessResult.AddMessage($"Cannot found discount id : {discountId} from data source");
+                    ProcessResult.AddErrorMessage($"Cannot found discount id : {discountId} from data source");
                     continue;
                 }
 
@@ -103,7 +102,7 @@ namespace VehicleInfoManager.GasLogMan
             {
                 ProcessResult.Rest();
                 ProcessResult.Success = false;
-                ProcessResult.AddMessage("Cannot find discount catalog from data source");
+                ProcessResult.AddErrorMessage("Cannot find discount catalog from data source");
                 return null;
             }
 
@@ -204,7 +203,7 @@ namespace VehicleInfoManager.GasLogMan
             if (string.IsNullOrEmpty(noteContent))
             {
                 ProcessResult.Success = false;
-                ProcessResult.AddMessage("Null or empty note content found", true);
+                ProcessResult.AddErrorMessage("Null or empty note content found", true);
                 noteXml = null;
                 return false;
             }

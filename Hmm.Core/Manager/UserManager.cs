@@ -77,7 +77,7 @@ namespace Hmm.Core.Manager
                 if (user == null)
                 {
                     ProcessResult.Success = false;
-                    ProcessResult.AddMessage($"Cannot find user with id {userId}");
+                    ProcessResult.AddErrorMessage($"Cannot find user with id {userId}");
                     return false;
                 }
 
@@ -126,7 +126,7 @@ namespace Hmm.Core.Manager
             if (user == null)
             {
                 ProcessResult.Success = false;
-                ProcessResult.AddMessage($"Cannot find user with id : {id}", true);
+                ProcessResult.AddErrorMessage($"Cannot find user with id : {id}", true);
             }
             else
             {

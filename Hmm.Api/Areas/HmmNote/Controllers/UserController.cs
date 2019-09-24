@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
+using Hmm.Utility.Misc;
 
 namespace Hmm.Api.Areas.HmmNote.Controllers
 {

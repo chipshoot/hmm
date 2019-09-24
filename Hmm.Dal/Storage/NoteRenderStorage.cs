@@ -41,7 +41,7 @@ namespace Hmm.Dal.Storage
             if (entity.Id <= 0)
             {
                 ProcessMessage.Success = false;
-                ProcessMessage.AddMessage($"Can not update NoteRender with id {entity.Id}", true);
+                ProcessMessage.AddErrorMessage($"Can not update NoteRender with id {entity.Id}", true);
                 return null;
             }
 

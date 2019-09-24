@@ -2,14 +2,13 @@
 using DomainEntity.Vehicle;
 using Hmm.Contract.Core;
 using Hmm.Contract.GasLogMan;
+using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
-using Hmm.Contract;
-using Hmm.Utility.Dal.Query;
 
 namespace VehicleInfoManager.GasLogMan
 {
@@ -39,12 +38,12 @@ namespace VehicleInfoManager.GasLogMan
         {
             Guard.Against<ArgumentNullException>(car == null, nameof(car));
 
-            var carCatalog  = _lookupRepo.GetEntities<NoteCatalog>().FirstOrDefault(c=>c.Name == AppConstant.AutoMobileRecordSubject);
+            var carCatalog = _lookupRepo.GetEntities<NoteCatalog>().FirstOrDefault(c => c.Name == AppConstant.AutoMobileRecordSubject);
             if (carCatalog == null)
             {
                 ProcessResult.Rest();
                 ProcessResult.Success = false;
-                ProcessResult.AddMessage("Cannot find automobile from data source");
+                ProcessResult.AddErrorMessage("Cannot find automobile from data source");
                 return null;
             }
 
@@ -71,7 +70,7 @@ namespace VehicleInfoManager.GasLogMan
 
             // ReSharper disable once PossibleNullReferenceException
             SetEntityContent(car);
-            
+
             var savedNote = _noteManager.Update(car);
 
             if (!_noteManager.ProcessResult.Success)
