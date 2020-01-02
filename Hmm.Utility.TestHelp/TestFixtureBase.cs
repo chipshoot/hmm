@@ -1,7 +1,6 @@
 ﻿using DomainEntity.Enumerations;
 using DomainEntity.Misc;
 using DomainEntity.User;
-using DomainEntity.Vehicle;
 using Hmm.Contract.Core;
 using Hmm.Core.Manager;
 using Hmm.Dal.Data;
@@ -19,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using DomainEntity.Vehicle;
 using Hmm.Core.Manager.Validation;
 using VehicleInfoManager.GasLogMan;
 
@@ -123,7 +123,7 @@ namespace Hmm.Utility.TestHelp
                 },
                 new NoteCatalog
                 {
-                    Name = "Gas Log",
+                    Name = "GasLog",
                     Schema = "GasLogSchema",
                     Render = renders[1],
                     Description = "Testing catalog"
@@ -149,7 +149,6 @@ namespace Hmm.Utility.TestHelp
                 {
                     new GasDiscount
                     {
-                        Author = authors[0],
                         Program = "Costco membership",
                         Amount = new Money(0.6),
                         DiscountType = GasDiscountType.PreLiter,
@@ -159,7 +158,6 @@ namespace Hmm.Utility.TestHelp
 
                     new GasDiscount
                     {
-                        Author = authors[0],
                         Program = "Petro-Canada membership",
                         Amount = new Money(0.2),
                         DiscountType = GasDiscountType.PreLiter,
@@ -174,14 +172,11 @@ namespace Hmm.Utility.TestHelp
                 {
                     new Automobile
                     {
-                        Author = authors[0],
                         Brand = "AutoBack",
                         Maker = "Subaru",
-                        Content = "Blue",
                         MeterReading = 100,
                         Year = "2018",
                         Pin = "1234",
-                        Description = "Testing car"
                     }
                 }
                 : new List<Automobile>();
@@ -246,18 +241,14 @@ namespace Hmm.Utility.TestHelp
             foreach (var discount in discounts)
             {
                 var user = LookupRepo.GetEntities<User>().OrderBy(u => u.Id).FirstOrDefault();
-                discount.Author = user;
-
-                discountMan.Create(discount);
+                discountMan.Create(discount, user);
             }
 
             var autoMan = new AutomobileManager(NoteManager, LookupRepo);
             foreach (var car in cars)
             {
                 var user = LookupRepo.GetEntities<User>().OrderBy(u => u.Id).FirstOrDefault();
-                car.Author = user;
-
-                autoMan.Create(car);
+                autoMan.Create(car, user);
             }
 
             // ReSharper restore PossibleNullReferenceException

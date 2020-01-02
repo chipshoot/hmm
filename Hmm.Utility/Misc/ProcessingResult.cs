@@ -1,6 +1,7 @@
 ﻿using Hmm.Utility.Dal.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Hmm.Utility.Misc
 {
@@ -22,12 +23,14 @@ namespace Hmm.Utility.Misc
             MessageList.Clear();
         }
 
-        public void AddErrorMessage(string message, bool clearOldMessage = false)
+        public void AddErrorMessage(string message, bool clearOldMessage = false, bool isFailure = true)
         {
             if (clearOldMessage)
             {
                 MessageList.Clear();
             }
+
+            Success = !isFailure;
 
             MessageList.Add(new ReturnMessage { Message = message, Type = MessageType.Error });
         }
@@ -44,6 +47,12 @@ namespace Hmm.Utility.Misc
             Rest();
             Success = false;
             AddErrorMessage(ex.GetAllMessage());
+        }
+
+        public string GetWholeMessage()
+        {
+            var msg = MessageList.Aggregate("", (cur, next) => $"{cur}|{next}");
+            return msg;
         }
     }
 }

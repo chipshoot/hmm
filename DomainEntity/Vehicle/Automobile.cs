@@ -1,14 +1,7 @@
-﻿using DomainEntity.Misc;
-
-namespace DomainEntity.Vehicle
+﻿namespace DomainEntity.Vehicle
 {
-    public class Automobile : HmmNote
+    public class Automobile : VehicleBase
     {
-        public Automobile()
-        {
-            Subject = AppConstant.AutoMobileRecordSubject;
-        }
-
         public int MeterReading { get; set; }
 
         public string Brand { get; set; }

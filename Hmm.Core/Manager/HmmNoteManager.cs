@@ -78,7 +78,7 @@ namespace Hmm.Core.Manager
             return notes;
         }
 
-        public XNamespace ContentNamespace => "http://schema.hmm.com/2017";
+        public XNamespace ContentNamespace => "http://schema.hmm.com/2019";
 
         public ProcessingResult ProcessResult { get; } = new ProcessingResult();
 

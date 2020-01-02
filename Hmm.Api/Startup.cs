@@ -2,7 +2,7 @@
 using DomainEntity.Misc;
 using DomainEntity.User;
 using Hmm.Contract.Core;
-using Hmm.Contract.GasLogMan;
+using Hmm.Contract.VehicleInfoManager;
 using Hmm.Core.Manager;
 using Hmm.Core.Manager.Validation;
 using Hmm.Dal.Data;
@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using VehicleInfoManager.GasLogMan;
 
 namespace Hmm.Api
@@ -34,6 +35,7 @@ namespace Hmm.Api
         public void ConfigureServices(IServiceCollection services)
         {
             var connectString = Configuration.GetConnectionString("DefaultConnection");
+            services.AddControllers();
             services.AddDbContext<HmmDataContext>(opt => opt.UseSqlServer(connectString));
             services.AddScoped<IUnitOfWork, EfUnitOfWork>();
             services.AddSingleton<IDateTimeProvider, DateTimeAdapter>();
@@ -59,15 +61,21 @@ namespace Hmm.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            env.EnvironmentName = EnvironmentName.Development;
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMvc();
+            app.UseHttpsRedirection();
+
+            app.UseRouting();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
         }
     }
 }

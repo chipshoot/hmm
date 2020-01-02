@@ -1,18 +1,11 @@
-﻿using DomainEntity.Misc;
+﻿using System.Collections.Generic;
 using Hmm.Utility.Currency;
 using Hmm.Utility.MeasureUnit;
-using System.Collections.Generic;
 
 namespace DomainEntity.Vehicle
 {
-    public class GasLog : HmmNote
+    public class GasLog : VehicleBase
     {
-        public GasLog()
-        {
-            // set catalog and render for gas log
-            Subject = AppConstant.GasLogRecordSubject;
-        }
-
         public Automobile Car { get; set; }
 
         public Dimension Distance { get; set; }

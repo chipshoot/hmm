@@ -1,94 +1,87 @@
 ﻿using DomainEntity.Misc;
+using DomainEntity.User;
 using DomainEntity.Vehicle;
 using Hmm.Contract.Core;
-using Hmm.Contract.GasLogMan;
+using Hmm.Contract.VehicleInfoManager;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
 namespace VehicleInfoManager.GasLogMan
 {
-    public class AutomobileManager : ManagerBase<Automobile>, IAutomobileManager
+    public class AutomobileManager : EntityManagerBase<Automobile>, IAutomobileManager
     {
-        private readonly IHmmNoteManager<HmmNote> _noteManager;
-        private readonly IEntityLookup _lookupRepo;
-
-        public AutomobileManager(IHmmNoteManager<HmmNote> noteManager, IEntityLookup lookupRepo)
+        public AutomobileManager(IHmmNoteManager<HmmNote> noteManager, IEntityLookup lookupRepo) : base(noteManager, lookupRepo)
         {
-            Guard.Against<ArgumentNullException>(noteManager == null, nameof(noteManager));
-            Guard.Against<ArgumentNullException>(lookupRepo == null, nameof(lookupRepo));
-
-            _noteManager = noteManager;
-            _lookupRepo = lookupRepo;
         }
 
-        public IEnumerable<Automobile> GetAutomobiles()
+        public IQueryable<Automobile> GetAutomobiles()
         {
-            var cars = _noteManager.GetNotes()
-                .Where(n => n.Subject == AppConstant.AutoMobileRecordSubject)
-                .Select(GetEntityFromNote).ToList();
-            return cars;
+            return GetEntities(AppConstant.AutoMobileRecordSubject);
         }
 
-        public Automobile Create(Automobile car)
+        public Automobile GetAutomobileById(int id)
+        {
+            var car = GetAutomobiles().FirstOrDefault(c => c.Id == id);
+            return car;
+        }
+
+        public Automobile Create(Automobile car, User author)
         {
             Guard.Against<ArgumentNullException>(car == null, nameof(car));
 
-            var carCatalog = _lookupRepo.GetEntities<NoteCatalog>().FirstOrDefault(c => c.Name == AppConstant.AutoMobileRecordSubject);
-            if (carCatalog == null)
+            try
             {
-                ProcessResult.Rest();
-                ProcessResult.Success = false;
-                ProcessResult.AddErrorMessage("Cannot find automobile from data source");
+                var id = CreateEntity(car, AppConstant.AutoMobileRecordSubject, author);
+                var savedCar = GetAutomobileById(id);
+                return savedCar;
+            }
+            catch (EntityManagerException ex)
+            {
+                ProcessResult.AddErrorMessage(ex.Message);
                 return null;
             }
-
-            // ReSharper disable once PossibleNullReferenceException
-            car.Subject = AppConstant.AutoMobileRecordSubject;
-            car.Catalog = carCatalog;
-
-            SetEntityContent(car);
-            var savedNote = _noteManager.Create(car);
-
-            if (!_noteManager.ProcessResult.Success)
-            {
-                ProcessResult.PropagandaResult(_noteManager.ProcessResult);
-                return null;
-            }
-
-            var savedCar = GetEntityFromNote(savedNote);
-            return savedCar;
         }
 
-        public Automobile Update(Automobile car)
+        public Automobile Update(Automobile car, User author)
         {
             Guard.Against<ArgumentNullException>(car == null, nameof(car));
 
             // ReSharper disable once PossibleNullReferenceException
-            SetEntityContent(car);
-
-            var savedNote = _noteManager.Update(car);
-
-            if (!_noteManager.ProcessResult.Success)
+            var curCar = GetAutomobileById(car.Id);
+            if (curCar == null)
             {
-                ProcessResult.PropagandaResult(_noteManager.ProcessResult);
+                ProcessResult.AddErrorMessage("Cannot find automobile in data source");
                 return null;
             }
 
-            var savedCar = GetEntityFromNote(savedNote);
-            return savedCar;
+            curCar.Brand = car.Brand;
+            curCar.Maker = car.Maker;
+            curCar.MeterReading = car.MeterReading;
+            curCar.Pin = car.Pin;
+            curCar.Year = car.Year;
+
+            try
+            {
+                UpdateEntity(curCar, AppConstant.AutoMobileRecordSubject);
+                var savedCar = GetAutomobileById(curCar.Id);
+                return savedCar;
+            }
+            catch (EntityManagerException ex)
+            {
+                ProcessResult.AddErrorMessage(ex.Message);
+                return null;
+            }
         }
 
         public ProcessingResult ProcessResult { get; } = new ProcessingResult();
 
-        protected override void SetEntityContent(Automobile automobile)
+        protected override string GetNoteContent(Automobile automobile)
         {
             var xml = new XElement(AppConstant.AutoMobileRecordSubject,
-                new XElement("Date", automobile.CreateDate.ToString("O")),
                 new XElement("MeterReading", automobile.MeterReading),
                 new XElement("Brand", automobile.Brand),
                 new XElement("Maker", automobile.Maker),
@@ -96,11 +89,10 @@ namespace VehicleInfoManager.GasLogMan
                 new XElement("Pin", automobile.Pin)
             );
 
-            automobile.Content = string.Empty;
-            automobile.Content = xml.ToString(SaveOptions.DisableFormatting);
+            return xml.ToString();
         }
 
-        protected override Automobile GetEntityFromNote(HmmNote note)
+        protected override Automobile GetEntity(HmmNote note)
         {
             if (note == null)
             {
@@ -120,17 +112,11 @@ namespace VehicleInfoManager.GasLogMan
             var automobile = new Automobile
             {
                 Id = note.Id,
-                Author = note.Author,
-                Catalog = note.Catalog,
-                CreateDate = note.CreateDate,
-                LastModifiedDate = note.LastModifiedDate,
-                Content = note.Content,
                 MeterReading = meterReading,
                 Brand = automobileRoot.Element(ns + "Brand")?.Value,
                 Maker = automobileRoot.Element(ns + "Maker")?.Value,
                 Year = automobileRoot.Element(ns + "Year")?.Value,
                 Pin = automobileRoot.Element(ns + "Pin")?.Value,
-                Description = note.Description,
             };
 
             return automobile;

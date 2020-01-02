@@ -1,6 +1,7 @@
 ﻿using DomainEntity.Vehicle;
-using Hmm.Contract.GasLogMan;
+using Hmm.Contract.VehicleInfoManager;
 using Hmm.Utility.TestHelp;
+using System.Collections.Generic;
 using System.Linq;
 using VehicleInfoManager.GasLogMan;
 using Xunit;
@@ -24,25 +25,20 @@ namespace VehicleInfoManager.Tests
             var user = UserStorage.GetEntities().FirstOrDefault();
             var car = new Automobile
             {
-                Author = user,
                 Brand = "AutoBack",
                 Maker = "Subaru",
-                Content = "Blue",
                 MeterReading = 100,
                 Year = "2018",
                 Pin = "1234",
-                Description = "Testing car"
             };
 
             // Act
-            var savedCar = _manager.Create(car);
+            var savedCar = _manager.Create(car, user);
 
             // Assert
             Assert.True(_manager.ProcessResult.Success);
             Assert.NotNull(savedCar);
-            Assert.True(car.Id >= 1, "car.Id >= 1");
-            Assert.True(car.Id == savedCar.Id, "car.Id == savedCar.Id");
-            Assert.True(car.Subject == "Automobile");
+            Assert.True(savedCar.Id >= 1, "car.Id >= 1");
         }
 
         [Fact]
@@ -50,22 +46,12 @@ namespace VehicleInfoManager.Tests
         {
             // Arrange
             var user = UserStorage.GetEntities().FirstOrDefault();
-            var car = new Automobile
-            {
-                Author = user,
-                Brand = "AutoBack",
-                Maker = "Subaru",
-                Content = "Blue",
-                MeterReading = 100,
-                Year = "2018",
-                Pin = "1234",
-                Description = "Testing car"
-            };
-            SetupEnvironment(car);
+            var car = SetupEnvironment().FirstOrDefault();
+            Assert.NotNull(car);
 
             // Act
             car.Brand = "AutoBack1";
-            var savedCar = _manager.Update(car);
+            var savedCar = _manager.Update(car, user);
 
             // Assert
             Assert.True(_manager.ProcessResult.Success);
@@ -77,19 +63,7 @@ namespace VehicleInfoManager.Tests
         public void CanGetAutoMobile()
         {
             // Arrange
-            var user = UserStorage.GetEntities().FirstOrDefault();
-            var car = new Automobile
-            {
-                Author = user,
-                Brand = "AutoBack",
-                Maker = "Subaru",
-                Content = "Blue",
-                MeterReading = 100,
-                Year = "2018",
-                Pin = "1234",
-                Description = "Testing car"
-            };
-            SetupEnvironment(car);
+            SetupEnvironment();
 
             // Act
             var savedCars = _manager.GetAutomobiles();
@@ -105,9 +79,20 @@ namespace VehicleInfoManager.Tests
             Assert.True(savedCar.Id >= 1, "savedCar.Id>=1");
         }
 
-        private void SetupEnvironment(Automobile car)
+        private IEnumerable<Automobile> SetupEnvironment()
         {
-            _manager.Create(car);
+            var user = UserStorage.GetEntities().FirstOrDefault();
+            var car = new Automobile
+            {
+                Brand = "AutoBack",
+                Maker = "Subaru",
+                MeterReading = 100,
+                Year = "2018",
+                Pin = "1234",
+            };
+            _manager.Create(car, user);
+
+            return _manager.GetAutomobiles().ToList();
         }
     }
 }

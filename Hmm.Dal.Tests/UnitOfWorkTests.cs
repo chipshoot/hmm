@@ -46,10 +46,12 @@ namespace Hmm.Dal.Tests
                 Salt = "81C70F747E094C05B6EEB4457B3A40D1"
             };
 
-            var uow = new EfUnitOfWork(_dbContext);
-
             // Act
-            var newUser = uow.Add(usr);
+            User newUser;
+            using (var uow = new EfUnitOfWork(_dbContext))
+            {
+                newUser = uow.Add(usr);
+            }
 
             // Assert
             Assert.NotNull(newUser);

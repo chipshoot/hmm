@@ -1,8 +1,9 @@
 ﻿using DomainEntity.Enumerations;
 using DomainEntity.Misc;
+using DomainEntity.User;
 using DomainEntity.Vehicle;
 using Hmm.Contract.Core;
-using Hmm.Contract.GasLogMan;
+using Hmm.Contract.VehicleInfoManager;
 using Hmm.Utility.Currency;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
@@ -14,25 +15,15 @@ using System.Xml.Linq;
 
 namespace VehicleInfoManager.GasLogMan
 {
-    public class DiscountManager : ManagerBase<GasDiscount>, IDiscountManager
+    public class DiscountManager : EntityManagerBase<GasDiscount>, IDiscountManager
     {
-        private readonly IHmmNoteManager<HmmNote> _noteManager;
-        private readonly IEntityLookup _lookupRepo;
-
-        public DiscountManager(IHmmNoteManager<HmmNote> noteManager, IEntityLookup lookupRepo)
+        public DiscountManager(IHmmNoteManager<HmmNote> noteManager, IEntityLookup lookupRepo) : base(noteManager, lookupRepo)
         {
-            Guard.Against<ArgumentNullException>(noteManager == null, nameof(noteManager));
-            Guard.Against<ArgumentNullException>(lookupRepo == null, nameof(lookupRepo));
-
-            _noteManager = noteManager;
-            _lookupRepo = lookupRepo;
         }
 
-        public IEnumerable<GasDiscount> GetDiscounts()
+        public IQueryable<GasDiscount> GetDiscounts()
         {
-            var discounts = _noteManager.GetNotes()
-                .Where(n => n.Subject == AppConstant.GasDiscountRecordSubject)
-                .Select(GetEntityFromNote).ToList();
+            var discounts = GetEntities(AppConstant.GasDiscountRecordSubject);
             return discounts;
         }
 
@@ -41,86 +32,21 @@ namespace VehicleInfoManager.GasLogMan
             return GetDiscounts().FirstOrDefault(d => d.Id == id);
         }
 
-        public IEnumerable<GasDiscountInfo> GetDiscountInfos(GasLog gasLog)
-        {
-            var infos = new List<GasDiscountInfo>();
-
-            var content = gasLog.Content;
-            if (!IsNoteContentValid(content, out var noteXml))
-            {
-                return infos;
-            }
-
-            var ns = noteXml.Root?.GetDefaultNamespace();
-            var discountRoot = noteXml.Root?.Element(ns + "Content")?.Element(ns + "GasLog")?.Element(ns + "Discounts");
-            if (discountRoot == null)
-            {
-                ProcessResult.AddErrorMessage("Cannot find discounts element");
-                return infos;
-            }
-
-            foreach (var element in discountRoot.Elements())
-            {
-                var amountNode = element.Element(ns + "Amount")?.Element(ns + "Money");
-                if (amountNode == null)
-                {
-                    ProcessResult.AddErrorMessage("Cannot found money information from discount string");
-                    continue;
-                }
-
-                var money = Money.FromXml(amountNode);
-                var discountIdStr = element.Element(ns + "Program")?.Value;
-                if (!int.TryParse(discountIdStr, out var discountId))
-                {
-                    ProcessResult.AddErrorMessage($"Cannot found valid discount id from string {discountIdStr}");
-                    continue;
-                }
-
-                var discount = GetDiscountById(discountId);
-                if (discount == null)
-                {
-                    ProcessResult.AddErrorMessage($"Cannot found discount id : {discountId} from data source");
-                    continue;
-                }
-
-                infos.Add(new GasDiscountInfo
-                {
-                    Amount = money,
-                    Program = discount
-                });
-            }
-
-            return infos;
-        }
-
-        public GasDiscount Create(GasDiscount discount)
+        public GasDiscount Create(GasDiscount discount, User author)
         {
             Guard.Against<ArgumentNullException>(discount == null, nameof(discount));
 
-            var discountCatalog = _lookupRepo.GetEntities<NoteCatalog>().FirstOrDefault(c => c.Name == AppConstant.GasDiscountRecordSubject);
-            if (discountCatalog == null)
+            try
             {
-                ProcessResult.Rest();
-                ProcessResult.Success = false;
-                ProcessResult.AddErrorMessage("Cannot find discount catalog from data source");
+                var id = CreateEntity(discount, AppConstant.GasDiscountRecordSubject, author);
+                var savedDiscount = GetDiscountById(id);
+                return savedDiscount;
+            }
+            catch (EntityManagerException ex)
+            {
+                ProcessResult.AddErrorMessage(ex.Message);
                 return null;
             }
-
-            // ReSharper disable once PossibleNullReferenceException
-            discount.Subject = AppConstant.GasDiscountRecordSubject;
-            discount.Catalog = discountCatalog;
-
-            SetEntityContent(discount);
-            var savedNote = _noteManager.Create(discount);
-
-            if (!_noteManager.ProcessResult.Success)
-            {
-                ProcessResult.PropagandaResult(_noteManager.ProcessResult);
-                return null;
-            }
-
-            var savedDiscount = GetEntityFromNote(savedNote);
-            return savedDiscount;
         }
 
         public GasDiscount Update(GasDiscount discount)
@@ -128,37 +54,35 @@ namespace VehicleInfoManager.GasLogMan
             Guard.Against<ArgumentNullException>(discount == null, nameof(discount));
 
             // ReSharper disable once PossibleNullReferenceException
-            SetEntityContent(discount);
-            var savedNote = _noteManager.Update(discount);
-
-            if (!_noteManager.ProcessResult.Success)
+            var curDiscount = GetDiscountById(discount.Id);
+            if (curDiscount == null)
             {
-                ProcessResult.PropagandaResult(_noteManager.ProcessResult);
+                ProcessResult.AddErrorMessage("Cannot find discount in data source");
                 return null;
             }
 
-            var savedDiscount = GetEntityFromNote(savedNote);
-            return savedDiscount;
+            curDiscount.Amount = discount.Amount;
+            curDiscount.Comment = discount.Comment;
+            curDiscount.DiscountType = discount.DiscountType;
+            curDiscount.IsActive = discount.IsActive;
+            curDiscount.Program = discount.Program;
+
+            try
+            {
+                UpdateEntity(discount,AppConstant.GasDiscountRecordSubject);
+                var savedDiscount = GetDiscountById(discount.Id);
+                return savedDiscount;
+            }
+            catch (EntityManagerException ex)
+            {
+                ProcessResult.AddErrorMessage(ex.Message);
+                return null;
+            }
         }
 
         public ProcessingResult ProcessResult { get; } = new ProcessingResult();
 
-        protected override void SetEntityContent(GasDiscount discount)
-        {
-            var xml = new XElement(AppConstant.GasDiscountRecordSubject,
-                new XElement("Date", discount.CreateDate.ToString("O")),
-                new XElement("Program", discount.Program),
-                new XElement("Amount", discount.Amount.Measure2Xml(_noteManager.ContentNamespace)),
-                new XElement("DiscountType", discount.DiscountType),
-                new XElement("IsActive", discount.IsActive),
-                new XElement("Comment", discount.Comment)
-            );
-
-            discount.Content = string.Empty;
-            discount.Content = xml.ToString(SaveOptions.DisableFormatting);
-        }
-
-        protected override GasDiscount GetEntityFromNote(HmmNote note)
+        protected override GasDiscount GetEntity(HmmNote note)
         {
             if (note == null)
             {
@@ -182,20 +106,27 @@ namespace VehicleInfoManager.GasLogMan
             var discount = new GasDiscount
             {
                 Id = note.Id,
-                Author = note.Author,
-                Catalog = note.Catalog,
-                CreateDate = note.CreateDate,
-                LastModifiedDate = note.LastModifiedDate,
-                Content = note.Content,
                 Program = discountRoot.Element(ns + "Program")?.Value,
                 Amount = Money.FromXml(discountRoot.Element(ns + "Amount")?.Element(ns + "Money")),
                 DiscountType = discType,
                 IsActive = isActive,
                 Comment = discountRoot.Element(ns + "Comment")?.Value,
-                Description = note.Description,
             };
 
             return discount;
+        }
+
+        protected override string GetNoteContent(GasDiscount entity)
+        {
+            var xml = new XElement(AppConstant.GasDiscountRecordSubject,
+                new XElement("Program", entity.Program),
+                new XElement("Amount", entity.Amount.Measure2Xml(ContentNamespace)),
+                new XElement("DiscountType", entity.DiscountType),
+                new XElement("IsActive", entity.IsActive),
+                new XElement("Comment", entity.Comment)
+            );
+
+            return xml.ToString(SaveOptions.DisableFormatting);
         }
 
         private bool IsNoteContentValid(string noteContent, out XDocument noteXml)

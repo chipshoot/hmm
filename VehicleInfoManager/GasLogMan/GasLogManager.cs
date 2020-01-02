@@ -2,129 +2,106 @@
 using DomainEntity.User;
 using DomainEntity.Vehicle;
 using Hmm.Contract.Core;
-using Hmm.Contract.GasLogMan;
+using Hmm.Contract.VehicleInfoManager;
 using Hmm.Utility.Currency;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.MeasureUnit;
 using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
 namespace VehicleInfoManager.GasLogMan
 {
-    public class GasLogManager : ManagerBase<GasLog>, IGasLogManager
+    public class GasLogManager : EntityManagerBase<GasLog>, IGasLogManager
     {
-        private readonly IHmmNoteManager<HmmNote> _noteManager;
         private readonly IAutomobileManager _carManager;
         private readonly IDiscountManager _discountManager;
-        private readonly IEntityLookup _lookupRepo;
 
         public GasLogManager(
             IHmmNoteManager<HmmNote> noteManager,
             IAutomobileManager carManager,
             IDiscountManager discountManager,
-            IEntityLookup lookupRepo)
+            IEntityLookup lookupRepo) : base(noteManager, lookupRepo)
         {
-            Guard.Against<ArgumentNullException>(noteManager == null, nameof(noteManager));
             Guard.Against<ArgumentNullException>(carManager == null, nameof(carManager));
             Guard.Against<ArgumentNullException>(discountManager == null, nameof(discountManager));
-            Guard.Against<ArgumentNullException>(lookupRepo == null, nameof(lookupRepo));
-
-            _noteManager = noteManager;
             _carManager = carManager;
             _discountManager = discountManager;
-            _lookupRepo = lookupRepo;
-        }
-
-        public GasLog UpdateGasLog(GasLog gasLog)
-        {
-            var catalog = _lookupRepo.GetEntities<NoteCatalog>().FirstOrDefault(c => c.Name == AppConstant.GasLogCatalogName);
-            if (catalog != null)
-            {
-                gasLog.Catalog = catalog;
-            }
-
-            SetEntityContent(gasLog);
-            var note = _noteManager.Update(gasLog);
-
-            if (note == null)
-            {
-                SetProcessResult(_noteManager.ProcessResult);
-                return null;
-            }
-
-            var updatedGasLog = GetEntityFromNote(note);
-            return updatedGasLog;
         }
 
         public ProcessingResult ProcessResult { get; } = new ProcessingResult();
 
-        public GasLog FindGasLog(int id)
+        public GasLog GetGasLogById(int id)
         {
-            var note = _noteManager.GetNoteById(id);
-            if (note == null)
+            return GetEntities(AppConstant.GasLogRecordSubject).FirstOrDefault(l => l.Id == id);
+        }
+
+        public GasLog Create(GasLog gasLog, User author)
+        {
+            Guard.Against<ArgumentNullException>(gasLog == null, nameof(gasLog));
+
+            try
             {
-                SetProcessResult(_noteManager.ProcessResult);
+                var id = CreateEntity(gasLog, AppConstant.GasLogRecordSubject, author);
+                var savedGasLog = GetGasLogById(id);
+                return savedGasLog;
+            }
+            catch (EntityManagerException ex)
+            {
+                ProcessResult.AddErrorMessage(ex.Message);
+                return null;
+            }
+        }
+
+        public GasLog Update(GasLog gasLog)
+        {
+            Guard.Against<ArgumentNullException>(gasLog == null, nameof(gasLog));
+
+            // ReSharper disable once PossibleNullReferenceException
+            var curLog = GetGasLogById(gasLog.Id);
+            if (curLog == null)
+            {
+                ProcessResult.AddErrorMessage("Cannot find gas log in data source");
                 return null;
             }
 
-            var gasLog = GetEntityFromNote(note);
-            return gasLog;
-        }
+            curLog.Car = gasLog.Car;
+            curLog.Gas = gasLog.Gas;
+            curLog.Price = gasLog.Price;
+            curLog.Station = gasLog.Station;
+            curLog.Distance = gasLog.Distance;
+            curLog.Discounts = gasLog.Discounts;
 
-        public GasLog CreateLog(GasLog gasLog)
-        {
-            var catalog = _lookupRepo.GetEntities<NoteCatalog>().FirstOrDefault(c => c.Name == AppConstant.GasLogCatalogName);
-            if (catalog != null)
+            try
             {
-                gasLog.Catalog = catalog;
+                UpdateEntity(curLog, AppConstant.GasLogRecordSubject);
+                var savedDiscount = GetGasLogById(curLog.Id);
+                return savedDiscount;
             }
-
-            SetEntityContent(gasLog);
-            var note = _noteManager.Create(gasLog);
-
-            if (note == null)
+            catch (EntityManagerException ex)
             {
-                SetProcessResult(_noteManager.ProcessResult);
+                ProcessResult.AddErrorMessage(ex.Message);
                 return null;
             }
-
-            var newGasLog = GetEntityFromNote(note);
-            return newGasLog;
         }
 
-        public GasLog CreateLogForAuthor(int authorId, GasLog gasLog)
-        {
-            var author = _lookupRepo.GetEntity<User>(authorId);
-            if (author == null)
-            {
-                ProcessResult.Success = false;
-                ProcessResult.AddErrorMessage($"Cannot found author with Id {authorId}");
-                return null;
-            }
-
-            gasLog.Author = author;
-            var newLog = CreateLog(gasLog);
-            return newLog;
-        }
-
-        protected override void SetEntityContent(GasLog gasLog)
+        protected override string GetNoteContent(GasLog entity)
         {
             var xml = new XElement("GasLog",
-                new XElement("Automobile", gasLog.Car.Id),
-                new XElement("Date", gasLog.CreateDate.ToString("O")),
-                new XElement("Distance", gasLog.Distance.Measure2Xml(_noteManager.ContentNamespace)),
-                new XElement("Gas", gasLog.Gas.Measure2Xml(_noteManager.ContentNamespace)),
-                new XElement("Price", gasLog.Price.Measure2Xml(_noteManager.ContentNamespace)),
-                new XElement("GasStation", gasLog.Station),
+                new XElement("Automobile", entity.Car.Id),
+                new XElement("Distance", entity.Distance.Measure2Xml(ContentNamespace)),
+                new XElement("Gas", entity.Gas.Measure2Xml(ContentNamespace)),
+                new XElement("Price", entity.Price.Measure2Xml(ContentNamespace)),
+                new XElement("GasStation", entity.Station),
                 new XElement("Discounts", "")
             );
 
-            if (gasLog.Discounts.Any())
+            if (entity.Discounts.Any())
             {
-                foreach (var disc in gasLog.Discounts)
+                foreach (var disc in entity.Discounts)
                 {
                     if (disc.Amount == null || disc.Program == null)
                     {
@@ -133,16 +110,16 @@ namespace VehicleInfoManager.GasLogMan
                     }
 
                     var discElement = new XElement("Discount",
-                        new XElement("Amount", disc.Amount?.Measure2Xml(_noteManager.ContentNamespace)),
+                        new XElement("Amount", disc.Amount?.Measure2Xml(ContentNamespace)),
                         new XElement("Program", disc.Program?.Id));
                     xml.Element("Discounts")?.Add(discElement);
                 }
             }
 
-            gasLog.Content = xml.ToString(SaveOptions.DisableFormatting);
+            return xml.ToString(SaveOptions.DisableFormatting);
         }
 
-        protected override GasLog GetEntityFromNote(HmmNote note)
+        protected override GasLog GetEntity(HmmNote note)
         {
             if (note == null)
             {
@@ -166,33 +143,73 @@ namespace VehicleInfoManager.GasLogMan
             var gas = new GasLog
             {
                 Id = note.Id,
-                Author = note.Author,
-                Catalog = note.Catalog,
-                CreateDate = note.CreateDate,
-                LastModifiedDate = note.LastModifiedDate,
                 Car = car,
-                Content = note.Content,
                 Station = logRoot.Element(ns + "GasStation")?.Value,
-                Description = note.Description,
                 Distance = Dimension.FromXml(logRoot.Element(ns + "Distance")?.Element(ns + "Dimension")),
                 Gas = Volume.FromXml(logRoot.Element(ns + "Gas")?.Element(ns + "Volume")),
                 Price = Money.FromXml(logRoot.Element(ns + "Price")?.Element(ns + "Money"))
             };
 
-            gas.Discounts = _discountManager.GetDiscountInfos(gas).ToList();
+            var discounts = GetDiscountInfos(logRoot.Element(ns + "Discounts"), ns);
+            if (discounts.Any())
+            {
+                gas.Discounts = discounts;
+            }
+
             return gas;
         }
 
-        private void SetProcessResult(ProcessingResult innerProcessResult)
+        private List<GasDiscountInfo> GetDiscountInfos(XElement discountRoot, XNamespace ns)
         {
-            if (innerProcessResult == null)
+            var infos = new List<GasDiscountInfo>();
+            if (discountRoot == null)
             {
-                return;
+                return infos;
             }
 
-            ProcessResult.Rest();
-            ProcessResult.Success = innerProcessResult.Success;
-            ProcessResult.MessageList.AddRange(innerProcessResult.MessageList);
+            foreach (var element in discountRoot.Elements())
+            {
+                var amountNode = element.Element(ns + "Amount")?.Element(ns + "Money");
+                if (amountNode == null)
+                {
+                    ProcessResult.AddErrorMessage("Cannot found money information from discount string");
+                    continue;
+                }
+
+                var money = Money.FromXml(amountNode);
+                var discountIdStr = element.Element(ns + "Program")?.Value;
+
+                if (!int.TryParse(discountIdStr, out var discountId))
+                {
+                    ProcessResult.AddErrorMessage($"Cannot found valid discount id from string {discountIdStr}");
+                    continue;
+                }
+
+                var discount = _discountManager.GetDiscountById(discountId);
+                if (discount == null)
+                {
+                    ProcessResult.AddErrorMessage($"Cannot found discount id : {discountId} from data source");
+                    continue;
+                }
+
+                infos.Add(new GasDiscountInfo
+                {
+                    Amount = money,
+                    Program = discount
+                });
+            }
+
+            return infos;
+        }
+
+        public GasLog CreateLogForAuthor(int authorId, GasLog gasLog)
+        {
+            throw new NotImplementedException();
+        }
+
+        public GasLog UpdateGasLog(GasLog gasLog)
+        {
+            throw new NotImplementedException();
         }
     }
 }

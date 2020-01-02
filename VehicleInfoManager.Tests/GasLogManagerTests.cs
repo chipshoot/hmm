@@ -1,12 +1,12 @@
-﻿using DomainEntity.Vehicle;
-using Hmm.Contract.GasLogMan;
-using Hmm.Core.Manager;
+﻿using Hmm.Core.Manager;
 using Hmm.Utility.Currency;
 using Hmm.Utility.MeasureUnit;
 using Hmm.Utility.TestHelp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DomainEntity.Vehicle;
+using Hmm.Contract.VehicleInfoManager;
 using Hmm.Core.Manager.Validation;
 using VehicleInfoManager.GasLogMan;
 using Xunit;
@@ -37,31 +37,30 @@ namespace VehicleInfoManager.Tests
             var discount = _discountManager.GetDiscounts().FirstOrDefault();
             var gasLog = new GasLog
             {
-                Author = user,
                 Car = car,
                 Station = "Costco",
                 Gas = Volume.FromLiter(40),
                 Price = new Money(40.0),
                 Distance = Dimension.FromKilometre(300),
-                CreateDate = DateTime.UtcNow,
                 Discounts = new List<GasDiscountInfo>
-                {
-                    new GasDiscountInfo
-                    {
-                        Amount = new Money(0.8),
-                        Program = discount
-                    }
-                }
+                        {
+                            new GasDiscountInfo
+                            {
+                                Amount = new Money(0.8),
+                                Program = discount
+                            }
+                        }
             };
 
             // Act
-            var newGas = _manager.CreateLog(gasLog);
+            var newGas = _manager.Create(gasLog, user);
 
             // Assert
             Assert.True(_manager.ProcessResult.Success);
             Assert.True(newGas.Id >= 1, "newGas.Id >= 1");
             Assert.NotNull(newGas.Car);
             Assert.NotNull(newGas.Discounts);
+            Assert.Equal(newGas.Discounts.First().Amount, new Money(0.8));
             Assert.True(newGas.Discounts.Any());
             Assert.True(newGas.Discounts.FirstOrDefault()?.Amount.Amount == 0.8m);
         }
@@ -78,7 +77,7 @@ namespace VehicleInfoManager.Tests
             gas.Distance = newDistance;
 
             // Act
-            var updatedGasLog = _manager.UpdateGasLog(gas);
+            var updatedGasLog = _manager.Update(gas);
 
             // Assert
             Assert.True(_manager.ProcessResult.Success);
@@ -94,7 +93,7 @@ namespace VehicleInfoManager.Tests
             var id = InsertSampleGasLog().Id;
 
             // Act
-            var gasLog = _manager.FindGasLog(id);
+            var gasLog = _manager.GetGasLogById(id);
 
             // Assert
             Assert.NotNull(gasLog);
@@ -114,26 +113,24 @@ namespace VehicleInfoManager.Tests
             var discount = _discountManager.GetDiscounts().FirstOrDefault();
             var gasLog = new GasLog
             {
-                Author = user,
                 Car = car,
                 Station = "Costco",
                 Gas = Volume.FromLiter(40),
                 Price = new Money(40.0),
                 Distance = Dimension.FromKilometre(300),
-                CreateDate = DateTime.UtcNow,
                 Discounts = new List<GasDiscountInfo>
-                {
-                    new GasDiscountInfo
-                    {
-                        Amount = new Money(0.8),
-                        Program = discount
-                    }
-                }
+                        {
+                            new GasDiscountInfo
+                            {
+                                Amount = new Money(0.8),
+                                Program = discount
+                            }
+                        }
             };
 
-            _manager.CreateLog(gasLog);
+            var newLog = _manager.Create(gasLog, user);
 
-            return gasLog;
+            return newLog;
         }
     }
 }
