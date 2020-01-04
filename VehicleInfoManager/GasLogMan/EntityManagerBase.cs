@@ -1,16 +1,18 @@
 ﻿using DomainEntity.Misc;
+using DomainEntity.User;
 using DomainEntity.Vehicle;
 using Hmm.Contract.Core;
+using Hmm.Contract.VehicleInfoManager;
 using Hmm.Utility.Dal.Query;
+using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
 using System.Linq;
 using System.Xml.Linq;
-using DomainEntity.User;
 
 namespace VehicleInfoManager.GasLogMan
 {
-    public abstract class EntityManagerBase<T> where T : VehicleBase
+    public abstract class EntityManagerBase<T> : IAutoEntityManager<T> where T : VehicleBase
     {
         private readonly IHmmNoteManager<HmmNote> _noteManager;
         private readonly IEntityLookup _lookupRepo;
@@ -27,17 +29,31 @@ namespace VehicleInfoManager.GasLogMan
 
         protected abstract string GetNoteContent(T entity);
 
-        protected abstract T GetEntity(HmmNote note);
+        #region method of interface IAutoEntityManager
 
-        protected IQueryable<T> GetEntities(string subject)
+        public abstract IQueryable<T> GetEntities();
+
+        public abstract T GetEntityById(int id);
+
+        public abstract T Create(T entity, User author);
+
+        public abstract T Update(T entity, User author);
+
+        public ProcessingResult ProcessResult { get; } = new ProcessingResult();
+
+        #endregion method of interface IAutoEntityManager
+
+        protected abstract T GetEntityFromRawData(HmmNote note);
+
+        protected IQueryable<T> GetEntitiesFromRawData(string subject)
         {
             var notes = _noteManager.GetNotes()
                 .Where(n => n.Subject == subject)
-                .Select(GetEntity).AsQueryable();
+                .Select(GetEntityFromRawData).AsQueryable();
             return notes;
         }
 
-        protected int CreateEntity(T entity, string catalogName, User author)
+        protected int CreateEntityRawData(T entity, string catalogName, User author)
         {
             Guard.Against<ArgumentNullException>(entity == null, nameof(entity));
             Guard.Against<ArgumentNullException>(string.IsNullOrEmpty(catalogName), nameof(entity));
@@ -45,7 +61,8 @@ namespace VehicleInfoManager.GasLogMan
             var catalog = _lookupRepo.GetEntities<NoteCatalog>().FirstOrDefault(c => c.Name == catalogName);
             if (catalog == null)
             {
-                throw new EntityManagerException("Cannot find discount catalog from data source");
+                ProcessResult.AddErrorMessage("Cannot find discount catalog from data source");
+                return -1;
             }
 
             var note = new HmmNote
@@ -60,13 +77,14 @@ namespace VehicleInfoManager.GasLogMan
 
             if (!_noteManager.ProcessResult.Success || newNode == null)
             {
-                throw new EntityManagerException(_noteManager.ProcessResult.GetWholeMessage());
+                ProcessResult.AddErrorMessage(_noteManager.ProcessResult.GetWholeMessage());
+                return -1;
             }
 
             return newNode.Id;
         }
 
-        protected void UpdateEntity(T entity, string catalogName)
+        protected void UpdateEntityRawData(T entity, string catalogName)
         {
             Guard.Against<ArgumentNullException>(entity == null, nameof(entity));
             Guard.Against<ArgumentNullException>(string.IsNullOrEmpty(catalogName), nameof(entity));
@@ -74,23 +92,25 @@ namespace VehicleInfoManager.GasLogMan
             var catalog = _lookupRepo.GetEntities<NoteCatalog>().FirstOrDefault(c => c.Name == catalogName);
             if (catalog == null)
             {
-                throw new EntityManagerException("Cannot find discount catalog from data source");
+                ProcessResult.AddErrorMessage("Cannot find discount catalog from data source");
+                return;
             }
 
             // ReSharper disable once PossibleNullReferenceException
             var curNote = _noteManager.GetNoteById(entity.Id);
             if (curNote == null)
             {
-                throw new EntityManagerException("Cannot find note record in data source");
+                ProcessResult.AddErrorMessage("Cannot find note record in data source");
+                return;
             }
 
             curNote.Content = GetNoteContent(entity);
-            curNote.LastModifiedDate=DateTime.Now;
+            curNote.LastModifiedDate = DateTime.Now;
             var newNode = _noteManager.Update(curNote);
 
             if (!_noteManager.ProcessResult.Success || newNode == null)
             {
-                throw new EntityManagerException(_noteManager.ProcessResult.GetWholeMessage());
+                ProcessResult.PropagandaResult(_noteManager.ProcessResult);
             }
         }
     }

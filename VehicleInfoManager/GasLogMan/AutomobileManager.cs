@@ -2,9 +2,7 @@
 using DomainEntity.User;
 using DomainEntity.Vehicle;
 using Hmm.Contract.Core;
-using Hmm.Contract.VehicleInfoManager;
 using Hmm.Utility.Dal.Query;
-using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
 using System.Linq;
@@ -12,46 +10,43 @@ using System.Xml.Linq;
 
 namespace VehicleInfoManager.GasLogMan
 {
-    public class AutomobileManager : EntityManagerBase<Automobile>, IAutomobileManager
+    public class AutomobileManager : EntityManagerBase<Automobile>
     {
         public AutomobileManager(IHmmNoteManager<HmmNote> noteManager, IEntityLookup lookupRepo) : base(noteManager, lookupRepo)
         {
         }
 
-        public IQueryable<Automobile> GetAutomobiles()
+        public override IQueryable<Automobile> GetEntities()
         {
-            return GetEntities(AppConstant.AutoMobileRecordSubject);
+            return GetEntitiesFromRawData(AppConstant.AutoMobileRecordSubject);
         }
 
-        public Automobile GetAutomobileById(int id)
+        public override Automobile GetEntityById(int id)
         {
-            var car = GetAutomobiles().FirstOrDefault(c => c.Id == id);
+            var car = GetEntities().FirstOrDefault(c => c.Id == id);
             return car;
         }
 
-        public Automobile Create(Automobile car, User author)
+        public override Automobile Create(Automobile car, User author)
         {
             Guard.Against<ArgumentNullException>(car == null, nameof(car));
 
-            try
+            var id = CreateEntityRawData(car, AppConstant.AutoMobileRecordSubject, author);
+            if (!ProcessResult.Success)
             {
-                var id = CreateEntity(car, AppConstant.AutoMobileRecordSubject, author);
-                var savedCar = GetAutomobileById(id);
-                return savedCar;
-            }
-            catch (EntityManagerException ex)
-            {
-                ProcessResult.AddErrorMessage(ex.Message);
                 return null;
             }
+
+            var savedCar = GetEntityById(id);
+            return savedCar;
         }
 
-        public Automobile Update(Automobile car, User author)
+        public override Automobile Update(Automobile car, User author)
         {
             Guard.Against<ArgumentNullException>(car == null, nameof(car));
 
             // ReSharper disable once PossibleNullReferenceException
-            var curCar = GetAutomobileById(car.Id);
+            var curCar = GetEntityById(car.Id);
             if (curCar == null)
             {
                 ProcessResult.AddErrorMessage("Cannot find automobile in data source");
@@ -64,20 +59,15 @@ namespace VehicleInfoManager.GasLogMan
             curCar.Pin = car.Pin;
             curCar.Year = car.Year;
 
-            try
+            UpdateEntityRawData(curCar, AppConstant.AutoMobileRecordSubject);
+            if (!ProcessResult.Success)
             {
-                UpdateEntity(curCar, AppConstant.AutoMobileRecordSubject);
-                var savedCar = GetAutomobileById(curCar.Id);
-                return savedCar;
-            }
-            catch (EntityManagerException ex)
-            {
-                ProcessResult.AddErrorMessage(ex.Message);
                 return null;
             }
-        }
 
-        public ProcessingResult ProcessResult { get; } = new ProcessingResult();
+            var savedCar = GetEntityById(curCar.Id);
+            return savedCar;
+        }
 
         protected override string GetNoteContent(Automobile automobile)
         {
@@ -92,7 +82,7 @@ namespace VehicleInfoManager.GasLogMan
             return xml.ToString();
         }
 
-        protected override Automobile GetEntity(HmmNote note)
+        protected override Automobile GetEntityFromRawData(HmmNote note)
         {
             if (note == null)
             {

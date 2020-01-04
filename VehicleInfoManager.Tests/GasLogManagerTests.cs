@@ -1,13 +1,12 @@
-﻿using Hmm.Core.Manager;
+﻿using DomainEntity.Vehicle;
+using Hmm.Contract.VehicleInfoManager;
+using Hmm.Core.Manager;
+using Hmm.Core.Manager.Validation;
 using Hmm.Utility.Currency;
 using Hmm.Utility.MeasureUnit;
 using Hmm.Utility.TestHelp;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using DomainEntity.Vehicle;
-using Hmm.Contract.VehicleInfoManager;
-using Hmm.Core.Manager.Validation;
 using VehicleInfoManager.GasLogMan;
 using Xunit;
 
@@ -15,9 +14,9 @@ namespace VehicleInfoManager.Tests
 {
     public class GasLogManagerTests : TestFixtureBase
     {
-        private readonly IGasLogManager _manager;
-        private readonly IAutomobileManager _carManager;
-        private readonly IDiscountManager _discountManager;
+        private readonly IAutoEntityManager<GasLog> _manager;
+        private readonly IAutoEntityManager<Automobile> _carManager;
+        private readonly IAutoEntityManager<GasDiscount> _discountManager;
 
         public GasLogManagerTests()
         {
@@ -33,8 +32,8 @@ namespace VehicleInfoManager.Tests
         {
             // Arrange
             var user = UserStorage.GetEntities().FirstOrDefault();
-            var car = _carManager.GetAutomobiles().FirstOrDefault();
-            var discount = _discountManager.GetDiscounts().FirstOrDefault();
+            var car = _carManager.GetEntities().FirstOrDefault();
+            var discount = _discountManager.GetEntities().FirstOrDefault();
             var gasLog = new GasLog
             {
                 Car = car,
@@ -75,9 +74,10 @@ namespace VehicleInfoManager.Tests
             var orgDistance = gas.Distance;
             var newDistance = Dimension.FromKilometre(distance);
             gas.Distance = newDistance;
+            var user = UserStorage.GetEntities().FirstOrDefault();
 
             // Act
-            var updatedGasLog = _manager.Update(gas);
+            var updatedGasLog = _manager.Update(gas, user);
 
             // Assert
             Assert.True(_manager.ProcessResult.Success);
@@ -93,7 +93,7 @@ namespace VehicleInfoManager.Tests
             var id = InsertSampleGasLog().Id;
 
             // Act
-            var gasLog = _manager.GetGasLogById(id);
+            var gasLog = _manager.GetEntityById(id);
 
             // Assert
             Assert.NotNull(gasLog);
@@ -109,8 +109,8 @@ namespace VehicleInfoManager.Tests
         private GasLog InsertSampleGasLog()
         {
             var user = UserStorage.GetEntities().FirstOrDefault();
-            var car = _carManager.GetAutomobiles().FirstOrDefault();
-            var discount = _discountManager.GetDiscounts().FirstOrDefault();
+            var car = _carManager.GetEntities().FirstOrDefault();
+            var discount = _discountManager.GetEntities().FirstOrDefault();
             var gasLog = new GasLog
             {
                 Car = car,

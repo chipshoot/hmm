@@ -10,7 +10,7 @@ namespace VehicleInfoManager.Tests
 {
     public class AutomobileManagerTests : TestFixtureBase
     {
-        private readonly IAutomobileManager _manager;
+        private readonly IAutoEntityManager<Automobile> _manager;
 
         public AutomobileManagerTests()
         {
@@ -66,7 +66,7 @@ namespace VehicleInfoManager.Tests
             SetupEnvironment();
 
             // Act
-            var savedCars = _manager.GetAutomobiles();
+            var savedCars = _manager.GetEntities();
 
             // Assert
             Assert.True(_manager.ProcessResult.Success);
@@ -92,7 +92,7 @@ namespace VehicleInfoManager.Tests
             };
             _manager.Create(car, user);
 
-            return _manager.GetAutomobiles().ToList();
+            return _manager.GetEntities().ToList();
         }
     }
 }

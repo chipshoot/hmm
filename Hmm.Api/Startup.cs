@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DomainEntity.Misc;
 using DomainEntity.User;
+using DomainEntity.Vehicle;
 using Hmm.Contract.Core;
 using Hmm.Contract.VehicleInfoManager;
 using Hmm.Core.Manager;
@@ -49,9 +50,9 @@ namespace Hmm.Api
             services.AddScoped<IHmmNoteManager<HmmNote>, HmmNoteManager>();
             services.AddScoped<INoteRenderManager, NoteRenderManager>();
             services.AddScoped<INoteCatalogManager, NoteCatalogManager>();
-            services.AddScoped<IGasLogManager, GasLogManager>();
-            services.AddScoped<IAutomobileManager, AutomobileManager>();
-            services.AddScoped<IDiscountManager, DiscountManager>();
+            services.AddScoped<IAutoEntityManager<GasLog>, GasLogManager>();
+            services.AddScoped<IAutoEntityManager<Automobile>, AutomobileManager>();
+            services.AddScoped<IAutoEntityManager<GasDiscount>, DiscountManager>();
             services.AddScoped<UserValidator, UserValidator>();
             services.AddScoped<NoteValidator, NoteValidator>();
             services.AddScoped<NoteRenderValidator, NoteRenderValidator>();

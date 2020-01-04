@@ -3,58 +3,52 @@ using DomainEntity.Misc;
 using DomainEntity.User;
 using DomainEntity.Vehicle;
 using Hmm.Contract.Core;
-using Hmm.Contract.VehicleInfoManager;
 using Hmm.Utility.Currency;
 using Hmm.Utility.Dal.Query;
-using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
 namespace VehicleInfoManager.GasLogMan
 {
-    public class DiscountManager : EntityManagerBase<GasDiscount>, IDiscountManager
+    public class DiscountManager : EntityManagerBase<GasDiscount>
     {
         public DiscountManager(IHmmNoteManager<HmmNote> noteManager, IEntityLookup lookupRepo) : base(noteManager, lookupRepo)
         {
         }
 
-        public IQueryable<GasDiscount> GetDiscounts()
+        public override IQueryable<GasDiscount> GetEntities()
         {
-            var discounts = GetEntities(AppConstant.GasDiscountRecordSubject);
+            var discounts = GetEntitiesFromRawData(AppConstant.GasDiscountRecordSubject);
             return discounts;
         }
 
-        public GasDiscount GetDiscountById(int id)
+        public override GasDiscount GetEntityById(int id)
         {
-            return GetDiscounts().FirstOrDefault(d => d.Id == id);
+            return GetEntities().FirstOrDefault(d => d.Id == id);
         }
 
-        public GasDiscount Create(GasDiscount discount, User author)
+        public override GasDiscount Create(GasDiscount discount, User author)
         {
             Guard.Against<ArgumentNullException>(discount == null, nameof(discount));
 
-            try
+            var id = CreateEntityRawData(discount, AppConstant.GasDiscountRecordSubject, author);
+            if (!ProcessResult.Success)
             {
-                var id = CreateEntity(discount, AppConstant.GasDiscountRecordSubject, author);
-                var savedDiscount = GetDiscountById(id);
-                return savedDiscount;
-            }
-            catch (EntityManagerException ex)
-            {
-                ProcessResult.AddErrorMessage(ex.Message);
                 return null;
             }
+
+            var savedDiscount = GetEntityById(id);
+            return savedDiscount;
         }
 
-        public GasDiscount Update(GasDiscount discount)
+        public override GasDiscount Update(GasDiscount discount, User author)
         {
             Guard.Against<ArgumentNullException>(discount == null, nameof(discount));
 
             // ReSharper disable once PossibleNullReferenceException
-            var curDiscount = GetDiscountById(discount.Id);
+            var curDiscount = GetEntityById(discount.Id);
             if (curDiscount == null)
             {
                 ProcessResult.AddErrorMessage("Cannot find discount in data source");
@@ -67,22 +61,17 @@ namespace VehicleInfoManager.GasLogMan
             curDiscount.IsActive = discount.IsActive;
             curDiscount.Program = discount.Program;
 
-            try
+            UpdateEntityRawData(discount, AppConstant.GasDiscountRecordSubject);
+            if (!ProcessResult.Success)
             {
-                UpdateEntity(discount,AppConstant.GasDiscountRecordSubject);
-                var savedDiscount = GetDiscountById(discount.Id);
-                return savedDiscount;
-            }
-            catch (EntityManagerException ex)
-            {
-                ProcessResult.AddErrorMessage(ex.Message);
                 return null;
             }
+
+            var savedDiscount = GetEntityById(discount.Id);
+            return savedDiscount;
         }
 
-        public ProcessingResult ProcessResult { get; } = new ProcessingResult();
-
-        protected override GasDiscount GetEntity(HmmNote note)
+        protected override GasDiscount GetEntityFromRawData(HmmNote note)
         {
             if (note == null)
             {
@@ -90,10 +79,11 @@ namespace VehicleInfoManager.GasLogMan
             }
 
             var noteStr = note.Content;
-            if (string.IsNullOrEmpty(noteStr))
+            if (!IsNoteContentValid(noteStr, out var noteXml))
             {
+                return null;
             }
-            var noteXml = XDocument.Parse(noteStr);
+
             var ns = noteXml.Root?.GetDefaultNamespace();
             var discountRoot = noteXml.Root?.Element(ns + "Content")?.Element(ns + AppConstant.GasDiscountRecordSubject);
             if (discountRoot == null)

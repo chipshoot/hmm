@@ -6,7 +6,6 @@ using Hmm.Contract.VehicleInfoManager;
 using Hmm.Utility.Currency;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.MeasureUnit;
-using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
 using System.Collections.Generic;
@@ -15,15 +14,15 @@ using System.Xml.Linq;
 
 namespace VehicleInfoManager.GasLogMan
 {
-    public class GasLogManager : EntityManagerBase<GasLog>, IGasLogManager
+    public class GasLogManager : EntityManagerBase<GasLog>
     {
-        private readonly IAutomobileManager _carManager;
-        private readonly IDiscountManager _discountManager;
+        private readonly IAutoEntityManager<Automobile> _carManager;
+        private readonly IAutoEntityManager<GasDiscount> _discountManager;
 
         public GasLogManager(
             IHmmNoteManager<HmmNote> noteManager,
-            IAutomobileManager carManager,
-            IDiscountManager discountManager,
+            IAutoEntityManager<Automobile> carManager,
+            IAutoEntityManager<GasDiscount> discountManager,
             IEntityLookup lookupRepo) : base(noteManager, lookupRepo)
         {
             Guard.Against<ArgumentNullException>(carManager == null, nameof(carManager));
@@ -32,36 +31,36 @@ namespace VehicleInfoManager.GasLogMan
             _discountManager = discountManager;
         }
 
-        public ProcessingResult ProcessResult { get; } = new ProcessingResult();
-
-        public GasLog GetGasLogById(int id)
+        public override IQueryable<GasLog> GetEntities()
         {
-            return GetEntities(AppConstant.GasLogRecordSubject).FirstOrDefault(l => l.Id == id);
+            return GetEntitiesFromRawData(AppConstant.GasLogRecordSubject);
         }
 
-        public GasLog Create(GasLog gasLog, User author)
+        public override GasLog GetEntityById(int id)
+        {
+            return GetEntities().FirstOrDefault(l => l.Id == id);
+        }
+
+        public override GasLog Create(GasLog gasLog, User author)
         {
             Guard.Against<ArgumentNullException>(gasLog == null, nameof(gasLog));
 
-            try
+            var id = CreateEntityRawData(gasLog, AppConstant.GasLogRecordSubject, author);
+            if (!ProcessResult.Success)
             {
-                var id = CreateEntity(gasLog, AppConstant.GasLogRecordSubject, author);
-                var savedGasLog = GetGasLogById(id);
-                return savedGasLog;
-            }
-            catch (EntityManagerException ex)
-            {
-                ProcessResult.AddErrorMessage(ex.Message);
                 return null;
             }
+
+            var savedGasLog = GetEntityById(id);
+            return savedGasLog;
         }
 
-        public GasLog Update(GasLog gasLog)
+        public override GasLog Update(GasLog gasLog, User author)
         {
             Guard.Against<ArgumentNullException>(gasLog == null, nameof(gasLog));
 
             // ReSharper disable once PossibleNullReferenceException
-            var curLog = GetGasLogById(gasLog.Id);
+            var curLog = GetEntityById(gasLog.Id);
             if (curLog == null)
             {
                 ProcessResult.AddErrorMessage("Cannot find gas log in data source");
@@ -75,17 +74,14 @@ namespace VehicleInfoManager.GasLogMan
             curLog.Distance = gasLog.Distance;
             curLog.Discounts = gasLog.Discounts;
 
-            try
+            UpdateEntityRawData(curLog, AppConstant.GasLogRecordSubject);
+            if (!ProcessResult.Success)
             {
-                UpdateEntity(curLog, AppConstant.GasLogRecordSubject);
-                var savedDiscount = GetGasLogById(curLog.Id);
-                return savedDiscount;
-            }
-            catch (EntityManagerException ex)
-            {
-                ProcessResult.AddErrorMessage(ex.Message);
                 return null;
             }
+
+            var savedDiscount = GetEntityById(curLog.Id);
+            return savedDiscount;
         }
 
         protected override string GetNoteContent(GasLog entity)
@@ -119,7 +115,7 @@ namespace VehicleInfoManager.GasLogMan
             return xml.ToString(SaveOptions.DisableFormatting);
         }
 
-        protected override GasLog GetEntity(HmmNote note)
+        protected override GasLog GetEntityFromRawData(HmmNote note)
         {
             if (note == null)
             {
@@ -138,7 +134,7 @@ namespace VehicleInfoManager.GasLogMan
             // get automobile information
             var carIdStr = logRoot.Element(ns + "Automobile")?.Value;
             int.TryParse(carIdStr, out var carId);
-            var car = _carManager.GetAutomobiles().FirstOrDefault(c => c.Id == carId);
+            var car = _carManager.GetEntityById(carId);
 
             var gas = new GasLog
             {
@@ -185,7 +181,7 @@ namespace VehicleInfoManager.GasLogMan
                     continue;
                 }
 
-                var discount = _discountManager.GetDiscountById(discountId);
+                var discount = _discountManager.GetEntityById(discountId);
                 if (discount == null)
                 {
                     ProcessResult.AddErrorMessage($"Cannot found discount id : {discountId} from data source");
