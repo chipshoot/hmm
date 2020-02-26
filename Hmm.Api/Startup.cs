@@ -7,18 +7,20 @@ using Hmm.Contract.VehicleInfoManager;
 using Hmm.Core.Manager;
 using Hmm.Core.Manager.Validation;
 using Hmm.Dal.Data;
+using Hmm.Dal.DataRepository;
 using Hmm.Dal.Queries;
-using Hmm.Dal.Storage;
-using Hmm.Utility.Dal;
-using Hmm.Utility.Dal.DataStore;
 using Hmm.Utility.Dal.Query;
+using Hmm.Utility.Dal.Repository;
 using Hmm.Utility.Misc;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json.Serialization;
 using VehicleInfoManager.GasLogMan;
 
 namespace Hmm.Api
@@ -36,18 +38,44 @@ namespace Hmm.Api
         public void ConfigureServices(IServiceCollection services)
         {
             var connectString = Configuration.GetConnectionString("DefaultConnection");
-            services.AddControllers();
+            services.AddControllers(setupAction =>
+            {
+                setupAction.ReturnHttpNotAcceptable = true;
+            }).AddNewtonsoftJson(setupAction =>
+                {
+                    setupAction.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                })
+                .AddXmlDataContractSerializerFormatters()
+                .ConfigureApiBehaviorOptions(setupAction =>
+                {
+                    setupAction.InvalidModelStateResponseFactory = context =>
+                    {
+                        var problemDetails = new ValidationProblemDetails(context.ModelState)
+                        {
+                            Type = "https://homemademessage.com/modelvalidationproblem",
+                            Title = "One or more model validation errors occurred.",
+                            Status = StatusCodes.Status422UnprocessableEntity,
+                            Detail = "See the errors property for details.",
+                            Instance = context.HttpContext.Request.Path
+                        };
+                        problemDetails.Extensions.Add("traceId", context.HttpContext.TraceIdentifier);
+
+                        return new UnprocessableEntityObjectResult(problemDetails)
+                        {
+                            ContentTypes = { "application/problem+json" }
+                        };
+                    };
+                });
             services.AddDbContext<HmmDataContext>(opt => opt.UseSqlServer(connectString));
-            services.AddScoped<IUnitOfWork, EfUnitOfWork>();
             services.AddSingleton<IDateTimeProvider, DateTimeAdapter>();
-            services.AddScoped<IDataStore<HmmNote>, NoteStorage>();
+            services.AddScoped<IVersionRepository<HmmNote>, NoteEfRepository>();
             services.AddScoped<IHmmDataContext, HmmDataContext>();
             services.AddScoped<IEntityLookup, EfEntityLookup>();
-            services.AddScoped<IDataStore<User>, UserStorage>();
-            services.AddScoped<IDataStore<NoteRender>, NoteRenderStorage>();
-            services.AddScoped<IDataStore<NoteCatalog>, NoteCatalogStorage>();
+            services.AddScoped<IGuidRepository<User>, UserEfRepository>();
+            services.AddScoped<IRepository<NoteRender>, NoteRenderEfRepository>();
+            services.AddScoped<IRepository<NoteCatalog>, NoteCatalogEfRepository>();
             services.AddScoped<IUserManager, UserManager>();
-            services.AddScoped<IHmmNoteManager<HmmNote>, HmmNoteManager>();
+            services.AddScoped<IHmmNoteManager, HmmNoteManager>();
             services.AddScoped<INoteRenderManager, NoteRenderManager>();
             services.AddScoped<INoteCatalogManager, NoteCatalogManager>();
             services.AddScoped<IAutoEntityManager<GasLog>, GasLogManager>();

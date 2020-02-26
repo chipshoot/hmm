@@ -1,7 +1,7 @@
 ﻿using DomainEntity.User;
 using DomainEntity.Vehicle;
 using Hmm.Utility.Misc;
-using System.Linq;
+using System.Collections.Generic;
 
 namespace Hmm.Contract.VehicleInfoManager
 {
@@ -9,7 +9,7 @@ namespace Hmm.Contract.VehicleInfoManager
     {
         T GetEntityById(int id);
 
-        IQueryable<T> GetEntities();
+        IEnumerable<T> GetEntities();
 
         T Create(T entity, User author);
 

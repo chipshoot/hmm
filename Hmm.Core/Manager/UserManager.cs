@@ -1,26 +1,26 @@
 ﻿using DomainEntity.User;
-using Hmm.Contract.Core;
 using Hmm.Core.Manager.Validation;
-using Hmm.Utility.Dal.DataStore;
+using Hmm.Utility.Dal.Repository;
 using Hmm.Utility.Encrypt;
 using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Hmm.Contract.Core;
 
 namespace Hmm.Core.Manager
 {
     public class UserManager : IUserManager
     {
-        private readonly IDataStore<User> _dataSource;
+        private readonly IGuidRepository<User> _userRepo;
         private readonly UserValidator _validator;
 
-        public UserManager(IDataStore<User> dataSource, UserValidator validator)
+        public UserManager(IGuidRepository<User> userRepo, UserValidator validator)
         {
-            Guard.Against<ArgumentNullException>(dataSource == null, nameof(dataSource));
+            Guard.Against<ArgumentNullException>(userRepo == null, nameof(userRepo));
             Guard.Against<ArgumentNullException>(validator == null, nameof(validator));
-            _dataSource = dataSource;
+            _userRepo = userRepo;
             _validator = validator;
         }
 
@@ -35,7 +35,7 @@ namespace Hmm.Core.Manager
             GetPassword(userInfo);
             try
             {
-                var addedUsr = _dataSource.Add(userInfo);
+                var addedUsr = _userRepo.Add(userInfo);
                 return addedUsr;
             }
             catch (Exception ex)
@@ -54,10 +54,10 @@ namespace Hmm.Core.Manager
                     return null;
                 }
 
-                var updatedUser = _dataSource.Update(userInfo);
+                var updatedUser = _userRepo.Update(userInfo);
                 if (updatedUser == null)
                 {
-                    ProcessResult.PropagandaResult(_dataSource.ProcessMessage);
+                    ProcessResult.PropagandaResult(_userRepo.ProcessMessage);
                 }
 
                 return updatedUser;
@@ -69,7 +69,7 @@ namespace Hmm.Core.Manager
             }
         }
 
-        public bool ResetPassword(int userId, string newPassword)
+        public bool ResetPassword(Guid userId, string newPassword)
         {
             try
             {
@@ -88,15 +88,14 @@ namespace Hmm.Core.Manager
                 }
 
                 GetPassword(user);
-                var updatedUser = _dataSource.Update(user);
+                var updatedUser = _userRepo.Update(user);
                 if (updatedUser == null)
                 {
-                    ProcessResult.PropagandaResult(_dataSource.ProcessMessage);
+                    ProcessResult.PropagandaResult(_userRepo.ProcessMessage);
                     return false;
                 }
 
                 return true;
-
             }
             catch (Exception ex)
             {
@@ -109,7 +108,7 @@ namespace Hmm.Core.Manager
         {
             try
             {
-                var users = _dataSource.GetEntities();
+                var users = _userRepo.GetEntities();
 
                 return users;
             }
@@ -120,9 +119,9 @@ namespace Hmm.Core.Manager
             }
         }
 
-        public void DeActivate(int id)
+        public void DeActivate(Guid id)
         {
-            var user = _dataSource.GetEntities().FirstOrDefault(u => u.Id == id && u.IsActivated);
+            var user = _userRepo.GetEntities().FirstOrDefault(u => u.Id == id && u.IsActivated);
             if (user == null)
             {
                 ProcessResult.Success = false;
@@ -133,7 +132,7 @@ namespace Hmm.Core.Manager
                 try
                 {
                     user.IsActivated = false;
-                    _dataSource.Update(user);
+                    _userRepo.Update(user);
                 }
                 catch (Exception ex)
                 {

@@ -13,5 +13,7 @@ namespace Hmm.Dal.Data
         DbSet<NoteRender> Renders { get; set; }
 
         DbSet<NoteCatalog> Catalogs { get; set; }
+
+        void Save();
     }
 }

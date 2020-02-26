@@ -15,14 +15,14 @@ namespace VehicleInfoManager.Tests
         public AutomobileManagerTests()
         {
             InsertSeedRecords();
-            _manager = new AutomobileManager(NoteManager, LookupRepo);
+            _manager = new AutomobileManager(NoteManager, LookupRepo, DateProvider);
         }
 
         [Fact]
         public void CanCreateAutoMobile()
         {
             // Arrange
-            var user = UserStorage.GetEntities().FirstOrDefault();
+            var user = UserRepository.GetEntities().FirstOrDefault();
             var car = new Automobile
             {
                 Brand = "AutoBack",
@@ -45,7 +45,7 @@ namespace VehicleInfoManager.Tests
         public void CanUpdateAutoMobile()
         {
             // Arrange
-            var user = UserStorage.GetEntities().FirstOrDefault();
+            var user = UserRepository.GetEntities().FirstOrDefault();
             var car = SetupEnvironment().FirstOrDefault();
             Assert.NotNull(car);
 
@@ -81,7 +81,7 @@ namespace VehicleInfoManager.Tests
 
         private IEnumerable<Automobile> SetupEnvironment()
         {
-            var user = UserStorage.GetEntities().FirstOrDefault();
+            var user = UserRepository.GetEntities().FirstOrDefault();
             var car = new Automobile
             {
                 Brand = "AutoBack",

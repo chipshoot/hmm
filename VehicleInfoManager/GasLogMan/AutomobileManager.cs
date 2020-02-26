@@ -3,8 +3,10 @@ using DomainEntity.User;
 using DomainEntity.Vehicle;
 using Hmm.Contract.Core;
 using Hmm.Utility.Dal.Query;
+using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -12,11 +14,11 @@ namespace VehicleInfoManager.GasLogMan
 {
     public class AutomobileManager : EntityManagerBase<Automobile>
     {
-        public AutomobileManager(IHmmNoteManager<HmmNote> noteManager, IEntityLookup lookupRepo) : base(noteManager, lookupRepo)
+        public AutomobileManager(IHmmNoteManager noteManager, IEntityLookup lookupRepo, IDateTimeProvider dateProvider) : base(noteManager, lookupRepo, dateProvider)
         {
         }
 
-        public override IQueryable<Automobile> GetEntities()
+        public override IEnumerable<Automobile> GetEntities()
         {
             return GetEntitiesFromRawData(AppConstant.AutoMobileRecordSubject);
         }

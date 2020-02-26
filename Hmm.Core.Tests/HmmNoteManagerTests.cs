@@ -13,15 +13,15 @@ namespace Hmm.Core.Tests
 {
     public class HmmNoteManagerTests : TestFixtureBase
     {
-        private const string Namespace = @"http://schema.hmm.com/2017";
-        private readonly IHmmNoteManager<HmmNote> _manager;
-        private User _user;
+        private const string Namespace = @"http://schema.hmm.com/2020";
+        private readonly IHmmNoteManager _manager;
+        private readonly User _user;
 
         public HmmNoteManagerTests()
         {
             InsertSeedRecords();
-            _user = UserStorage.GetEntities().FirstOrDefault();
-            _manager = new HmmNoteManager(NoteStorage, new NoteValidator(NoteStorage));
+            _user = UserRepository.GetEntities().FirstOrDefault();
+            _manager = new HmmNoteManager(NoteRepository, new NoteValidator(NoteRepository));
         }
 
         [Fact]
@@ -61,7 +61,7 @@ namespace Hmm.Core.Tests
                 Content = null
             };
             var xmldoc = new XmlDocument();
-            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\" ?><note xmlns=\"http://schema.hmm.com/2017\"><content></content></note>");
+            xmldoc.LoadXml($"<?xml version=\"1.0\" encoding=\"utf-16\" ?><note xmlns=\"{Namespace}\"><content></content></note>");
 
             // Act
             var newNote = _manager.Create(note);
@@ -82,7 +82,7 @@ namespace Hmm.Core.Tests
                 Content = "Testing content with < and >"
             };
             var xmldoc = new XmlDocument();
-            xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\" ?><note xmlns=\"http://schema.hmm.com/2017\"><content>Testing content with &lt; and &gt;</content></note>");
+            xmldoc.LoadXml($"<?xml version=\"1.0\" encoding=\"utf-16\" ?><note xmlns=\"{Namespace}\"><content>Testing content with &lt; and &gt;</content></note>");
 
             // Act
             var newNote = _manager.Create(note);
@@ -99,7 +99,7 @@ namespace Hmm.Core.Tests
         {
             // Arrange - note with null content
             var xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\" ?><note xmlns=\"http://schema.hmm.com/2017\"><content>Testing content with &lt; and &gt;</content></note>");
+            xmlDoc.LoadXml($"<?xml version=\"1.0\" encoding=\"utf-16\" ?><note xmlns=\"{Namespace}\"><content>Testing content with &lt; and &gt;</content></note>");
             var note = new HmmNote
             {
                 Author = _user,
@@ -136,13 +136,13 @@ namespace Hmm.Core.Tests
             };
             _manager.Create(note);
 
-            Assert.True(NoteStorage.ProcessMessage.Success);
-            var savedRec = NoteStorage.GetEntities().FirstOrDefault();
+            Assert.True(NoteRepository.ProcessMessage.Success);
+            var savedRec = NoteRepository.GetEntities().FirstOrDefault();
             Assert.NotNull(savedRec);
             Assert.Equal("jfang", savedRec.Author.AccountName);
 
             // change the note render
-            var newUser = UserStorage.GetEntities().FirstOrDefault(u => u.AccountName != "jfang");
+            var newUser = UserRepository.GetEntities().FirstOrDefault(u => u.AccountName != "jfang");
             Assert.NotNull(newUser);
             note.Author = newUser;
 

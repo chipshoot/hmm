@@ -22,12 +22,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Data\EfTransaction.cs" />
+    <Compile Remove="Data\EfUnitOfWork.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="Queries\EfEntityLookup.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="8.6.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.Design" Version="1.1.6" />
   </ItemGroup>
 

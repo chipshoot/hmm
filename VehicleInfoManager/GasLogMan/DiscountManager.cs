@@ -7,18 +7,20 @@ using Hmm.Utility.Currency;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Validation;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using Hmm.Utility.Misc;
 
 namespace VehicleInfoManager.GasLogMan
 {
     public class DiscountManager : EntityManagerBase<GasDiscount>
     {
-        public DiscountManager(IHmmNoteManager<HmmNote> noteManager, IEntityLookup lookupRepo) : base(noteManager, lookupRepo)
+        public DiscountManager(IHmmNoteManager noteManager, IEntityLookup lookupRepo, IDateTimeProvider dateProvider) : base(noteManager, lookupRepo, dateProvider)
         {
         }
 
-        public override IQueryable<GasDiscount> GetEntities()
+        public override IEnumerable<GasDiscount> GetEntities()
         {
             var discounts = GetEntitiesFromRawData(AppConstant.GasDiscountRecordSubject);
             return discounts;

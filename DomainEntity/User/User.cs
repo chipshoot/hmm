@@ -3,7 +3,7 @@ using System;
 
 namespace DomainEntity.User
 {
-    public class User : Entity
+    public class User : GuidEntity
     {
         public string FirstName { get; set; }
 

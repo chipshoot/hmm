@@ -5,15 +5,15 @@ using Hmm.Utility.Misc;
 
 namespace Hmm.Contract.Core
 {
-    public interface IHmmNoteManager<T> where T : HmmNote
+    public interface IHmmNoteManager
     {
-        T GetNoteById(int id);
+        HmmNote GetNoteById(int id);
 
-        IEnumerable<T> GetNotes();
+        IEnumerable<HmmNote> GetNotes();
 
-        T Create(T note);
+        HmmNote Create(HmmNote note);
 
-        T Update(T note);
+        HmmNote Update(HmmNote note);
 
         XNamespace ContentNamespace { get; }
 

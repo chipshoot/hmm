@@ -1,7 +1,7 @@
 ﻿using DomainEntity.Misc;
 using Hmm.Contract.Core;
 using Hmm.Core.Manager.Validation;
-using Hmm.Utility.Dal.DataStore;
+using Hmm.Utility.Dal.Repository;
 using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
@@ -11,10 +11,10 @@ namespace Hmm.Core.Manager
 {
     public class NoteRenderManager : INoteRenderManager
     {
-        private readonly IDataStore<NoteRender> _dataSource;
+        private readonly IRepository<NoteRender> _dataSource;
         private readonly NoteRenderValidator _validator;
 
-        public NoteRenderManager(IDataStore<NoteRender> dataSource, NoteRenderValidator validator)
+        public NoteRenderManager(IRepository<NoteRender> dataSource, NoteRenderValidator validator)
         {
             Guard.Against<ArgumentNullException>(dataSource == null, nameof(dataSource));
             Guard.Against<ArgumentNullException>(validator == null, nameof(validator));

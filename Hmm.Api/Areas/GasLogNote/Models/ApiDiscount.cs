@@ -13,6 +13,8 @@ namespace Hmm.Api.Areas.GasLogNote.Models
 
         public decimal Amount { get; set; }
 
+        public int AuthorId { get; set; }
+
         public bool IsActive { get; set; }
     }
 }

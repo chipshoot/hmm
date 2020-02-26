@@ -7,7 +7,6 @@ using Hmm.Utility.TestHelp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Hmm.Utility.Misc;
 using Xunit;
 
 namespace Hmm.Core.Tests
@@ -23,7 +22,7 @@ namespace Hmm.Core.Tests
         public UserManagerTests()
         {
             InsertSeedRecords(isSetupDiscount: true, isSetupAutomobile: true);
-            _userManager = new UserManager(UserStorage, new UserValidator(UserStorage));
+            _userManager = new UserManager(UserRepository, new UserValidator(UserRepository));
         }
 
         [Fact]
@@ -58,7 +57,7 @@ namespace Hmm.Core.Tests
             // Assert
             Assert.True(_userManager.ProcessResult.Success);
             Assert.NotNull(newUsr);
-            Assert.True(newUsr.Id >= 1, "newUsr.Id >= 1");
+            Assert.True(newUsr.Id != Guid.Empty, "newUsr.Id is not empty");
             Assert.NotNull(newUsr.Salt);
         }
 
@@ -66,7 +65,7 @@ namespace Hmm.Core.Tests
         [InlineData("jfang", "Duplicated account name")]
         public void Cannot_Add_Invalid_User(string accountName, string errorMessage)
         {
-            //    Arrange
+            // Arrange
             var user = new User
             {
                 AccountName = accountName,
@@ -77,12 +76,12 @@ namespace Hmm.Core.Tests
                 Password = "1235",
             };
 
-            //   Act
+            // Act
             var newUsr = _userManager.Create(user);
 
-            //  Assert
+            // Assert
             Assert.False(_userManager.ProcessResult.Success);
-            Assert.True(_userManager.ProcessResult.MessageList.FirstOrDefault()?.Contains(errorMessage));
+            Assert.True(_userManager.ProcessResult.MessageList.FirstOrDefault()?.Message.Contains(errorMessage));
             Assert.Null(newUsr);
         }
 
@@ -100,7 +99,7 @@ namespace Hmm.Core.Tests
                 Password = "1235",
             };
             _userManager.Create(user);
-            Assert.True(user.Id >= 1, "user.Id>=1");
+            Assert.True(user.Id != Guid.Empty, "user.Id is not Guid empty");
 
             //   Act
             user.FirstName = "Chaoyang";
@@ -130,7 +129,7 @@ namespace Hmm.Core.Tests
                 Password = "1235",
             };
             _userManager.Create(user);
-            Assert.True(user.Id >= 1, "user.Id>=1");
+            Assert.True(user.Id != Guid.Empty, "user.Id is not empty Guid");
 
             //   Act
             user.AccountName = accountName;
@@ -139,7 +138,7 @@ namespace Hmm.Core.Tests
 
             //  Assert
             Assert.False(_userManager.ProcessResult.Success);
-            Assert.True(_userManager.ProcessResult.MessageList.FirstOrDefault()?.Contains(errorMsg));
+            Assert.True(_userManager.ProcessResult.MessageList.FirstOrDefault()?.Message.Contains(errorMsg));
             Assert.Null(newUsr);
         }
 
@@ -166,7 +165,7 @@ namespace Hmm.Core.Tests
         public void UserAccountNameValidationTests(string accountName)
         {
             // Arrange
-            var validator = new UserValidator(UserStorage);
+            var validator = new UserValidator(UserRepository);
 
             // Act
             validator.ShouldHaveValidationErrorFor(u => u.AccountName, accountName);
@@ -177,7 +176,7 @@ namespace Hmm.Core.Tests
         public void BirthDayValidationTests(DateTime birthDay)
         {
             // Arrange
-            var validator = new UserValidator(UserStorage);
+            var validator = new UserValidator(UserRepository);
             var user = new User { AccountName = "UniquId", BirthDay = birthDay };
 
             // Act

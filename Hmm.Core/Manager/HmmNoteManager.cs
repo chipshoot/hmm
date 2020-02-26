@@ -1,7 +1,7 @@
 ﻿using DomainEntity.Misc;
 using Hmm.Contract.Core;
 using Hmm.Core.Manager.Validation;
-using Hmm.Utility.Dal.DataStore;
+using Hmm.Utility.Dal.Repository;
 using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
@@ -11,20 +11,20 @@ using System.Xml.Linq;
 
 namespace Hmm.Core.Manager
 {
-    public class HmmNoteManager : IHmmNoteManager<HmmNote>
+    public class HmmNoteManager : IHmmNoteManager
     {
         #region private fields
 
-        private readonly IDataStore<HmmNote> _noteStorage;
+        private readonly IVersionRepository<HmmNote> _noteNoteRepo;
         private readonly NoteValidator _validator;
 
         #endregion private fields
 
-        public HmmNoteManager(IDataStore<HmmNote> storage, NoteValidator validator)
+        public HmmNoteManager(IVersionRepository<HmmNote> noteRepo, NoteValidator validator)
         {
-            Guard.Against<ArgumentNullException>(storage == null, nameof(storage));
+            Guard.Against<ArgumentNullException>(noteRepo == null, nameof(noteRepo));
             Guard.Against<ArgumentNullException>(validator == null, nameof(validator));
-            _noteStorage = storage;
+            _noteNoteRepo = noteRepo;
             _validator = validator;
         }
 
@@ -37,10 +37,10 @@ namespace Hmm.Core.Manager
 
             var xmlContent = GetNoteContent(note, true);
             note.Content = xmlContent.ToString(SaveOptions.DisableFormatting);
-            var ret = _noteStorage.Add(note);
+            var ret = _noteNoteRepo.Add(note);
             if (ret == null)
             {
-                ProcessResult.PropagandaResult(_noteStorage.ProcessMessage);
+                ProcessResult.PropagandaResult(_noteNoteRepo.ProcessMessage);
             }
             return ret;
         }
@@ -57,10 +57,10 @@ namespace Hmm.Core.Manager
 
             // make sure not update note which get cached in current session
             var adjustNote = GetCachedNote(note);
-            var ret = _noteStorage.Update(adjustNote);
+            var ret = _noteNoteRepo.Update(adjustNote);
             if (ret == null)
             {
-                ProcessResult.PropagandaResult(_noteStorage.ProcessMessage);
+                ProcessResult.PropagandaResult(_noteNoteRepo.ProcessMessage);
             }
 
             return ret;
@@ -74,11 +74,11 @@ namespace Hmm.Core.Manager
 
         public IEnumerable<HmmNote> GetNotes()
         {
-            var notes = _noteStorage.GetEntities();
+            var notes = _noteNoteRepo.GetEntities();
             return notes;
         }
 
-        public XNamespace ContentNamespace => "http://schema.hmm.com/2019";
+        public XNamespace ContentNamespace => "http://schema.hmm.com/2020";
 
         public ProcessingResult ProcessResult { get; } = new ProcessingResult();
 
@@ -131,7 +131,7 @@ namespace Hmm.Core.Manager
                 return null;
             }
 
-            var cachedNote = _noteStorage.GetEntities().FirstOrDefault(n => n.Id == note.Id);
+            var cachedNote = _noteNoteRepo.GetEntities().FirstOrDefault(n => n.Id == note.Id);
             if (cachedNote == null)
             {
                 return note;

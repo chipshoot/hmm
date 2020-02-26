@@ -6,8 +6,8 @@ using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Validation;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Hmm.Dal.Queries
 {
@@ -21,14 +21,25 @@ namespace Hmm.Dal.Queries
             _dataContext = dataContext;
         }
 
-        public T GetEntity<T>(int id) where T : Entity
+        public T GetEntity<T>(Guid id) where T : GuidEntity
         {
             T entity;
             if (typeof(T) == typeof(User))
             {
                 entity = _dataContext.Users.Find(id) as T;
             }
-            else if (typeof(T) == typeof(NoteRender))
+            else
+            {
+                throw new DataSourceException($"{typeof(T)} is not support");
+            }
+
+            return entity;
+        }
+
+        public T GetEntity<T>(int id) where T : Entity
+        {
+            T entity;
+            if (typeof(T) == typeof(NoteRender))
             {
                 entity = _dataContext.Renders.Find(id) as T;
             }
@@ -48,32 +59,36 @@ namespace Hmm.Dal.Queries
             return entity;
         }
 
-        public IEnumerable<T> GetEntities<T>() where T : Entity
+        public IQueryable<T> GetEntities<T>(Expression<Func<T, bool>> query = null)
         {
-            List<T> entities;
-            if (typeof(T) == typeof(User))
+            IQueryable<T> entities;
+            if (typeof(T) == typeof(NoteRender))
             {
-                entities = _dataContext.Users.Cast<T>().ToList();
-            }
-            else if (typeof(T) == typeof(NoteRender))
-            {
-                entities = _dataContext.Renders.Cast<T>().ToList();
+                entities = _dataContext.Renders.Cast<T>();
             }
             else if (typeof(T) == typeof(HmmNote))
             {
                 entities = _dataContext.Notes
-                    .Include(n=>n.Author).Cast<T>()
-                    .ToList();
+                    .Include(n => n.Author).Cast<T>();
             }
             else if (typeof(T) == typeof(NoteCatalog))
             {
                 entities = _dataContext.Catalogs
-                    .Include(c => c.Render).Cast<T>()
-                    .ToList();
+                    .Include(c => c.Render).Cast<T>();
+            }
+            else if (typeof(T) == typeof(User))
+            {
+                entities = _dataContext.Users
+                    .Cast<T>();
             }
             else
             {
                 throw new DataSourceException($"{typeof(T)} is not support");
+            }
+
+            if (query != null)
+            {
+                entities = entities.Where(query);
             }
 
             return entities;

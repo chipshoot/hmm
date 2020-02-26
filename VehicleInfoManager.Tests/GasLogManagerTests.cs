@@ -1,7 +1,5 @@
 ﻿using DomainEntity.Vehicle;
 using Hmm.Contract.VehicleInfoManager;
-using Hmm.Core.Manager;
-using Hmm.Core.Manager.Validation;
 using Hmm.Utility.Currency;
 using Hmm.Utility.MeasureUnit;
 using Hmm.Utility.TestHelp;
@@ -21,17 +19,17 @@ namespace VehicleInfoManager.Tests
         public GasLogManagerTests()
         {
             InsertSeedRecords(isSetupDiscount: true, isSetupAutomobile: true);
-            var noteManager = new HmmNoteManager(NoteStorage, new NoteValidator(NoteStorage));
-            _carManager = new AutomobileManager(noteManager, LookupRepo);
-            _discountManager = new DiscountManager(noteManager, LookupRepo);
-            _manager = new GasLogManager(noteManager, _carManager, _discountManager, LookupRepo);
+            var noteManager = NoteManager;
+            _carManager = new AutomobileManager(noteManager, LookupRepo, DateProvider);
+            _discountManager = new DiscountManager(noteManager, LookupRepo, DateProvider);
+            _manager = new GasLogManager(noteManager, _carManager, _discountManager, LookupRepo, DateProvider);
         }
 
         [Fact]
         public void CanAddGasLog()
         {
             // Arrange
-            var user = UserStorage.GetEntities().FirstOrDefault();
+            var user = UserRepository.GetEntities().FirstOrDefault();
             var car = _carManager.GetEntities().FirstOrDefault();
             var discount = _discountManager.GetEntities().FirstOrDefault();
             var gasLog = new GasLog
@@ -74,7 +72,7 @@ namespace VehicleInfoManager.Tests
             var orgDistance = gas.Distance;
             var newDistance = Dimension.FromKilometre(distance);
             gas.Distance = newDistance;
-            var user = UserStorage.GetEntities().FirstOrDefault();
+            var user = UserRepository.GetEntities().FirstOrDefault();
 
             // Act
             var updatedGasLog = _manager.Update(gas, user);
@@ -108,7 +106,7 @@ namespace VehicleInfoManager.Tests
 
         private GasLog InsertSampleGasLog()
         {
-            var user = UserStorage.GetEntities().FirstOrDefault();
+            var user = UserRepository.GetEntities().FirstOrDefault();
             var car = _carManager.GetEntities().FirstOrDefault();
             var discount = _discountManager.GetEntities().FirstOrDefault();
             var gasLog = new GasLog

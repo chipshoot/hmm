@@ -6,6 +6,7 @@ using Hmm.Contract.VehicleInfoManager;
 using Hmm.Utility.Currency;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.MeasureUnit;
+using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
 using System.Collections.Generic;
@@ -20,10 +21,11 @@ namespace VehicleInfoManager.GasLogMan
         private readonly IAutoEntityManager<GasDiscount> _discountManager;
 
         public GasLogManager(
-            IHmmNoteManager<HmmNote> noteManager,
+            IHmmNoteManager noteManager,
             IAutoEntityManager<Automobile> carManager,
             IAutoEntityManager<GasDiscount> discountManager,
-            IEntityLookup lookupRepo) : base(noteManager, lookupRepo)
+            IEntityLookup lookupRepo,
+            IDateTimeProvider dateProvider) : base(noteManager, lookupRepo, dateProvider)
         {
             Guard.Against<ArgumentNullException>(carManager == null, nameof(carManager));
             Guard.Against<ArgumentNullException>(discountManager == null, nameof(discountManager));
@@ -31,9 +33,14 @@ namespace VehicleInfoManager.GasLogMan
             _discountManager = discountManager;
         }
 
-        public override IQueryable<GasLog> GetEntities()
+        public override IEnumerable<GasLog> GetEntities()
         {
-            return GetEntitiesFromRawData(AppConstant.GasLogRecordSubject);
+            var logs = GetEntitiesFromRawData(AppConstant.GasLogRecordSubject);
+            foreach (var log in logs)
+            {
+                log.Discounts = FillDiscounts(log.Discounts);
+            }
+            return logs;
         }
 
         public override GasLog GetEntityById(int id)
@@ -181,6 +188,8 @@ namespace VehicleInfoManager.GasLogMan
                     continue;
                 }
 
+                // Setup temporary discount object with right id, we cannot get discount entity right now because DB reader
+                // is still opening for GasLog
                 var discount = _discountManager.GetEntityById(discountId);
                 if (discount == null)
                 {
@@ -198,14 +207,21 @@ namespace VehicleInfoManager.GasLogMan
             return infos;
         }
 
-        public GasLog CreateLogForAuthor(int authorId, GasLog gasLog)
+        // Replace place holder gas discount with found gas discount record in data source
+        private List<GasDiscountInfo> FillDiscounts(List<GasDiscountInfo> gasDiscounts)
         {
-            throw new NotImplementedException();
-        }
+            if (gasDiscounts == null || !gasDiscounts.Any())
+            {
+                return gasDiscounts;
+            }
 
-        public GasLog UpdateGasLog(GasLog gasLog)
-        {
-            throw new NotImplementedException();
+            foreach (var item in gasDiscounts)
+            {
+                var discount = _discountManager.GetEntityById(item.Program.Id);
+                item.Program = discount;
+            }
+
+            return gasDiscounts;
         }
     }
 }

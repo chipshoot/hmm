@@ -1,4 +1,5 @@
-﻿using DomainEntity.Misc;
+﻿using System;
+using DomainEntity.Misc;
 using DomainEntity.User;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +18,18 @@ namespace Hmm.Dal.Data
         public DbSet<NoteRender> Renders { get; set; }
 
         public DbSet<NoteCatalog> Catalogs { get; set; }
+
+        public void Save()
+        {
+            try
+            {
+                base.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new DataSourceException(ex.Message, ex);
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -37,7 +37,7 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
         #endregion constructor
 
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public IActionResult Get(Guid id)
         {
             var user = _userManager.GetEntities().FirstOrDefault(u => u.Id == id);
             var ret = _mapper.Map<User, ApiUser>(user);
@@ -71,11 +71,11 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
 
         // todo: add reset password method for user account
         [HttpPost("{id}/password")]
-        public IActionResult ResetPassword(string userId, [FromBody] string newPassword)
+        public IActionResult ResetPassword(Guid userId, [FromBody] string newPassword)
         {
             try
             {
-                var successful = _userManager.ResetPassword(1, newPassword);
+                var successful = _userManager.ResetPassword(userId, newPassword);
 
                 if (!successful)
                 {
@@ -92,9 +92,9 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
 
         // PUT api/users/5
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody]ApiUserForUpdate user)
+        public IActionResult Put(Guid id, [FromBody]ApiUserForUpdate user)
         {
-            if (user == null || id <= 0)
+            if (user == null || id != Guid.Empty)
             {
                 return BadRequest(new ApiBadRequestResponse("user information is null or invalid id found"));
             }
@@ -124,9 +124,9 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
 
         // PATCH api/users/5
         [HttpPatch("{id}")]
-        public IActionResult Patch(int id, [FromBody] JsonPatchDocument<ApiUserForUpdate> patchDoc)
+        public IActionResult Patch(Guid id, JsonPatchDocument<ApiUserForUpdate> patchDoc)
         {
-            if (patchDoc == null || id <= 0)
+            if (patchDoc == null || id != Guid.Empty)
             {
                 return BadRequest(new ApiBadRequestResponse("Patch information is null or invalid id found"));
             }
@@ -159,7 +159,7 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
 
         // DELETE api/users/5
         [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
+        public ActionResult Delete(Guid id)
         {
             _userManager.DeActivate(id);
             if (_userManager.ProcessResult.Success)

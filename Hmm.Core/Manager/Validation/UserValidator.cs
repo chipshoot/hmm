@@ -1,6 +1,6 @@
 ﻿using DomainEntity.User;
 using FluentValidation;
-using Hmm.Utility.Dal.DataStore;
+using Hmm.Utility.Dal.Repository;
 using Hmm.Utility.Validation;
 using System;
 using System.Linq;
@@ -9,9 +9,9 @@ namespace Hmm.Core.Manager.Validation
 {
     public class UserValidator : ValidatorBase<User>
     {
-        private readonly IDataStore<User> _dataSource;
+        private readonly IGuidRepository<User> _dataSource;
 
-        public UserValidator(IDataStore<User> userSource)
+        public UserValidator(IGuidRepository<User> userSource)
         {
             Guard.Against<ArgumentNullException>(userSource == null, nameof(userSource));
             _dataSource = userSource;
@@ -26,8 +26,8 @@ namespace Hmm.Core.Manager.Validation
 
         private static bool ValidBirthday(DateTime birthday)
         {
-            var result = birthday != DateTime.MaxValue && 
-                   birthday != DateTime.MinValue && 
+            var result = birthday != DateTime.MaxValue &&
+                   birthday != DateTime.MinValue &&
                    birthday <= DateTime.Now &&
                    birthday.Date != DateTime.Now.Date;
             return result;

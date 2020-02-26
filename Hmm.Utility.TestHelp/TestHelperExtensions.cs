@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Hmm.Utility.Dal.DataEntity;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Hmm.Utility.Dal.DataEntity;
-using Microsoft.EntityFrameworkCore;
 
 namespace Hmm.Utility.TestHelp
 {

@@ -2,9 +2,13 @@
   "iisSettings": {
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
-    "iisExpress": {
-      "applicationUrl": "http://localhost:54960/",
+    "iis": {
+      "applicationUrl": "http://localhost/Hmm.Api",
       "sslPort": 0
+    },
+    "iisExpress": {
+      "applicationUrl": "https://localhost:44327/",
+      "sslPort": 44327
     }
   },
   "profiles": {
@@ -17,7 +21,7 @@
       }
     },
     "Hmm.Api": {
-      "commandName": "Project",
+      "commandName": "IISExpress",
       "launchBrowser": true,
       "launchUrl": "api/automobiles/gaslogs",
       "environmentVariables": {

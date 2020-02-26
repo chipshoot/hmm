@@ -1,14 +1,16 @@
 ﻿using DomainEntity.Enumerations;
 using DomainEntity.Misc;
 using DomainEntity.User;
+using DomainEntity.Vehicle;
 using Hmm.Contract.Core;
 using Hmm.Core.Manager;
+using Hmm.Core.Manager.Validation;
 using Hmm.Dal.Data;
+using Hmm.Dal.DataRepository;
 using Hmm.Dal.Queries;
-using Hmm.Dal.Storage;
 using Hmm.Utility.Currency;
-using Hmm.Utility.Dal;
 using Hmm.Utility.Dal.Query;
+using Hmm.Utility.Dal.Repository;
 using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using Microsoft.EntityFrameworkCore;
@@ -18,8 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using DomainEntity.Vehicle;
-using Hmm.Core.Manager.Validation;
 using VehicleInfoManager.GasLogMan;
 
 namespace Hmm.Utility.TestHelp
@@ -56,17 +56,19 @@ namespace Hmm.Utility.TestHelp
             }
         }
 
-        protected UserStorage UserStorage { get; private set; }
+        protected IGuidRepository<User> UserRepository { get; private set; }
 
-        protected NoteStorage NoteStorage { get; private set; }
+        protected IVersionRepository<HmmNote> NoteRepository { get; private set; }
 
-        protected NoteCatalogStorage CatalogStorage { get; private set; }
+        protected IHmmNoteManager NoteManager { get; private set; }
 
-        protected NoteRenderStorage RenderStorage { get; private set; }
+        protected IRepository<NoteCatalog> CatalogRepository { get; private set; }
+
+        protected IRepository<NoteRender> RenderRepository { get; private set; }
 
         protected IEntityLookup LookupRepo { get; private set; }
 
-        protected IHmmNoteManager<HmmNote> NoteManager { get; private set; }
+        protected IDateTimeProvider DateProvider { get; private set; }
 
         protected void InsertSeedRecords(bool isSetupDiscount = false, bool isSetupAutomobile = false)
         {
@@ -198,12 +200,12 @@ namespace Hmm.Utility.TestHelp
             // ReSharper disable PossibleNullReferenceException
             foreach (var user in users)
             {
-                UserStorage.Add(user);
+                UserRepository.Add(user);
             }
 
             foreach (var render in renders)
             {
-                RenderStorage.Add(render);
+                RenderRepository.Add(render);
             }
 
             foreach (var catalog in catalogs)
@@ -234,17 +236,18 @@ namespace Hmm.Utility.TestHelp
                     }
                 }
 
-                CatalogStorage.Add(catalog);
+                CatalogRepository.Add(catalog);
             }
 
-            var discountMan = new DiscountManager(NoteManager, LookupRepo);
+            NoteManager = new HmmNoteManager(NoteRepository, new NoteValidator(NoteRepository));
+            var discountMan = new DiscountManager(NoteManager, LookupRepo, DateProvider);
             foreach (var discount in discounts)
             {
                 var user = LookupRepo.GetEntities<User>().OrderBy(u => u.Id).FirstOrDefault();
                 discountMan.Create(discount, user);
             }
 
-            var autoMan = new AutomobileManager(NoteManager, LookupRepo);
+            var autoMan = new AutomobileManager(NoteManager, LookupRepo, DateProvider);
             foreach (var car in cars)
             {
                 var user = LookupRepo.GetEntities<User>().OrderBy(u => u.Id).FirstOrDefault();
@@ -278,28 +281,28 @@ namespace Hmm.Utility.TestHelp
                     context.Reset();
                 }
 
-                var notes = LookupRepo.GetEntities<HmmNote>();
+                var notes = LookupRepo.GetEntities<HmmNote>().ToList();
                 foreach (var note in notes)
                 {
-                    NoteStorage.Delete(note);
+                    NoteRepository.Delete(note);
                 }
 
-                var catalogs = LookupRepo.GetEntities<NoteCatalog>();
+                var catalogs = LookupRepo.GetEntities<NoteCatalog>().ToList();
                 foreach (var catalog in catalogs)
                 {
-                    CatalogStorage.Delete(catalog);
+                    CatalogRepository.Delete(catalog);
                 }
 
-                var renders = LookupRepo.GetEntities<NoteRender>();
+                var renders = LookupRepo.GetEntities<NoteRender>().ToList();
                 foreach (var render in renders)
                 {
-                    RenderStorage.Delete(render);
+                    RenderRepository.Delete(render);
                 }
 
-                var users = LookupRepo.GetEntities<User>();
+                var users = LookupRepo.GetEntities<User>().ToList();
                 foreach (var user in users)
                 {
-                    UserStorage.Delete(user);
+                    UserRepository.Delete(user);
                 }
 
                 if (_dbContext is DbContext newContext)
@@ -318,7 +321,7 @@ namespace Hmm.Utility.TestHelp
 
             // set up for entity look up
             var lookupMoc = new Mock<IEntityLookup>();
-            lookupMoc.Setup(lk => lk.GetEntity<User>(It.IsAny<int>())).Returns((int id) =>
+            lookupMoc.Setup(lk => lk.GetEntity<User>(It.IsAny<Guid>())).Returns((Guid id) =>
             {
                 var recFound = _users.FirstOrDefault(c => c.Id == id);
                 return recFound;
@@ -345,19 +348,19 @@ namespace Hmm.Utility.TestHelp
 
             // set up unit of work
             // set up for user
-            var uowMock = new Mock<IUnitOfWork>();
-            uowMock.Setup(u => u.Add(It.IsAny<User>())).Returns((User user) =>
+            var dataContextMock = new Mock<IHmmDataContext>();
+            dataContextMock.Setup(u => u.Users.Add(It.IsAny<User>())).Returns((User user) =>
                 {
-                    user.Id = _users.GetNextId();
+                    user.Id = Guid.NewGuid();
                     _users.AddEntity(user);
-                    return user;
+                    return null;
                 }
             );
-            uowMock.Setup(u => u.Delete(It.IsAny<User>())).Callback((User user) =>
+            dataContextMock.Setup(u => u.Users.Remove(It.IsAny<User>())).Callback((User user) =>
             {
                 _users.Remove(user);
             });
-            uowMock.Setup(u => u.Update(It.IsAny<User>())).Callback((User user) =>
+            dataContextMock.Setup(u => u.Users.Update(It.IsAny<User>())).Callback((User user) =>
             {
                 var ordUser = _users.FirstOrDefault(c => c.Id == user.Id);
                 if (ordUser != null)
@@ -368,18 +371,18 @@ namespace Hmm.Utility.TestHelp
             });
 
             // set up for note render
-            uowMock.Setup(u => u.Add(It.IsAny<NoteRender>())).Returns((NoteRender render) =>
+            dataContextMock.Setup(u => u.Renders.Add(It.IsAny<NoteRender>())).Returns((NoteRender render) =>
                 {
                     render.Id = _renders.GetNextId();
                     _renders.AddEntity(render);
-                    return render;
+                    return null;
                 }
             );
-            uowMock.Setup(u => u.Delete(It.IsAny<NoteRender>())).Callback((NoteRender render) =>
+            dataContextMock.Setup(u => u.Renders.Remove(It.IsAny<NoteRender>())).Callback((NoteRender render) =>
             {
                 _renders.Remove(render);
             });
-            uowMock.Setup(u => u.Update(It.IsAny<NoteRender>())).Callback((NoteRender render) =>
+            dataContextMock.Setup(u => u.Renders.Update(It.IsAny<NoteRender>())).Callback((NoteRender render) =>
             {
                 var orgRender = _renders.FirstOrDefault(c => c.Id == render.Id);
                 if (orgRender != null)
@@ -390,19 +393,19 @@ namespace Hmm.Utility.TestHelp
             });
 
             // set up for note catalog
-            uowMock.Setup(u => u.Add(It.IsAny<NoteCatalog>())).Returns((NoteCatalog cat) =>
+            dataContextMock.Setup(u => u.Catalogs.Add(It.IsAny<NoteCatalog>())).Returns((NoteCatalog cat) =>
                 {
                     cat.Id = _catalogs.GetNextId();
                     _catalogs.AddEntity(cat);
-                    return cat;
+                    return null;
                 }
             );
-            uowMock.Setup(u => u.Delete(It.IsAny<NoteCatalog>())).Callback((NoteCatalog cat) =>
+            dataContextMock.Setup(u => u.Catalogs.Remove(It.IsAny<NoteCatalog>())).Callback((NoteCatalog cat) =>
             {
                 _catalogs.Remove(cat);
             });
 
-            uowMock.Setup(u => u.Update(It.IsAny<NoteCatalog>())).Callback((NoteCatalog cat) =>
+            dataContextMock.Setup(u => u.Catalogs.Update(It.IsAny<NoteCatalog>())).Callback((NoteCatalog cat) =>
             {
                 var orgCat = _catalogs.FirstOrDefault(c => c.Id == cat.Id);
                 if (orgCat != null)
@@ -413,15 +416,14 @@ namespace Hmm.Utility.TestHelp
             });
 
             // set up for note
-            uowMock.Setup(u => u.Add(It.IsAny<HmmNote>()))
+            dataContextMock.Setup(u => u.Notes.Add(It.IsAny<HmmNote>()))
                 .Returns((HmmNote note) =>
                 {
                     note.Id = _notes.GetNextId();
                     _notes.AddEntity(note);
-                    var savedRec = _notes.FirstOrDefault(n => n.Id == note.Id);
-                    return savedRec;
+                    return null;
                 });
-            uowMock.Setup(u => u.Delete(It.IsAny<HmmNote>()))
+            dataContextMock.Setup(u => u.Notes.Remove(It.IsAny<HmmNote>()))
                 .Callback((HmmNote note) =>
                 {
                     var rec = _notes.FirstOrDefault(n => n.Id == note.Id);
@@ -430,7 +432,7 @@ namespace Hmm.Utility.TestHelp
                         _notes.Remove(rec);
                     }
                 });
-            uowMock.Setup(u => u.Update(It.IsAny<HmmNote>()))
+            dataContextMock.Setup(u => u.Notes.Update(It.IsAny<HmmNote>()))
                 .Callback((HmmNote note) =>
                 {
                     var rec = _notes.FirstOrDefault(n => n.Id == note.Id);
@@ -447,16 +449,18 @@ namespace Hmm.Utility.TestHelp
             var timeProviderMock = new Mock<IDateTimeProvider>();
 
             // setup user storage
-            UserStorage = new UserStorage(uowMock.Object, lookupMoc.Object, timeProviderMock.Object);
+            UserRepository = new UserEfRepository(dataContextMock.Object, lookupMoc.Object);
 
             // set up render storage
-            RenderStorage = new NoteRenderStorage(uowMock.Object, lookupMoc.Object, timeProviderMock.Object);
+            RenderRepository = new NoteRenderEfRepository(dataContextMock.Object, lookupMoc.Object, timeProviderMock.Object);
 
             // set up for catalog storage
-            CatalogStorage = new NoteCatalogStorage(uowMock.Object, lookupMoc.Object, timeProviderMock.Object);
+            CatalogRepository = new NoteCatalogEfRepository(dataContextMock.Object, lookupMoc.Object, timeProviderMock.Object);
 
             // set up for note storage
-            NoteStorage = new NoteStorage(uowMock.Object, lookupMoc.Object, timeProviderMock.Object);
+            NoteRepository = new NoteEfRepository(dataContextMock.Object, lookupMoc.Object, timeProviderMock.Object);
+
+            DateProvider = new DateTimeAdapter();
         }
 
         private void SetRealEnvironment(string connectString)
@@ -464,14 +468,14 @@ namespace Hmm.Utility.TestHelp
             var optBuilder = new DbContextOptionsBuilder()
                 .UseSqlServer(connectString);
             _dbContext = new HmmDataContext(optBuilder.Options);
-            var uow = new EfUnitOfWork(_dbContext);
             LookupRepo = new EfEntityLookup(_dbContext);
             var dateProvider = new DateTimeAdapter();
-            UserStorage = new UserStorage(uow, LookupRepo, dateProvider);
-            NoteStorage = new NoteStorage(uow, LookupRepo, dateProvider);
-            RenderStorage = new NoteRenderStorage(uow, LookupRepo, dateProvider);
-            CatalogStorage = new NoteCatalogStorage(uow, LookupRepo, dateProvider);
-            NoteManager = new HmmNoteManager(NoteStorage, new NoteValidator(NoteStorage));
+            UserRepository = new UserEfRepository(_dbContext, LookupRepo);
+            NoteRepository = new NoteEfRepository(_dbContext, LookupRepo, dateProvider);
+            RenderRepository = new NoteRenderEfRepository(_dbContext, LookupRepo, dateProvider);
+            CatalogRepository = new NoteCatalogEfRepository(_dbContext, LookupRepo, dateProvider);
+            DateProvider = new DateTimeAdapter();
+            //NoteManager = new HmmNoteEfRepository(NoteRepository, new NoteValidator(NoteRepository));
         }
     }
 }

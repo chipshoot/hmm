@@ -1,162 +1,110 @@
-﻿//using AutoMapper;
-//using Hmm.Api.Areas.GasLogNote.Models;
-//using Hmm.Api.Models;
-//using Hmm.Contract.Core;
-//using Hmm.Utility.Validation;
-//using Microsoft.AspNetCore.Http;
-//using Microsoft.AspNetCore.Mvc;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using Hmm.Contract.VehicleInfoManager;
+﻿using AutoMapper;
+using DomainEntity.Vehicle;
+using Hmm.Api.Areas.GasLogNote.Models;
+using Hmm.Contract.Core;
+using Hmm.Contract.VehicleInfoManager;
+using Hmm.Utility.Validation;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
-//namespace Hmm.Api.Areas.GasLogNote.Controllers
-//{
-//    [Route("api/automobiles")]
-//    public class AutomobileController : Controller
-//    {
-//        private readonly IAutomobileManager _automobileManager;
-//        private readonly IMapper _mapper;
-//        private readonly IUserManager _userManager;
+namespace Hmm.Api.Areas.GasLogNote.Controllers
+{
+    [ApiController]
+    [Route("api/automobiles")]
+    public class AutomobileController : Controller
+    {
+        private readonly IAutoEntityManager<Automobile> _automobileManager;
+        private readonly IUserManager _userManager;
+        private readonly IMapper _mapper;
 
-//        public AutomobileController(IAutomobileManager automobileManager, IMapper mapper, IUserManager userManager)
-//        {
-//            Guard.Against<ArgumentNullException>(automobileManager == null, nameof(automobileManager));
-//            Guard.Against<ArgumentNullException>(mapper == null, nameof(mapper));
-//            Guard.Against<ArgumentNullException>(userManager == null, nameof(userManager));
+        public AutomobileController(IAutoEntityManager<Automobile> automobileManager, IMapper mapper, IUserManager userManager)
+        {
+            Guard.Against<ArgumentNullException>(automobileManager == null, nameof(automobileManager));
+            Guard.Against<ArgumentNullException>(mapper == null, nameof(mapper));
+            Guard.Against<ArgumentNullException>(userManager == null, nameof(userManager));
 
-//            _automobileManager = automobileManager;
-//            _mapper = mapper;
-//            _userManager = userManager;
-//        }
+            _automobileManager = automobileManager;
+            _mapper = mapper;
+            _userManager = userManager;
+        }
 
-//        // GET api/automobiles/
-//        [HttpGet]
-//        public IActionResult GetMobilesForAuthor(int authorId)
-//        {
-//            try
-//            {
-//                var cars = _automobileManager.GetAutomobiles().Where(c => c.Author.Id == authorId).ToList();
+        // GET api/automobiles/5
+        [HttpGet("{id}", Name = "GetAutomobile")]
+        [HttpHead]
+        public IActionResult GetAutomobileById(int id)
+        {
+            var car = _automobileManager.GetEntityById(id);
+            if (car == null)
+            {
+                return NotFound();
+            }
 
-//                if (!cars.Any())
-//                {
-//                    return StatusCode(StatusCodes.Status404NotFound);
-//                }
+            var apiCar = _mapper.Map<ApiAutomobile>(car);
+            return Ok(apiCar);
+        }
 
-//                var apiCars = new List<ApiAutomobile>();
-//                foreach (var car in cars)
-//                {
-//                    var apiCar = _mapper.Map<ApiAutomobile>(car);
-//                    apiCars.Add(apiCar);
-//                }
+        // GET api/automobiles/
+        [HttpGet]
+        public ActionResult<IEnumerable<ApiAutomobile>> GetMobiles()
+        {
+            var apiCars = _mapper.Map<IEnumerable<ApiAutomobile>>(_automobileManager.GetEntities().ToList());
+            return Ok(apiCars);
+        }
 
-//                return Ok(apiCars);
-//            }
-//            catch (Exception)
-//            {
-//                return StatusCode(StatusCodes.Status500InternalServerError);
-//            }
-//        }
+        // POST api/automobiles
+        [HttpPost]
+        public ActionResult CreateAutomobile(ApiAutomobileForCreate apiCar)
+        {
+            //var user = _userManager.GetEntities().FirstOrDefault(u => u.Id == authorId);
+            //if (user == null)
+            //{
+            //    return BadRequest();
+            //}
 
-//        // GET api/automobiles/5
-//        [HttpGet("{id}")]
-//        public IActionResult Get(int id)
-//        {
-//            try
-//            {
-//                var car = _automobileManager.GetAutomobiles().FirstOrDefault(c => c.Id == id);
+            var newApiCars = new List<ApiAutomobile>();
+            var car = _mapper.Map<Automobile>(apiCar);
+            var newCar = _automobileManager.Create(car, null);
 
-//                if (car == null)
-//                {
-//                    return StatusCode(StatusCodes.Status404NotFound);
-//                }
+            if (newCar == null || !_automobileManager.ProcessResult.Success)
+            {
+                throw new Exception(_automobileManager.ProcessResult.GetWholeMessage());
+            }
 
-//                var apiCar = _mapper.Map<ApiAutomobile>(car);
-//                return Ok(apiCar);
-//            }
-//            catch (Exception)
-//            {
-//                return StatusCode(StatusCodes.Status500InternalServerError);
-//            }
-//        }
+            return Ok();
+        }
 
-//        // POST api/automobiles
-//        [HttpPost]
-//        public IActionResult Post(int authorId, [FromBody] ApiAutomobileForCreate[] apiCars)
-//        {
-//            if (apiCars == null || !apiCars.Any())
-//            {
-//                return BadRequest(new ApiBadRequestResponse("null or empty automobile list found"));
-//            }
+        // PUT api/automobiles/5
+        //[HttpPut("{id}")]
+        //public IActionResult UpdateAutomobile(int id, [FromBody]ApiAutomobile apiCar)
+        //{
+        //    if (apiCar == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-//            try
-//            {
-//                var user = _userManager.GetEntities().FirstOrDefault(u => u.Id == authorId);
-//                if (user == null)
-//                {
-//                    return BadRequest(new ApiBadRequestResponse($"Cannot find user with id : {authorId}"));
-//                }
+        //    var curCar = _automobileManager.GetEntityById(id);
+        //    if (curCar == null)
+        //    {
+        //        return BadRequest(new ApiBadRequestResponse("Cannot find automobile"));
+        //    }
+        //    _mapper.Map(apiCar, curCar);
+        //    var newCar = _automobileManager.Update(curCar);
+        //    if (newCar == null)
+        //    {
+        //        return BadRequest(new ApiBadRequestResponse("Cannot update automobile"));
+        //    }
 
-//                var newApiCars = new List<ApiAutomobile>();
-//                foreach (var apiCar in apiCars)
-//                {
-//                    var car = _mapper.Map<Automobile>(apiCar);
-//                    car.Author = user;
-//                    var newCar = _automobileManager.Create(car);
+        //    var newApiCar = _mapper.Map<ApiAutomobile>(newCar);
+        //    return NoContent();
+        //}
 
-//                    if (newCar == null)
-//                    {
-//                        return BadRequest(new ApiBadRequestResponse("Cannot create automobile"));
-//                    }
-
-//                    var apiNewCar = _mapper.Map<ApiAutomobile>(newCar);
-//                    newApiCars.Add(apiNewCar);
-//                }
-//                return Ok(newApiCars);
-//            }
-//            catch (Exception)
-//            {
-//                return StatusCode(StatusCodes.Status500InternalServerError);
-//            }
-//        }
-
-//        // PUT api/automobiles/5
-//        [HttpPut("{id}")]
-//        public IActionResult Put(int id, [FromBody]ApiAutomobile apiCar)
-//        {
-//            if (apiCar == null)
-//            {
-//                return BadRequest(new ApiBadRequestResponse("null automobile found"));
-//            }
-
-//            try
-//            {
-//                var curCar = _automobileManager.GetAutomobiles().FirstOrDefault(c => c.Id == id);
-//                if (curCar == null)
-//                {
-//                    return BadRequest(new ApiBadRequestResponse("Cannot find automobile"));
-//                }
-//                _mapper.Map(apiCar, curCar);
-//                var newCar = _automobileManager.Update(curCar);
-//                if (newCar == null)
-//                {
-//                    return BadRequest(new ApiBadRequestResponse("Cannot update automobile"));
-//                }
-
-//                var newApiCar = _mapper.Map<ApiAutomobile>(newCar);
-//                return Ok(new ApiOkResponse(newApiCar));
-//            }
-//            catch (Exception)
-//            {
-//                return StatusCode(StatusCodes.Status500InternalServerError);
-//            }
-//        }
-
-//        // DELETE api/automobiles/5
-//        [HttpDelete("{id}")]
-//        public IActionResult Delete(int id)
-//        {
-//            throw new NotImplementedException();
-//        }
-//    }
-//}
+        //// DELETE api/automobiles/5
+        //[HttpDelete("{id}")]
+        //public IActionResult Delete(int id)
+        //{
+        //    throw new NotImplementedException();
+        //}
+    }
+}

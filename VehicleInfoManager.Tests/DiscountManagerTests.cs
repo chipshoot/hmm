@@ -17,14 +17,14 @@ namespace VehicleInfoManager.Tests
         public DiscountManagerTests()
         {
             InsertSeedRecords();
-            _manager = new DiscountManager(NoteManager, LookupRepo);
+            _manager = new DiscountManager(NoteManager, LookupRepo, DateProvider);
         }
 
         [Fact]
         public void CanCreateDiscount()
         {
             // Arrange
-            var user = UserStorage.GetEntities().FirstOrDefault();
+            var user = UserRepository.GetEntities().FirstOrDefault();
             var discount = new GasDiscount
             {
                 Program = "Costco membership",
@@ -48,7 +48,7 @@ namespace VehicleInfoManager.Tests
             // Arrange
             var discounts = SetupEnvironment();
             var discount = discounts.OrderByDescending(d => d.Id).FirstOrDefault();
-            var user = UserStorage.GetEntities().FirstOrDefault();
+            var user = UserRepository.GetEntities().FirstOrDefault();
             Assert.NotNull(discount);
 
             // Act
@@ -97,7 +97,7 @@ namespace VehicleInfoManager.Tests
         {
             var discounts = new List<GasDiscount>();
 
-            var user = UserStorage.GetEntities().FirstOrDefault();
+            var user = UserRepository.GetEntities().FirstOrDefault();
             var discount = new GasDiscount
             {
                 Program = "Costco membership",

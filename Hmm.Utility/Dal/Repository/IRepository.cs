@@ -2,18 +2,13 @@
 
 namespace Hmm.Utility.Dal.Repository
 {
+    /// <inheritdoc />
     /// <summary>
-    /// The <see cref="IRepository{TEntity}"/> interface defines a standard contract that repository
-    /// components should implement, all <see cref="Entity"/> of the repository gets integer as its unique id
+    /// The <see cref="T:Hmm.Utility.Dal.DataStore.IDataStore`1" /> interface defines a standard contract that repository
+    /// components should implement for GRUD, all <see cref="T:Hmm.Utility.Dal.DataEntity.Entity" /> of the repository gets integer as its unique identity
     /// </summary>
     /// <typeparam name="T">The entity type we want to managed in the repository</typeparam>
-    public interface IRepository<T> : IGenericRepository<T> where T : Entity
+    public interface IRepository<T> : IGenericRepository<T, int> where T : HasDefaultEntity
     {
-        /// <summary>
-        /// Finds the entity by its identifier.
-        /// </summary>
-        /// <param name="id">The identifier of the <see cref="Entity"/>.</param>
-        /// <returns><see cref="Entity"/> with id has been found from data source, otherwise null</returns>
-        T FindEntityById(int id);
     }
 }

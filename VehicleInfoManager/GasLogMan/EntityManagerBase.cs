@@ -7,6 +7,7 @@ using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -14,15 +15,18 @@ namespace VehicleInfoManager.GasLogMan
 {
     public abstract class EntityManagerBase<T> : IAutoEntityManager<T> where T : VehicleBase
     {
-        private readonly IHmmNoteManager<HmmNote> _noteManager;
+        private readonly IHmmNoteManager _noteManager;
         private readonly IEntityLookup _lookupRepo;
+        private readonly IDateTimeProvider _dateProvider;
 
-        protected EntityManagerBase(IHmmNoteManager<HmmNote> noteManager, IEntityLookup lookupRepo)
+        protected EntityManagerBase(IHmmNoteManager noteManager, IEntityLookup lookupRepo, IDateTimeProvider dateProvider)
         {
             Guard.Against<ArgumentNullException>(noteManager == null, nameof(noteManager));
             Guard.Against<ArgumentNullException>(lookupRepo == null, nameof(lookupRepo));
+            Guard.Against<ArgumentNullException>(dateProvider == null, nameof(dateProvider));
             _noteManager = noteManager;
             _lookupRepo = lookupRepo;
+            _dateProvider = dateProvider;
         }
 
         protected XNamespace ContentNamespace => _noteManager.ContentNamespace;
@@ -31,7 +35,7 @@ namespace VehicleInfoManager.GasLogMan
 
         #region method of interface IAutoEntityManager
 
-        public abstract IQueryable<T> GetEntities();
+        public abstract IEnumerable<T> GetEntities();
 
         public abstract T GetEntityById(int id);
 
@@ -45,11 +49,11 @@ namespace VehicleInfoManager.GasLogMan
 
         protected abstract T GetEntityFromRawData(HmmNote note);
 
-        protected IQueryable<T> GetEntitiesFromRawData(string subject)
+        protected IEnumerable<T> GetEntitiesFromRawData(string subject)
         {
             var notes = _noteManager.GetNotes()
                 .Where(n => n.Subject == subject)
-                .Select(GetEntityFromRawData).AsQueryable();
+                .Select(GetEntityFromRawData);
             return notes;
         }
 
@@ -71,7 +75,7 @@ namespace VehicleInfoManager.GasLogMan
                 Catalog = catalog,
                 Author = author,
                 Content = GetNoteContent(entity),
-                CreateDate = DateTime.UtcNow
+                CreateDate = _dateProvider.UtcNow
             };
             var newNode = _noteManager.Create(note);
 
@@ -105,7 +109,7 @@ namespace VehicleInfoManager.GasLogMan
             }
 
             curNote.Content = GetNoteContent(entity);
-            curNote.LastModifiedDate = DateTime.Now;
+            curNote.LastModifiedDate = _dateProvider.UtcNow;
             var newNode = _noteManager.Update(curNote);
 
             if (!_noteManager.ProcessResult.Success || newNode == null)
