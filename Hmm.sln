@@ -39,8 +39,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VehicleInfoManager", "Vehic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VehicleInfoManager.Tests", "VehicleInfoManager.Tests\VehicleInfoManager.Tests.csproj", "{2CB4FF48-144E-44E8-BB14-F0CB8F2A6CE7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hmm.IDP", "Hmm.IDP\Hmm.IDP.csproj", "{9EF8A31A-634C-40BB-9DCB-D26F4E26B158}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,10 +89,6 @@ Global
 		{2CB4FF48-144E-44E8-BB14-F0CB8F2A6CE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2CB4FF48-144E-44E8-BB14-F0CB8F2A6CE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2CB4FF48-144E-44E8-BB14-F0CB8F2A6CE7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9EF8A31A-634C-40BB-9DCB-D26F4E26B158}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9EF8A31A-634C-40BB-9DCB-D26F4E26B158}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9EF8A31A-634C-40BB-9DCB-D26F4E26B158}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9EF8A31A-634C-40BB-9DCB-D26F4E26B158}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -111,7 +105,6 @@ Global
 		{6865D671-3B62-4CF5-8EB3-908E47B2D9B0} = {CA7D64C0-BA5E-4D74-9D5A-1679E7B104A9}
 		{47FFD2E3-D8D5-4864-8106-8AC5A866EAF2} = {F062974F-3522-4213-91AB-DADC64B03E40}
 		{2CB4FF48-144E-44E8-BB14-F0CB8F2A6CE7} = {CA7D64C0-BA5E-4D74-9D5A-1679E7B104A9}
-		{9EF8A31A-634C-40BB-9DCB-D26F4E26B158} = {A7A6525F-899F-4D19-B3F6-34559CD709D6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {36D6EC40-0E62-4C0B-AE16-1BF878E7B224}
