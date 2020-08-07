@@ -24,6 +24,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Serilog.Sinks.Seq" Version="4.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\DomainEntity\DomainEntity.csproj" />
     <ProjectReference Include="..\Hmm.Contract\Hmm.Contract.csproj" />
     <ProjectReference Include="..\Hmm.Dal\Hmm.Dal.csproj" />

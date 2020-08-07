@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Hmm.Api.Areas.GasLogNote.Controllers
 {
@@ -39,6 +40,15 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
             _userManager = userManager;
             _autoManager = autoManager;
             _discountManager = discountManager;
+        }
+
+        // GET api/automobiles/gaslogs/5
+        [HttpGet]
+        public IActionResult Get()
+        {
+            var gasLogs = _gasLogManager.GetEntities().ToList();
+            var apiGasLogs = _mapper.Map<List<ApiGasLog>>(gasLogs);
+            return Ok(apiGasLogs);
         }
 
         // GET api/automobiles/gaslogs/5

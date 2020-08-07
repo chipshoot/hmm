@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace Hmm.Api
 {
@@ -7,12 +9,23 @@ namespace Hmm.Api
     {
         public static void Main(string[] args)
         {
-            BuildWebHost(args).Run();
+            var logConfig = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .Build();
+                
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(logConfig)
+                .CreateLogger();
+            CreateHostBuilder(args).Build().Run();
+
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .Build();
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .UseSerilog()
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });
     }
 }

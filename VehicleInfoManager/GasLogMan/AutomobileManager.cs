@@ -74,11 +74,12 @@ namespace VehicleInfoManager.GasLogMan
         protected override string GetNoteContent(Automobile automobile)
         {
             var xml = new XElement(AppConstant.AutoMobileRecordSubject,
-                new XElement("MeterReading", automobile.MeterReading),
-                new XElement("Brand", automobile.Brand),
                 new XElement("Maker", automobile.Maker),
+                new XElement("Brand", automobile.Brand),
                 new XElement("Year", automobile.Year),
-                new XElement("Pin", automobile.Pin)
+                new XElement("Color", automobile.Color),
+                new XElement("Pin", automobile.Pin),
+                new XElement("MeterReading", automobile.MeterReading)
             );
 
             return xml.ToString();

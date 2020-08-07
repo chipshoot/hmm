@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using DomainEntity.User;
 using DomainEntity.Vehicle;
 using Hmm.Api.Areas.GasLogNote.Models;
+using Hmm.Api.Models;
 using Hmm.Contract.Core;
 using Hmm.Contract.VehicleInfoManager;
 using Hmm.Utility.Validation;
@@ -76,35 +78,35 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
         }
 
         // PUT api/automobiles/5
-        //[HttpPut("{id}")]
-        //public IActionResult UpdateAutomobile(int id, [FromBody]ApiAutomobile apiCar)
-        //{
-        //    if (apiCar == null)
-        //    {
-        //        return NotFound();
-        //    }
+        [HttpPut("{id}")]
+        public IActionResult UpdateAutomobile(int id, [FromBody] ApiAutomobile apiCar)
+        {
+            if (apiCar == null)
+            {
+                return NotFound();
+            }
 
-        //    var curCar = _automobileManager.GetEntityById(id);
-        //    if (curCar == null)
-        //    {
-        //        return BadRequest(new ApiBadRequestResponse("Cannot find automobile"));
-        //    }
-        //    _mapper.Map(apiCar, curCar);
-        //    var newCar = _automobileManager.Update(curCar);
-        //    if (newCar == null)
-        //    {
-        //        return BadRequest(new ApiBadRequestResponse("Cannot update automobile"));
-        //    }
+            var curCar = _automobileManager.GetEntityById(id);
+            if (curCar == null)
+            {
+                return BadRequest(new ApiBadRequestResponse("Cannot find automobile"));
+            }
+            _mapper.Map(apiCar, curCar);
+            var newCar = _automobileManager.Update(curCar, new User());
+            if (newCar == null)
+            {
+                return BadRequest(new ApiBadRequestResponse("Cannot update automobile"));
+            }
 
-        //    var newApiCar = _mapper.Map<ApiAutomobile>(newCar);
-        //    return NoContent();
-        //}
+            var newApiCar = _mapper.Map<ApiAutomobile>(newCar);
+            return NoContent();
+        }
 
-        //// DELETE api/automobiles/5
-        //[HttpDelete("{id}")]
-        //public IActionResult Delete(int id)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        // DELETE api/automobiles/5
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
