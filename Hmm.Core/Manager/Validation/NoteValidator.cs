@@ -1,7 +1,7 @@
-﻿using DomainEntity.Misc;
-using DomainEntity.User;
-using FluentValidation;
+﻿using FluentValidation;
 using Hmm.Dal.DataRepository;
+using Hmm.DomainEntity.Misc;
+using Hmm.DomainEntity.User;
 using Hmm.Utility.Dal.Repository;
 using Hmm.Utility.Validation;
 using System;

@@ -1,15 +1,15 @@
 ﻿using AutoMapper;
-using DomainEntity.User;
-using Hmm.Api.Areas.HmmNote.Models;
 using Hmm.Api.Models;
 using Hmm.Contract.Core;
+using Hmm.DomainEntity.User;
+using Hmm.DtoEntity.Api.HmmNote;
+using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
-using Hmm.Utility.Misc;
 
 namespace Hmm.Api.Areas.HmmNote.Controllers
 {
@@ -92,7 +92,7 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
 
         // PUT api/users/5
         [HttpPut("{id}")]
-        public IActionResult Put(Guid id, [FromBody]ApiUserForUpdate user)
+        public IActionResult Put(Guid id, [FromBody] ApiUserForUpdate user)
         {
             if (user == null || id != Guid.Empty)
             {

@@ -1,5 +1,5 @@
-﻿using DomainEntity.Misc;
-using Hmm.Dal.Data;
+﻿using Hmm.Dal.Data;
+using Hmm.DomainEntity.Misc;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Dal.Repository;
 using Hmm.Utility.Misc;
@@ -100,8 +100,8 @@ namespace Hmm.Dal.DataRepository
             }
 
             var result = (from entry in dbContext.Entry(note).Properties
-                    where entry.Metadata.Name == propertyName.Trim()
-                    select entry.IsModified).FirstOrDefault();
+                          where entry.Metadata.Name == propertyName.Trim()
+                          select entry.IsModified).FirstOrDefault();
             return result;
         }
 

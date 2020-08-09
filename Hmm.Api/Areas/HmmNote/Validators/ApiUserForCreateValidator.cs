@@ -1,6 +1,6 @@
-﻿using System;
-using FluentValidation;
-using Hmm.Api.Areas.HmmNote.Models;
+﻿using FluentValidation;
+using Hmm.DtoEntity.Api.HmmNote;
+using System;
 
 namespace Hmm.Api.Areas.HmmNote.Validators
 {
@@ -12,7 +12,7 @@ namespace Hmm.Api.Areas.HmmNote.Validators
             RuleFor(note => note.Content).NotEmpty().NotNull();
             RuleFor(note => note.Author).NotNull();
             RuleFor(note => note.CreateDate).GreaterThan(DateTime.Now);
-            RuleFor(note => note.LastModifiedDate).GreaterThanOrEqualTo(note=>note.CreateDate);
+            RuleFor(note => note.LastModifiedDate).GreaterThanOrEqualTo(note => note.CreateDate);
         }
     }
 }

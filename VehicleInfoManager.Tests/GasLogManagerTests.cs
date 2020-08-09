@@ -1,5 +1,5 @@
-﻿using DomainEntity.Vehicle;
-using Hmm.Contract.VehicleInfoManager;
+﻿using Hmm.Contract.VehicleInfoManager;
+using Hmm.DomainEntity.Vehicle;
 using Hmm.Utility.Currency;
 using Hmm.Utility.MeasureUnit;
 using Hmm.Utility.TestHelp;

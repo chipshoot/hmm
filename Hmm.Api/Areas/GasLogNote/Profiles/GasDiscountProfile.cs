@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using DomainEntity.Vehicle;
 using Hmm.Api.Areas.GasLogNote.Models;
+using Hmm.DomainEntity.Vehicle;
 using Hmm.Utility.Currency;
 
 namespace Hmm.Api.Areas.GasLogNote.Profiles

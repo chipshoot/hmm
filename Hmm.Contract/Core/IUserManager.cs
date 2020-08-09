@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using DomainEntity.User;
+﻿using Hmm.DomainEntity.User;
 using Hmm.Utility.Misc;
+using System;
+using System.Collections.Generic;
 
 namespace Hmm.Contract.Core
 {

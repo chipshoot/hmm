@@ -1,12 +1,12 @@
-﻿using System;
-using DomainEntity.Misc;
-using Hmm.Contract.Core;
+﻿using Hmm.Contract.Core;
 using Hmm.Core.Manager;
+using Hmm.Core.Manager.Validation;
+using Hmm.DomainEntity.Misc;
+using Hmm.DomainEntity.User;
 using Hmm.Utility.TestHelp;
+using System;
 using System.Linq;
 using System.Xml;
-using DomainEntity.User;
-using Hmm.Core.Manager.Validation;
 using Xunit;
 
 namespace Hmm.Core.Tests
@@ -157,13 +157,13 @@ namespace Hmm.Core.Tests
         [Fact]
         public void CanSearchNoteById()
         {
-        //    throw new NotImplementedException();
+            //    throw new NotImplementedException();
         }
 
         [Fact]
         public void CanDeleteNote()
         {
-         //   throw new NotImplementedException();
+            //   throw new NotImplementedException();
         }
     }
 }

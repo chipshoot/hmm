@@ -1,6 +1,6 @@
-﻿using DomainEntity.Misc;
-using Hmm.Contract.Core;
+﻿using Hmm.Contract.Core;
 using Hmm.Core.Manager.Validation;
+using Hmm.DomainEntity.Misc;
 using Hmm.Utility.Dal.Repository;
 using Hmm.Utility.Misc;
 using Hmm.Utility.Validation;

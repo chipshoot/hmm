@@ -1,4 +1,4 @@
-﻿using DomainEntity.Vehicle;
+﻿using Hmm.DomainEntity.Vehicle;
 using Hmm.Utility.Validation;
 using Hmm.WebConsole.ViewModels;
 using Microsoft.AspNetCore.Mvc;

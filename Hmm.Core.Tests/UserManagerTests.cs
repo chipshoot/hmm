@@ -1,8 +1,8 @@
-﻿using DomainEntity.User;
-using FluentValidation.TestHelper;
+﻿using FluentValidation.TestHelper;
 using Hmm.Contract.Core;
 using Hmm.Core.Manager;
 using Hmm.Core.Manager.Validation;
+using Hmm.DomainEntity.User;
 using Hmm.Utility.TestHelp;
 using System;
 using System.Collections.Generic;

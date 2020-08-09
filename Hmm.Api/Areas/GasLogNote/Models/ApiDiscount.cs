@@ -1,5 +1,5 @@
-﻿using DomainEntity.Enumerations;
-using Hmm.Api.Models;
+﻿using Hmm.Api.Models;
+using Hmm.DomainEntity.Enumerations;
 
 namespace Hmm.Api.Areas.GasLogNote.Models
 {

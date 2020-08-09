@@ -1,6 +1,6 @@
-﻿using DomainEntity.Misc;
-using DomainEntity.User;
-using DomainEntity.Vehicle;
+﻿using Hmm.DomainEntity.Misc;
+using Hmm.DomainEntity.User;
+using Hmm.DomainEntity.Vehicle;
 using Hmm.Utility.TestHelp;
 using System;
 using System.Collections;

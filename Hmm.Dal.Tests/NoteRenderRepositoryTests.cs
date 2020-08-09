@@ -1,4 +1,4 @@
-﻿using DomainEntity.Misc;
+﻿using Hmm.DomainEntity.Misc;
 using Hmm.Utility.TestHelp;
 using Xunit;
 

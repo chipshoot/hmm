@@ -1,5 +1,5 @@
-﻿using DomainEntity.Misc;
-using DomainEntity.User;
+﻿using Hmm.DomainEntity.Misc;
+using Hmm.DomainEntity.User;
 using Microsoft.EntityFrameworkCore;
 
 namespace Hmm.Dal.Data

@@ -5,13 +5,28 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Areas\GasLogNote\Models\**" />
+    <Compile Remove="Areas\GasLogNote\Profiles\**" />
+    <Compile Remove="Areas\HmmNote\Models\**" />
+    <Content Remove="Areas\GasLogNote\Models\**" />
+    <Content Remove="Areas\GasLogNote\Profiles\**" />
+    <Content Remove="Areas\HmmNote\Models\**" />
+    <EmbeddedResource Remove="Areas\GasLogNote\Models\**" />
+    <EmbeddedResource Remove="Areas\GasLogNote\Profiles\**" />
+    <EmbeddedResource Remove="Areas\HmmNote\Models\**" />
+    <None Remove="Areas\GasLogNote\Models\**" />
+    <None Remove="Areas\GasLogNote\Profiles\**" />
+    <None Remove="Areas\HmmNote\Models\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.0.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.0.1" />
-    <PackageReference Include="FluentValidation" Version="9.0.1" />
+    <PackageReference Include="FluentValidation" Version="9.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="3.1.6" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.6">
@@ -25,10 +40,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DomainEntity\DomainEntity.csproj" />
     <ProjectReference Include="..\Hmm.Contract\Hmm.Contract.csproj" />
     <ProjectReference Include="..\Hmm.Core\Hmm.Core.csproj" />
     <ProjectReference Include="..\Hmm.Dal\Hmm.Dal.csproj" />
+    <ProjectReference Include="..\Hmm.DomainEntity\Hmm.DomainEntity.csproj" />
+    <ProjectReference Include="..\Hmm.DtoEntity\Hmm.DtoEntity.csproj" />
     <ProjectReference Include="..\Hmm.Utility\Hmm.Utility.csproj" />
     <ProjectReference Include="..\VehicleInfoManager\VehicleInfoManager.csproj" />
   </ItemGroup>

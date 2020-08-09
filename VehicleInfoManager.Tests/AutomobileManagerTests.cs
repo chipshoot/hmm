@@ -1,5 +1,5 @@
-﻿using DomainEntity.Vehicle;
-using Hmm.Contract.VehicleInfoManager;
+﻿using Hmm.Contract.VehicleInfoManager;
+using Hmm.DomainEntity.Vehicle;
 using Hmm.Utility.TestHelp;
 using System.Collections.Generic;
 using System.Linq;

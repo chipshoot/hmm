@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using DomainEntity.Misc;
-using Hmm.Api.Areas.HmmNote.Models;
 using Hmm.Api.Models;
 using Hmm.Contract.Core;
+using Hmm.DomainEntity.Misc;
+using Hmm.DtoEntity.Api.HmmNote;
 using Hmm.Utility.Validation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
@@ -69,7 +69,7 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
 
         // PUT api/renders/5
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody]ApiNoteRenderForUpdate render)
+        public IActionResult Put(int id, [FromBody] ApiNoteRenderForUpdate render)
         {
             if (render == null || id <= 0)
             {

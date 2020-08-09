@@ -1,4 +1,4 @@
-﻿using DomainEntity.Misc;
+﻿using Hmm.DomainEntity.Misc;
 
 namespace Hmm.Contract.Core
 {

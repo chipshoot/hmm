@@ -1,5 +1,5 @@
-﻿using DomainEntity.Misc;
-using Hmm.Dal.Data;
+﻿using Hmm.Dal.Data;
+using Hmm.DomainEntity.Misc;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Dal.Repository;
 using Hmm.Utility.Misc;

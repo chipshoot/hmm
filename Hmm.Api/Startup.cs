@@ -1,7 +1,4 @@
 ﻿using AutoMapper;
-using DomainEntity.Misc;
-using DomainEntity.User;
-using DomainEntity.Vehicle;
 using Hmm.Contract.Core;
 using Hmm.Contract.VehicleInfoManager;
 using Hmm.Core.Manager;
@@ -9,6 +6,10 @@ using Hmm.Core.Manager.Validation;
 using Hmm.Dal.Data;
 using Hmm.Dal.DataRepository;
 using Hmm.Dal.Queries;
+using Hmm.DomainEntity.Misc;
+using Hmm.DomainEntity.User;
+using Hmm.DomainEntity.Vehicle;
+using Hmm.DtoEntity.Api;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Dal.Repository;
 using Hmm.Utility.Misc;
@@ -86,7 +87,7 @@ namespace Hmm.Api
             services.AddScoped<NoteRenderValidator, NoteRenderValidator>();
             services.AddScoped<NoteCatalogValidator, NoteCatalogValidator>();
             services.AddMvc();
-            services.AddAutoMapper(typeof(Startup));
+            services.AddAutoMapper(typeof(ApiEntity));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

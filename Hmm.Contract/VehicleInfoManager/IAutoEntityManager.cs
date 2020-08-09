@@ -1,5 +1,5 @@
-﻿using DomainEntity.User;
-using DomainEntity.Vehicle;
+﻿using Hmm.DomainEntity.User;
+using Hmm.DomainEntity.Vehicle;
 using Hmm.Utility.Misc;
 using System.Collections.Generic;
 

@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
-using DomainEntity.User;
-using DomainEntity.Vehicle;
-using Hmm.Api.Areas.GasLogNote.Models;
 using Hmm.Api.Models;
 using Hmm.Api.Models.Validation;
 using Hmm.Contract.Core;
 using Hmm.Contract.VehicleInfoManager;
+using Hmm.DomainEntity.User;
+using Hmm.DomainEntity.Vehicle;
+using Hmm.DtoEntity.Api.GasLogNotes;
 using Hmm.Utility.Currency;
 using Hmm.Utility.Validation;
 using Microsoft.AspNetCore.Http;

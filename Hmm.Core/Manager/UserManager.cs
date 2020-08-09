@@ -1,5 +1,6 @@
-﻿using DomainEntity.User;
+﻿using Hmm.Contract.Core;
 using Hmm.Core.Manager.Validation;
+using Hmm.DomainEntity.User;
 using Hmm.Utility.Dal.Repository;
 using Hmm.Utility.Encrypt;
 using Hmm.Utility.Misc;
@@ -7,7 +8,6 @@ using Hmm.Utility.Validation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Hmm.Contract.Core;
 
 namespace Hmm.Core.Manager
 {

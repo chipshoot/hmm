@@ -1,6 +1,6 @@
-﻿using DomainEntity.Misc;
-using DomainEntity.User;
-using Hmm.Dal.Data;
+﻿using Hmm.Dal.Data;
+using Hmm.DomainEntity.Misc;
+using Hmm.DomainEntity.User;
 using Hmm.Utility.Dal.DataEntity;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Validation;

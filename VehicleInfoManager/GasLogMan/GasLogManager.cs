@@ -1,8 +1,8 @@
-﻿using DomainEntity.Misc;
-using DomainEntity.User;
-using DomainEntity.Vehicle;
-using Hmm.Contract.Core;
+﻿using Hmm.Contract.Core;
 using Hmm.Contract.VehicleInfoManager;
+using Hmm.DomainEntity.Misc;
+using Hmm.DomainEntity.User;
+using Hmm.DomainEntity.Vehicle;
 using Hmm.Utility.Currency;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.MeasureUnit;
@@ -35,7 +35,7 @@ namespace VehicleInfoManager.GasLogMan
 
         public override IEnumerable<GasLog> GetEntities()
         {
-            var logs = GetEntitiesFromRawData(AppConstant.GasLogRecordSubject);
+            var logs = GetEntitiesFromRawData(AppConstant.GasLogRecordSubject).ToList();
             foreach (var log in logs)
             {
                 log.Discounts = FillDiscounts(log.Discounts);
@@ -150,7 +150,8 @@ namespace VehicleInfoManager.GasLogMan
                 Station = logRoot.Element(ns + "GasStation")?.Value,
                 Distance = Dimension.FromXml(logRoot.Element(ns + "Distance")?.Element(ns + "Dimension")),
                 Gas = Volume.FromXml(logRoot.Element(ns + "Gas")?.Element(ns + "Volume")),
-                Price = Money.FromXml(logRoot.Element(ns + "Price")?.Element(ns + "Money"))
+                Price = Money.FromXml(logRoot.Element(ns + "Price")?.Element(ns + "Money")),
+                CreateDate = note.CreateDate
             };
 
             var discounts = GetDiscountInfos(logRoot.Element(ns + "Discounts"), ns);

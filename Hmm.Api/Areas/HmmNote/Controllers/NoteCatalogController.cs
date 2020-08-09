@@ -1,15 +1,15 @@
 ﻿using AutoMapper;
-using DomainEntity.Misc;
-using Hmm.Api.Areas.HmmNote.Models;
 using Hmm.Api.Models;
 using Hmm.Contract.Core;
+using Hmm.DomainEntity.Misc;
+using Hmm.DtoEntity.Api.HmmNote;
+using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Validation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
-using Hmm.Utility.Dal.Query;
 
 namespace Hmm.Api.Areas.HmmNote.Controllers
 {
@@ -80,7 +80,7 @@ namespace Hmm.Api.Areas.HmmNote.Controllers
 
         // PUT api/catalogs/5
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody]ApiNoteCatalogForUpdate catalog)
+        public IActionResult Put(int id, [FromBody] ApiNoteCatalogForUpdate catalog)
         {
             if (catalog == null || id <= 0)
             {

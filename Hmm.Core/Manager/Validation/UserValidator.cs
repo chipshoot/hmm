@@ -1,5 +1,5 @@
-﻿using DomainEntity.User;
-using FluentValidation;
+﻿using FluentValidation;
+using Hmm.DomainEntity.User;
 using Hmm.Utility.Dal.Repository;
 using Hmm.Utility.Validation;
 using System;

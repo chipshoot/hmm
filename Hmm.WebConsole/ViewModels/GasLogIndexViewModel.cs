@@ -1,4 +1,4 @@
-﻿using DomainEntity.Vehicle;
+﻿using Hmm.DomainEntity.Vehicle;
 using System.Collections.Generic;
 
 namespace Hmm.WebConsole.ViewModels

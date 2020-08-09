@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
-using DomainEntity.Vehicle;
-using Hmm.Api.Areas.GasLogNote.Models;
 using Hmm.Api.Models;
 using Hmm.Contract.Core;
 using Hmm.Contract.VehicleInfoManager;
+using Hmm.DomainEntity.Vehicle;
+using Hmm.DtoEntity.Api.GasLogNotes;
 using Hmm.Utility.Validation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;

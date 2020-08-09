@@ -1,6 +1,6 @@
-﻿using System;
-using FluentValidation;
-using Hmm.Api.Areas.HmmNote.Models;
+﻿using FluentValidation;
+using Hmm.DtoEntity.Api.HmmNote;
+using System;
 
 namespace Hmm.Api.Areas.HmmNote.Validators
 {

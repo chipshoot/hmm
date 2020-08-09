@@ -1,5 +1,5 @@
-﻿using DomainEntity.Misc;
-using FluentValidation;
+﻿using FluentValidation;
+using Hmm.DomainEntity.Misc;
 using Hmm.Utility.Validation;
 
 namespace Hmm.Core.Manager.Validation

@@ -1,6 +1,6 @@
-﻿using DomainEntity.Enumerations;
-using DomainEntity.Vehicle;
-using Hmm.Contract.VehicleInfoManager;
+﻿using Hmm.Contract.VehicleInfoManager;
+using Hmm.DomainEntity.Enumerations;
+using Hmm.DomainEntity.Vehicle;
 using Hmm.Utility.Currency;
 using Hmm.Utility.TestHelp;
 using System.Collections.Generic;
