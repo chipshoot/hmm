@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Hmm.Api.Authorization;
+using Hmm.Contract;
 using Hmm.Contract.Core;
 using Hmm.Contract.VehicleInfoManager;
 using Hmm.Core.Manager;
@@ -13,6 +15,8 @@ using Hmm.DtoEntity.Api;
 using Hmm.Utility.Dal.Query;
 using Hmm.Utility.Dal.Repository;
 using Hmm.Utility.Misc;
+using IdentityServer4.AccessTokenValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -21,7 +25,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json.Serialization;
 using VehicleInfoManager.GasLogMan;
 
 namespace Hmm.Api
@@ -42,10 +45,12 @@ namespace Hmm.Api
             services.AddControllers(setupAction =>
             {
                 setupAction.ReturnHttpNotAcceptable = true;
-            }).AddNewtonsoftJson(setupAction =>
-                {
-                    setupAction.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                })
+            })
+                .AddJsonOptions(opt => opt.JsonSerializerOptions.PropertyNamingPolicy = null)
+                //.AddNewtonsoftJson(setupAction =>
+                //{
+                //    setupAction.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                //})
                 .AddXmlDataContractSerializerFormatters()
                 .ConfigureApiBehaviorOptions(setupAction =>
                 {
@@ -67,6 +72,26 @@ namespace Hmm.Api
                         };
                     };
                 });
+
+            services.AddHttpContextAccessor();
+            services.AddScoped<IAuthorizationHandler, MustOwnGasLogHandler>();
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(
+                    HmmApiConstants.Policy.MustOwnGasLog,
+                    policyBuilder =>
+                    {
+                        policyBuilder.RequireAuthenticatedUser();
+                        policyBuilder.AddRequirements(new MustOwnGasLogRequirement());
+                    });
+            });
+            services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
+                .AddIdentityServerAuthentication(options =>
+                {
+                    options.Authority = "https://localhost:5001";
+                    options.ApiName = HmmConstants.HmmApiId;
+                    options.LegacyAudienceValidation = true;
+                });
             services.AddDbContext<HmmDataContext>(opt => opt.UseSqlServer(connectString));
             services.AddSingleton<IDateTimeProvider, DateTimeAdapter>();
             services.AddScoped<IVersionRepository<HmmNote>, NoteEfRepository>();
@@ -86,7 +111,7 @@ namespace Hmm.Api
             services.AddScoped<NoteValidator, NoteValidator>();
             services.AddScoped<NoteRenderValidator, NoteRenderValidator>();
             services.AddScoped<NoteCatalogValidator, NoteCatalogValidator>();
-            services.AddMvc();
+            //services.AddMvc();
             services.AddAutoMapper(typeof(ApiEntity));
         }
 
@@ -101,6 +126,10 @@ namespace Hmm.Api
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseAuthentication();
+
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

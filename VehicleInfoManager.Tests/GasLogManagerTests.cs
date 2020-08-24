@@ -1,4 +1,5 @@
-﻿using Hmm.Contract.VehicleInfoManager;
+﻿using System;
+using Hmm.Contract.VehicleInfoManager;
 using Hmm.DomainEntity.Vehicle;
 using Hmm.Utility.Currency;
 using Hmm.Utility.MeasureUnit;
@@ -29,9 +30,11 @@ namespace VehicleInfoManager.Tests
         public void CanAddGasLog()
         {
             // Arrange
+            const string comment = "This is a test gas log";
             var user = UserRepository.GetEntities().FirstOrDefault();
-            var car = _carManager.GetEntities().FirstOrDefault();
-            var discount = _discountManager.GetEntities().FirstOrDefault();
+            var car = _carManager.GetEntities(null).FirstOrDefault();
+            var discount = _discountManager.GetEntities(null).FirstOrDefault();
+            Assert.NotNull(user);
             var gasLog = new GasLog
             {
                 Car = car,
@@ -39,6 +42,7 @@ namespace VehicleInfoManager.Tests
                 Gas = Volume.FromLiter(40),
                 Price = new Money(40.0),
                 Distance = Dimension.FromKilometre(300),
+                CurrentMeterReading = Dimension.FromKilometre(12000),
                 Discounts = new List<GasDiscountInfo>
                         {
                             new GasDiscountInfo
@@ -46,7 +50,8 @@ namespace VehicleInfoManager.Tests
                                 Amount = new Money(0.8),
                                 Program = discount
                             }
-                        }
+                        },
+                Comment = comment
             };
 
             // Act
@@ -57,6 +62,9 @@ namespace VehicleInfoManager.Tests
             Assert.True(newGas.Id >= 1, "newGas.Id >= 1");
             Assert.NotNull(newGas.Car);
             Assert.NotNull(newGas.Discounts);
+            Assert.Equal(newGas.AuthorId, user.Id);
+            Assert.Equal(newGas.Comment, comment);
+            Assert.Equal(newGas.CurrentMeterReading, Dimension.FromKilometre(12000));
             Assert.Equal(newGas.Discounts.First().Amount, new Money(0.8));
             Assert.True(newGas.Discounts.Any());
             Assert.True(newGas.Discounts.FirstOrDefault()?.Amount.Amount == 0.8m);
@@ -85,6 +93,25 @@ namespace VehicleInfoManager.Tests
         }
 
         [Fact]
+        public void CanNotUpdateGasLogAuthorId()
+        {
+            // Arrange
+            var gas = InsertSampleGasLog();
+            Assert.NotNull(gas);
+            gas.AuthorId = Guid.NewGuid();
+            var user = UserRepository.GetEntities().FirstOrDefault();
+            Assert.NotNull(user);
+
+            // Act
+            var updatedGasLog = _manager.Update(gas, user);
+
+            // Assert
+            Assert.True(_manager.ProcessResult.Success);
+            Assert.NotNull(updatedGasLog);
+            Assert.Equal(user.Id, updatedGasLog.AuthorId);
+        }
+
+        [Fact]
         public void CanFindGasLog()
         {
             // Arrange
@@ -107,8 +134,8 @@ namespace VehicleInfoManager.Tests
         private GasLog InsertSampleGasLog()
         {
             var user = UserRepository.GetEntities().FirstOrDefault();
-            var car = _carManager.GetEntities().FirstOrDefault();
-            var discount = _discountManager.GetEntities().FirstOrDefault();
+            var car = _carManager.GetEntities(null).FirstOrDefault();
+            var discount = _discountManager.GetEntities(null).FirstOrDefault();
             var gasLog = new GasLog
             {
                 Car = car,

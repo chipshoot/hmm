@@ -1,7 +1,7 @@
-﻿using Hmm.Utility.MeasureUnit;
+﻿using Hmm.Utility.Currency;
+using Hmm.Utility.MeasureUnit;
 using System;
 using System.Collections.Generic;
-using Hmm.Utility.Currency;
 
 namespace Hmm.DomainEntity.Vehicle
 {
@@ -10,6 +10,8 @@ namespace Hmm.DomainEntity.Vehicle
         public Automobile Car { get; set; }
 
         public Dimension Distance { get; set; }
+
+        public Dimension CurrentMeterReading { get; set; }
 
         public Volume Gas { get; set; }
 
@@ -20,5 +22,7 @@ namespace Hmm.DomainEntity.Vehicle
         public string Station { get; set; }
 
         public DateTime CreateDate { get; set; }
+
+        public string Comment { get; set; }
     }
 }

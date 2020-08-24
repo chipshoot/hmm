@@ -66,7 +66,7 @@ namespace VehicleInfoManager.Tests
             SetupEnvironment();
 
             // Act
-            var savedCars = _manager.GetEntities();
+            var savedCars = _manager.GetEntities(null);
 
             // Assert
             Assert.True(_manager.ProcessResult.Success);
@@ -92,7 +92,7 @@ namespace VehicleInfoManager.Tests
             };
             _manager.Create(car, user);
 
-            return _manager.GetEntities().ToList();
+            return _manager.GetEntities(null).ToList();
         }
     }
 }

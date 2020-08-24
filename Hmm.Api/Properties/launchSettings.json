@@ -13,12 +13,12 @@
   },
   "profiles": {
     "IIS Express": {
-      "commandName": "IISExpress",
-      "launchBrowser": true,
+      "commandName": "Project",
       "launchUrl": "api/automobiles/gaslogs",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "applicationUrl": "https://localhost:44327/"
     },
     "Hmm.Api": {
       "commandName": "IIS",

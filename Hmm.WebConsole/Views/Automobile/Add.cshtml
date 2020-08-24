@@ -1,0 +1,46 @@
+﻿@model Hmm.WebConsole.ViewModels.GasLogAddViewModel
+
+<div class="container p-5">
+    <h2 class="leftMarginSmaller">Log Gas Fill</h2>
+    <div class="card p-3">
+        <form asp-action="Add" method="post" role="form" enctype="multipart/form-data">
+            <div class="row mb-3 gy-3">
+                <label for="dateInput" class="col-sm-2 col-form-label">Date</label>
+                <div class="col-sm-10">
+                    <input id="dateInput" type="datetime" asp-for="GasLog.CreateDate" class="form-control" />
+                </div>
+                <label for="distanceInput" class="col-sm-2 col-form-label">Distance</label>
+                <div class="col-sm-10">
+                    <input id="distanceInput" type="text" asp-for="GasLog.Distance" class="form-control" />
+                </div>
+                <label for="MeterInput" class="col-sm-2 col-form-label">Current Meter Reading</label>
+                <div class="col-sm-10">
+                    <input id="MeterInput" type="text" asp-for="GasLog.CurrentMeterReading" class="form-control" />
+                </div>
+                <label for="gasInput" class="col-sm-2 col-form-label">Gas</label>
+                <div class="col-sm-10">
+                    <input id="gasInput" type="text" asp-for="GasLog.Gas" class="form-control" />
+                </div>
+                <label for="priceInput" class="col-sm-2 col-form-label">Price</label>
+                <div class="col-sm-10">
+                    <input id="priceInput" type="text" asp-for="GasLog.Price" class="form-control" />
+                </div>
+                <label for="totalInput" class="col-sm-2 col-form-label">Total</label>
+                <div class="col-sm-10">
+                    <input id="totalInput" type="text" readonly class="form-control" />
+                </div>
+                <label for="gasStationInput" class="col-sm-2 col-form-label">Gas Station</label>
+                <div class="col-sm-10">
+                    <input id="gasStationInput" type="text" asp-for="GasLog.GasStation" class="form-control" />
+                </div>
+                <label for="commentInput" class="col-sm-2 col-form-label">Comment</label>
+                <div class="col-sm-10">
+                    <input id="commentInput" type="text" asp-for="GasLog.Comment" class="form-control" />
+                </div>
+                <div class="col-sm-10">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

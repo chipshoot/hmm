@@ -1,8 +1,10 @@
 using System;
+using Hmm.IDP.Quickstart.Account;
 using IdentityServer4.Models;
+using IdentityServerHost.Quickstart.UI;
 using Microsoft.AspNetCore.Mvc;
 
-namespace IdentityServerHost.Quickstart.UI
+namespace Hmm.IDP.Quickstart
 {
     public static class Extensions
     {

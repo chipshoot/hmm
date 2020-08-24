@@ -20,15 +20,15 @@ namespace VehicleInfoManager.GasLogMan
         {
         }
 
-        public override IEnumerable<GasDiscount> GetEntities()
+        public override IEnumerable<GasDiscount> GetEntities(User user)
         {
-            var discounts = GetEntitiesFromRawData(AppConstant.GasDiscountRecordSubject);
+            var discounts = GetEntitiesFromRawData(AppConstant.GasDiscountRecordSubject, user);
             return discounts;
         }
 
         public override GasDiscount GetEntityById(int id)
         {
-            return GetEntities().FirstOrDefault(d => d.Id == id);
+            return GetEntities(null).FirstOrDefault(d => d.Id == id);
         }
 
         public override GasDiscount Create(GasDiscount discount, User author)

@@ -4,7 +4,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [dbo].[Users](
-	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[ID] [UNIQUEIDENTIFIER] DEFAULT NEWID() NOT NULL,
 	[FirstName] [nvarchar](100) NOT NULL,
 	[LastName] [nvarchar](100) NOT NULL,
 	[BirthDay] [datetime] NOT NULL,
@@ -129,7 +129,7 @@ CREATE TABLE [dbo].[Notes](
 	[Subject] [nvarchar](1000) NOT NULL,
 	[Content] [xml] NOT NULL,
 	[CatalogId] [int] NOT NULL,
-	[AuthorID] [int] NOT NULL,
+	[AuthorID] [UNIQUEIDENTIFIER] NOT NULL,
 	[CreateDate] [datetime] NOT NULL,
 	[LastModifiedDate] [datetime] NOT NULL,
 	[Description] [nvarchar](1000) NULL,
@@ -148,7 +148,7 @@ GO
 CREATE TABLE [dbo].[Emails](
 	[ID] [int] IDENTITY(1,1) NOT NULL,
 	[Email] [nvarchar](1000) NOT NULL,
-	[Owner] [int] NOT NULL,
+	[Owner] [UNIQUEIDENTIFIER] NOT NULL,
 	[IsPrimary] [bit] NOT NULL,
 	[Catalog] [int] NOT NULL,
 	[IsActivated] [bit] NOT NULL,
@@ -169,7 +169,7 @@ CREATE TABLE [dbo].[Phones](
 	[AreaCode] [int] NULL,
 	[Phone] [nvarchar](1000) NOT NULL,
 	[Extension] [int] NULL,
-	[Owner] [int] NOT NULL,
+	[Owner] [UNIQUEIDENTIFIER] NOT NULL,
 	[Country] [nvarchar](3) NULL,
 	[Catalog] [int] NOT NULL,
 	[IsActivated] [bit] NOT NULL,

@@ -8,6 +8,7 @@ using Hmm.DomainEntity.Vehicle;
 using Hmm.DtoEntity.Api.GasLogNotes;
 using Hmm.Utility.Currency;
 using Hmm.Utility.Validation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
@@ -19,6 +20,7 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
 {
     [Route("api/automobiles/gaslogs")]
     [ValidationModel]
+    [Authorize]
     public class GasLogController : Controller
     {
         private readonly IAutoEntityManager<GasLog> _gasLogManager;
@@ -42,17 +44,32 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
             _discountManager = discountManager;
         }
 
-        // GET api/automobiles/gaslogs/5
+        // GET api/automobiles/gaslogs
         [HttpGet]
         public IActionResult Get()
         {
-            var gasLogs = _gasLogManager.GetEntities().ToList();
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+            if (userId == null)
+            {
+                var errorMsg = "Cannot get author information with null user id";
+                Log.Error(errorMsg);
+                return BadRequest(errorMsg);
+            }
+
+            var user = _userManager.GetEntities().FirstOrDefault(u => u.Id == Guid.Parse(userId));
+            if (user == null)
+            {
+                return Ok(new List<ApiGasLog>());
+            }
+
+            var gasLogs = _gasLogManager.GetEntities(user).ToList();
             var apiGasLogs = _mapper.Map<List<ApiGasLog>>(gasLogs);
             return Ok(apiGasLogs);
         }
 
         // GET api/automobiles/gaslogs/5
         [HttpGet("{id}")]
+        [Authorize(HmmApiConstants.Policy.MustOwnGasLog)]
         public IActionResult Get(int id)
         {
             var gasLog = _gasLogManager.GetEntityById(id);
@@ -67,6 +84,7 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
 
         // POST api/automobiles/gaslogs
         [HttpPost]
+        [Authorize(Roles = "author")]
         public IActionResult Post([FromBody] ApiGasLogForCreation apiGasLog)
         {
             if (apiGasLog == null)
@@ -129,6 +147,7 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
 
         // PUT api/automobiles/gaslogs/5
         [HttpPut("{id}")]
+        [Authorize(HmmApiConstants.Policy.MustOwnGasLog)]
         public IActionResult Put(int id, [FromBody] ApiGasLogForUpdate apiGasLog)
         {
             if (apiGasLog == null)
@@ -155,6 +174,7 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
 
         // DELETE api/automobiles/gaslogs/5
         [HttpDelete("{id}")]
+        [Authorize(HmmApiConstants.Policy.MustOwnGasLog)]
         public IActionResult Delete(int id)
         {
             throw new NotImplementedException();

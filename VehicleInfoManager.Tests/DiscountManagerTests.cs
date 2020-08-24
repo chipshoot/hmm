@@ -68,7 +68,7 @@ namespace VehicleInfoManager.Tests
             SetupEnvironment();
 
             // Act
-            var savedDiscounts = _manager.GetEntities().ToList();
+            var savedDiscounts = _manager.GetEntities(null).ToList();
 
             // Assert
             Assert.True(_manager.ProcessResult.Success);

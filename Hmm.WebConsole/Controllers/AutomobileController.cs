@@ -1,28 +1,67 @@
-﻿using Hmm.DomainEntity.Vehicle;
+﻿using AutoMapper;
+using Hmm.DtoEntity.Api.GasLogNotes;
 using Hmm.Utility.Validation;
 using Hmm.WebConsole.ViewModels;
+using IdentityModel.Client;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Hmm.WebConsole.Controllers
 {
+    [Authorize]
     public class AutomobileController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IMapper _mapper;
 
-        public AutomobileController(IHttpClientFactory httpClientFactory)
+        public AutomobileController(IHttpClientFactory httpClientFactory, IMapper mapper)
         {
             Guard.Against<ArgumentNullException>(httpClientFactory == null, nameof(httpClientFactory));
+            Guard.Against<ArgumentNullException>(mapper == null, nameof(mapper));
             _httpClientFactory = httpClientFactory;
+            _mapper = mapper;
         }
 
         public async Task<IActionResult> Index()
         {
-            var httpClient = _httpClientFactory.CreateClient("APIClient");
+            // todo: remove this helper method in production
+            await WriteOutIdentityInformation();
+
+            // todo: remove this in production
+            // try to get user address information from IDP's user info endpoint
+            var idpClient = _httpClientFactory.CreateClient(HmmWebConsoleConstants.HttpClient.Idp);
+            var metaDataResponse = await idpClient.GetDiscoveryDocumentAsync();
+            if (metaDataResponse.IsError)
+            {
+                throw new Exception("Problem accessing the discover endpoint", metaDataResponse.Exception);
+            }
+
+            var accessToken = await HttpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken);
+            var userInfoResponse = await idpClient.GetUserInfoAsync(
+                new UserInfoRequest
+                {
+                    Address = metaDataResponse.UserInfoEndpoint,
+                    Token = accessToken
+                });
+            if (userInfoResponse.IsError)
+            {
+                throw new Exception("Problem accessing the user endpoint", userInfoResponse.Exception);
+            }
+
+            var addr = userInfoResponse.Claims.FirstOrDefault(c => c.Type == "address")?.Value;
+
+            var httpClient = _httpClientFactory.CreateClient(HmmWebConsoleConstants.HttpClient.Api);
             var request = new HttpRequestMessage(
                 HttpMethod.Get,
                 "/api/automobiles/gaslogs");
@@ -30,11 +69,42 @@ namespace Hmm.WebConsole.Controllers
             var response = await httpClient.SendAsync(
                 request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
 
-            response.EnsureSuccessStatusCode();
-
-            using (var responseStream = await response.Content.ReadAsStreamAsync())
+            if (response.IsSuccessStatusCode)
             {
-                return View(new GasLogIndexViewModel(await JsonSerializer.DeserializeAsync<List<GasLog>>(responseStream)));
+                using (var responseStream = await response.Content.ReadAsStreamAsync())
+                {
+                    var gaslogs = await JsonSerializer.DeserializeAsync<List<ApiGasLog>>(responseStream);
+                    return View(new GasLogIndexViewModel(gaslogs, addr, _mapper));
+                }
+            }
+            else if (response.StatusCode==HttpStatusCode.Unauthorized || response.StatusCode==HttpStatusCode.Forbidden)
+            {
+                return RedirectToAction("AccessDenied", "Authorization");
+
+            }
+
+            throw new Exception("Problem accessing the API");
+        }
+
+        [Authorize(Policy = HmmWebConsoleConstants.Policy.CanAddGasLog)]
+        public IActionResult Add()
+        {
+            return View(new GasLogAddViewModel(_mapper));
+        }
+
+        public async Task WriteOutIdentityInformation()
+        {
+            var identityToken = await HttpContext.GetTokenAsync(OpenIdConnectParameterNames.IdToken);
+
+            var tokenInfo = $"Identity Token: {identityToken}";
+            Debug.WriteLine(tokenInfo);
+            Log.Debug(tokenInfo);
+
+            foreach (var claim in User.Claims)
+            {
+                var claimInfo = $"Claim type: {claim.Type} - Claim value: {claim.Value}";
+                Debug.WriteLine(claimInfo);
+                Log.Debug(tokenInfo);
             }
         }
     }

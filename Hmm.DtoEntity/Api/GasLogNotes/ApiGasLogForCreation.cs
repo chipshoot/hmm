@@ -9,6 +9,8 @@ namespace Hmm.DtoEntity.Api.GasLogNotes
 
         public float Distance { get; set; }
 
+        public float CurrentMetterReading { get; set; }
+
         public float Gas { get; set; }
 
         public decimal Price { get; set; }
@@ -18,5 +20,7 @@ namespace Hmm.DtoEntity.Api.GasLogNotes
         public int AutomobileId { get; set; }
 
         public string GasStation { get; set; }
+
+        public string Comment { get; set; }
     }
 }

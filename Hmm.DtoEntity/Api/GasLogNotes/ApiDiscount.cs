@@ -1,4 +1,5 @@
-﻿using Hmm.DomainEntity.Enumerations;
+﻿using System;
+using Hmm.DomainEntity.Enumerations;
 
 namespace Hmm.DtoEntity.Api.GasLogNotes
 {
@@ -12,7 +13,7 @@ namespace Hmm.DtoEntity.Api.GasLogNotes
 
         public decimal Amount { get; set; }
 
-        public int AuthorId { get; set; }
+        public Guid AuthorId { get; set; }
 
         public bool IsActive { get; set; }
     }

@@ -6,19 +6,41 @@
     <title>@ViewData["Title"] - Home made message</title>
 
     <environment names="Development">
-        <link rel="stylesheet" href="~/lib/twitter-bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap-5.0.0-alpha1-dist/css/bootstrap.css" />
         <link rel="stylesheet" href="~/css/site.css" />
     </environment>
-    <environment names="Staging,Production">
-        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/4.5.0/css/bootstrap.min.css"
-              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
-              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
-        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
-    </environment>
+    @*<environment names="Staging,Production">
+            <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/4.5.0/css/bootstrap.min.css"
+                  asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+                  asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
+            <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+        </environment>*@
 </head>
 <body>
-<div class="container body-container">
-    @RenderBody()
-</div>
+    <div class="container-fluid">
+        <nav class="navbar navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">Hmm</a>
+            <ul class="nav justify-content-end">
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="" asp-controller="Automobile" asp-action="Index">Home</a>
+                </li>
+                @if ((await AuthorizationService.AuthorizeAsync(User, "CanAddGasLog")).Succeeded)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Automobile" asp-action="Add">Add Log</a>
+                    </li>
+                }
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Logout">Logout</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+        <div class="body-container">
+            @RenderBody()
+        </div>
+    </div>
 </body>
 </html>

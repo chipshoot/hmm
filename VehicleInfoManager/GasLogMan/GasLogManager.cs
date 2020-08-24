@@ -33,9 +33,9 @@ namespace VehicleInfoManager.GasLogMan
             _discountManager = discountManager;
         }
 
-        public override IEnumerable<GasLog> GetEntities()
+        public override IEnumerable<GasLog> GetEntities(User author)
         {
-            var logs = GetEntitiesFromRawData(AppConstant.GasLogRecordSubject).ToList();
+            var logs = GetEntitiesFromRawData(AppConstant.GasLogRecordSubject, author).ToList();
             foreach (var log in logs)
             {
                 log.Discounts = FillDiscounts(log.Discounts);
@@ -45,14 +45,15 @@ namespace VehicleInfoManager.GasLogMan
 
         public override GasLog GetEntityById(int id)
         {
-            return GetEntities().FirstOrDefault(l => l.Id == id);
+            return GetEntities(null).FirstOrDefault(l => l.Id == id);
         }
 
         public override GasLog Create(GasLog gasLog, User author)
         {
             Guard.Against<ArgumentNullException>(gasLog == null, nameof(gasLog));
 
-            var id = CreateEntityRawData(gasLog, AppConstant.GasLogRecordSubject, author);
+            // ReSharper disable once PossibleNullReferenceException
+            var id = CreateEntityRawData(gasLog, AppConstant.GasLogRecordSubject, author, gasLog.Comment);
             if (!ProcessResult.Success)
             {
                 return null;
@@ -79,7 +80,10 @@ namespace VehicleInfoManager.GasLogMan
             curLog.Price = gasLog.Price;
             curLog.Station = gasLog.Station;
             curLog.Distance = gasLog.Distance;
+            curLog.CurrentMeterReading = gasLog.CurrentMeterReading;
             curLog.Discounts = gasLog.Discounts;
+            curLog.Comment = gasLog.Comment;
+            curLog.AuthorId = author.Id;
 
             UpdateEntityRawData(curLog, AppConstant.GasLogRecordSubject);
             if (!ProcessResult.Success)
@@ -96,6 +100,7 @@ namespace VehicleInfoManager.GasLogMan
             var xml = new XElement("GasLog",
                 new XElement("Automobile", entity.Car.Id),
                 new XElement("Distance", entity.Distance.Measure2Xml(ContentNamespace)),
+                new XElement("CurrentMeterReading", entity.CurrentMeterReading.Measure2Xml(ContentNamespace)),
                 new XElement("Gas", entity.Gas.Measure2Xml(ContentNamespace)),
                 new XElement("Price", entity.Price.Measure2Xml(ContentNamespace)),
                 new XElement("GasStation", entity.Station),
@@ -149,9 +154,12 @@ namespace VehicleInfoManager.GasLogMan
                 Car = car,
                 Station = logRoot.Element(ns + "GasStation")?.Value,
                 Distance = Dimension.FromXml(logRoot.Element(ns + "Distance")?.Element(ns + "Dimension")),
+                CurrentMeterReading = Dimension.FromXml(logRoot.Element(ns + "CurrentMeterReading")?.Element(ns + "Dimension")),
                 Gas = Volume.FromXml(logRoot.Element(ns + "Gas")?.Element(ns + "Volume")),
                 Price = Money.FromXml(logRoot.Element(ns + "Price")?.Element(ns + "Money")),
-                CreateDate = note.CreateDate
+                CreateDate = note.CreateDate,
+                Comment = note.Description,
+                AuthorId = note.Author.Id
             };
 
             var discounts = GetDiscountInfos(logRoot.Element(ns + "Discounts"), ns);

@@ -52,7 +52,7 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
         [HttpHead]
         public ActionResult<IEnumerable<ApiDiscount>> GetDiscounts()
         {
-            var discounts = _mapper.Map<IEnumerable<ApiDiscount>>(_discountManager.GetEntities().ToList());
+            var discounts = _mapper.Map<IEnumerable<ApiDiscount>>(_discountManager.GetEntities(null).ToList());
             return Ok(discounts);
         }
 

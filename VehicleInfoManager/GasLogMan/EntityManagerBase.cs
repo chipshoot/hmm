@@ -35,7 +35,7 @@ namespace VehicleInfoManager.GasLogMan
 
         #region method of interface IAutoEntityManager
 
-        public abstract IEnumerable<T> GetEntities();
+        public abstract IEnumerable<T> GetEntities(User author);
 
         public abstract T GetEntityById(int id);
 
@@ -43,21 +43,38 @@ namespace VehicleInfoManager.GasLogMan
 
         public abstract T Update(T entity, User author);
 
+        public bool IsEntityOwner(int id, Guid authorId)
+        {
+            var hasEntity = GetEntities(null).Any(e => e.Id == id && e.AuthorId == authorId);
+            return hasEntity;
+        }
+
         public ProcessingResult ProcessResult { get; } = new ProcessingResult();
 
         #endregion method of interface IAutoEntityManager
 
         protected abstract T GetEntityFromRawData(HmmNote note);
 
-        protected IEnumerable<T> GetEntitiesFromRawData(string subject)
+        protected IEnumerable<T> GetEntitiesFromRawData(string subject, User author)
         {
-            var notes = _noteManager.GetNotes()
-                .Where(n => n.Subject == subject)
-                .Select(GetEntityFromRawData);
+            IEnumerable<T> notes;
+            if (author == null)
+            {
+                notes = _noteManager.GetNotes()
+                    .Where(n => n.Subject == subject)
+                    .Select(GetEntityFromRawData);
+            }
+            else
+            {
+                notes = _noteManager.GetNotes()
+                    .Where(n => n.Subject == subject && n.Author.Id == author.Id)
+                    .Select(GetEntityFromRawData);
+            }
+
             return notes;
         }
 
-        protected int CreateEntityRawData(T entity, string catalogName, User author)
+        protected int CreateEntityRawData(T entity, string catalogName, User author, string comment = null)
         {
             Guard.Against<ArgumentNullException>(entity == null, nameof(entity));
             Guard.Against<ArgumentNullException>(string.IsNullOrEmpty(catalogName), nameof(entity));
@@ -75,7 +92,8 @@ namespace VehicleInfoManager.GasLogMan
                 Catalog = catalog,
                 Author = author,
                 Content = GetNoteContent(entity),
-                CreateDate = _dateProvider.UtcNow
+                CreateDate = _dateProvider.UtcNow,
+                Description = comment
             };
             var newNode = _noteManager.Create(note);
 

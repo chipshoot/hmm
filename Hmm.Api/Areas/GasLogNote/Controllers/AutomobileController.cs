@@ -51,7 +51,7 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<ApiAutomobile>> GetMobiles()
         {
-            var apiCars = _mapper.Map<IEnumerable<ApiAutomobile>>(_automobileManager.GetEntities().ToList());
+            var apiCars = _mapper.Map<IEnumerable<ApiAutomobile>>(_automobileManager.GetEntities(null).ToList());
             return Ok(apiCars);
         }
 

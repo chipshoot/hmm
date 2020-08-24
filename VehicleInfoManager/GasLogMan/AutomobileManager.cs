@@ -18,9 +18,9 @@ namespace VehicleInfoManager.GasLogMan
         {
         }
 
-        public override IEnumerable<Automobile> GetEntities()
+        public override IEnumerable<Automobile> GetEntities(User user = null)
         {
-            return GetEntitiesFromRawData(AppConstant.AutoMobileRecordSubject);
+            return GetEntitiesFromRawData(AppConstant.AutoMobileRecordSubject, user);
         }
 
         public override Automobile GetEntityById(int id)
