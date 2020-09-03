@@ -13,6 +13,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Reflection;
+using Hmm.IDP.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace Hmm.IDP
 {
@@ -33,6 +35,7 @@ namespace Hmm.IDP
             // uncomment, if you want to add an MVC-based UI
             services.AddControllersWithViews();
             services.AddScoped<ILocalUserService, LocalUserService>();
+            services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
             var builder = services.AddIdentityServer(options =>
             {

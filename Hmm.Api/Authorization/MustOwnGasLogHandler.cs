@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace Hmm.Api.Authorization
 {
+    /// <summary>
+    /// The handle for <see cref="MustOwnGasLogRequirement"/>
+    /// </summary>
     public class MustOwnGasLogHandler : AuthorizationHandler<MustOwnGasLogRequirement>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;

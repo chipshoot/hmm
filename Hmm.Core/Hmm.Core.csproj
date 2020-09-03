@@ -20,7 +20,7 @@
     <Compile Include="Manager\Validation\NoteCatalogValidator.cs" />
     <Compile Include="Manager\Validation\NoteRenderValidator.cs" />
     <Compile Include="Manager\Validation\NoteValidator.cs" />
-    <Compile Include="Manager\Validation\UserValidator.cs" />
+    <Compile Include="Manager\Validation\AuthorValidator.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -8,7 +8,7 @@ namespace Hmm.DtoEntity.Api.HmmNote
 
         public string Content { get; set; }
 
-        public ApiUser Author { get; set; }
+        public ApiAuthor Author { get; set; }
 
         public DateTime CreateDate { get; set; }
 

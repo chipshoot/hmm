@@ -35,13 +35,13 @@ namespace VehicleInfoManager.GasLogMan
 
         #region method of interface IAutoEntityManager
 
-        public abstract IEnumerable<T> GetEntities(User author);
+        public abstract IEnumerable<T> GetEntities(Author author);
 
         public abstract T GetEntityById(int id);
 
-        public abstract T Create(T entity, User author);
+        public abstract T Create(T entity, Author author);
 
-        public abstract T Update(T entity, User author);
+        public abstract T Update(T entity, Author author);
 
         public bool IsEntityOwner(int id, Guid authorId)
         {
@@ -55,7 +55,7 @@ namespace VehicleInfoManager.GasLogMan
 
         protected abstract T GetEntityFromRawData(HmmNote note);
 
-        protected IEnumerable<T> GetEntitiesFromRawData(string subject, User author)
+        protected IEnumerable<T> GetEntitiesFromRawData(string subject, Author author)
         {
             IEnumerable<T> notes;
             if (author == null)
@@ -74,7 +74,7 @@ namespace VehicleInfoManager.GasLogMan
             return notes;
         }
 
-        protected int CreateEntityRawData(T entity, string catalogName, User author, string comment = null)
+        protected int CreateEntityRawData(T entity, string catalogName, Author author, string comment = null)
         {
             Guard.Against<ArgumentNullException>(entity == null, nameof(entity));
             Guard.Against<ArgumentNullException>(string.IsNullOrEmpty(catalogName), nameof(entity));

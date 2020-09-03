@@ -22,6 +22,7 @@
     <ProjectReference Include="..\Hmm.Contract\Hmm.Contract.csproj" />
     <ProjectReference Include="..\Hmm.DomainEntity\Hmm.DomainEntity.csproj" />
     <ProjectReference Include="..\Hmm.DtoEntity\Hmm.DtoEntity.csproj" />
+    <ProjectReference Include="..\Hmm.Infrastructure\Hmm.Infrastructure.csproj" />
     <ProjectReference Include="..\Hmm.Utility\Hmm.Utility.csproj" />
   </ItemGroup>
 

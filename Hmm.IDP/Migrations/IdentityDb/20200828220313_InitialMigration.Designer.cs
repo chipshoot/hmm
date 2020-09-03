@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hmm.IDP.Migrations.IdentityDb
 {
     [DbContext(typeof(IdentityDbContext))]
-    [Migration("20200820035641_InitialMigration")]
+    [Migration("20200828220313_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -66,7 +66,7 @@ namespace Hmm.IDP.Migrations.IdentityDb
                             Password = "fchy",
                             Subject = "6E8FDCED-8857-46B9-BAD8-6DF2540FD07E",
                             UserName = "fchy",
-                            Version = "d9c38590-2718-475b-b080-836b0319944d"
+                            Version = "08cf6a48-b5d7-4447-aa1e-9b65b4116fa2"
                         },
                         new
                         {
@@ -75,7 +75,7 @@ namespace Hmm.IDP.Migrations.IdentityDb
                             Password = "fzt",
                             Subject = "1501CAB6-CA3F-470F-AE5E-1A0B970D1707",
                             UserName = "fzt",
-                            Version = "317fd686-775d-45e2-bf57-749e1153d9f6"
+                            Version = "35c44084-6778-4f75-b74a-ba21832b59cc"
                         },
                         new
                         {
@@ -84,7 +84,7 @@ namespace Hmm.IDP.Migrations.IdentityDb
                             Password = "bob",
                             Subject = "157BBC69-9989-4353-A4B9-02A205678562",
                             UserName = "bob",
-                            Version = "4b997a64-f851-46d6-b5b7-0a581e61897d"
+                            Version = "ea4d82fe-1bb4-4f5c-923a-139524b77eb5"
                         });
                 });
 
@@ -120,147 +120,147 @@ namespace Hmm.IDP.Migrations.IdentityDb
                     b.HasData(
                         new
                         {
-                            Id = new Guid("faf8d364-dd4f-44fb-a9a5-082270fbb40a"),
-                            Type = "Name",
+                            Id = new Guid("8bec2b50-ca9d-4ca5-a7ad-d3349eb0b4ce"),
+                            Type = "name",
                             UserId = new Guid("08e54ef4-f64c-442b-bd4d-63df65bdfb55"),
                             Value = "Chaoyang Fang",
-                            Version = "4ea629a7-a1cd-468f-859f-1fa83b5b5346"
+                            Version = "7cb44d4a-b8f0-4c6e-b2c6-b431d9c84345"
                         },
                         new
                         {
-                            Id = new Guid("e9e275b0-0389-44cb-8310-f69ac513a258"),
-                            Type = "GivenName",
+                            Id = new Guid("9f6bf4a9-526c-4c67-983e-e9a85e311651"),
+                            Type = "given_name",
                             UserId = new Guid("08e54ef4-f64c-442b-bd4d-63df65bdfb55"),
                             Value = "Chaoyang",
-                            Version = "80707950-19c1-4b86-a4a5-174ca26418b3"
+                            Version = "16aca772-75cc-476d-85a7-11eaf491e127"
                         },
                         new
                         {
-                            Id = new Guid("b2b399d5-31e4-41b8-b6e0-b9a9e8bb6190"),
-                            Type = "FamilyName",
+                            Id = new Guid("f8474a01-41a4-4a45-b58a-f8c40938da4d"),
+                            Type = "family_name",
                             UserId = new Guid("08e54ef4-f64c-442b-bd4d-63df65bdfb55"),
                             Value = "Fang",
-                            Version = "b5be93f6-6ad0-41d4-bc01-4c3d0b9ac1d8"
+                            Version = "e1bf9145-8681-461b-839a-453b60cd63f4"
                         },
                         new
                         {
-                            Id = new Guid("1dba8fb3-e874-4c22-974e-af4fb7d07a41"),
-                            Type = "Email",
+                            Id = new Guid("4a5eaf01-7efe-4386-90d2-9cfc9dc508b5"),
+                            Type = "email",
                             UserId = new Guid("08e54ef4-f64c-442b-bd4d-63df65bdfb55"),
                             Value = "fchy@yahoo.com",
-                            Version = "66087583-7033-4bef-8382-4d8c2b670efd"
+                            Version = "99c739f0-e89b-421f-b28d-6445c521cd2a"
                         },
                         new
                         {
-                            Id = new Guid("3c49c06d-093c-4198-a0b0-6941331aced8"),
-                            Type = "Address",
+                            Id = new Guid("c7884b4f-784e-48a7-b835-a7fd7c54e47e"),
+                            Type = "address",
                             UserId = new Guid("08e54ef4-f64c-442b-bd4d-63df65bdfb55"),
                             Value = "1750 Bloor St.",
-                            Version = "b5194b19-af74-4bbc-a572-55139fc40940"
+                            Version = "4d1c1880-c170-4abd-9546-4d74fc8e15e6"
                         },
                         new
                         {
-                            Id = new Guid("ff31b995-6f62-47c3-becf-ef0b0f0814a2"),
-                            Type = "Role",
+                            Id = new Guid("f325a27b-c90b-47bd-b661-936862e5b03e"),
+                            Type = "birthdate",
                             UserId = new Guid("08e54ef4-f64c-442b-bd4d-63df65bdfb55"),
-                            Value = "author",
-                            Version = "a061d990-325f-43e7-875e-602fe07a4218"
+                            Value = "1967-03-13",
+                            Version = "c94c26c6-6eca-4ff4-a8a6-b5121ed3742e"
                         },
                         new
                         {
-                            Id = new Guid("517ed90f-0065-4707-b17b-cb5cc717c648"),
-                            Type = "Name",
+                            Id = new Guid("4a028bf5-070f-43d6-a8a0-03eb8a958c51"),
+                            Type = "name",
                             UserId = new Guid("303cac10-a6c6-4b46-846b-aa07a8d46393"),
                             Value = "Zhitao Fang",
-                            Version = "670fbcda-7303-4444-8838-8b881ec42e92"
+                            Version = "0ea0e85e-34f7-4a39-89e2-0fd7a479ed82"
                         },
                         new
                         {
-                            Id = new Guid("cce9802d-d49a-42a8-950e-c119fe876555"),
-                            Type = "GivenName",
+                            Id = new Guid("d249498a-a20d-4208-a74c-560589c8e752"),
+                            Type = "given_name",
                             UserId = new Guid("303cac10-a6c6-4b46-846b-aa07a8d46393"),
                             Value = "Zhitao",
-                            Version = "008a7eb4-675d-48ea-9550-72fb54c635aa"
+                            Version = "6772c277-7e6f-432a-aba1-5c6003097ca3"
                         },
                         new
                         {
-                            Id = new Guid("0cb68716-50e4-48c0-9a7c-23edd3de4bb7"),
-                            Type = "FamilyName",
+                            Id = new Guid("46a6ef68-35f5-42db-8ecb-7e0fa77fa1e1"),
+                            Type = "family_name",
                             UserId = new Guid("303cac10-a6c6-4b46-846b-aa07a8d46393"),
                             Value = "Fang",
-                            Version = "ad3cb0d7-9105-4faf-87bf-539487558709"
+                            Version = "3080d2a7-a565-459e-8a1b-be41ae849b60"
                         },
                         new
                         {
-                            Id = new Guid("8b44bb38-7da3-422e-b33f-339723a05f1b"),
-                            Type = "Email",
+                            Id = new Guid("4ae82b81-3113-4a51-b425-4c90d488a781"),
+                            Type = "email",
                             UserId = new Guid("303cac10-a6c6-4b46-846b-aa07a8d46393"),
                             Value = "ftt@yahoo.com",
-                            Version = "8d4bc42e-6af4-4a40-8e17-a0931a4d800d"
+                            Version = "e56ae42a-0d79-4090-89eb-851d5ec28fe5"
                         },
                         new
                         {
-                            Id = new Guid("67f1b342-368a-4045-a3a8-0866cd561ac1"),
-                            Type = "Address",
+                            Id = new Guid("6135707f-e110-44cc-844e-ec15dee500ff"),
+                            Type = "address",
                             UserId = new Guid("303cac10-a6c6-4b46-846b-aa07a8d46393"),
                             Value = "29 Spencer Ave.",
-                            Version = "079b077c-c1b4-4ead-83e6-d9dd0755934c"
+                            Version = "5a80b3bb-4582-4a8a-aa7a-bf413de45ee5"
                         },
                         new
                         {
-                            Id = new Guid("a7e95bd3-a6a1-4216-9795-1e744d6bda9d"),
-                            Type = "Role",
+                            Id = new Guid("d4e52ec8-8b5b-4ebd-9054-d6bb9097495a"),
+                            Type = "birthdate",
                             UserId = new Guid("303cac10-a6c6-4b46-846b-aa07a8d46393"),
-                            Value = "author",
-                            Version = "50caad73-1e4f-4c23-b112-9c5f4189bafc"
+                            Value = "1999-09-30",
+                            Version = "088ff9dd-4604-460a-82d9-eac09ceb5c88"
                         },
                         new
                         {
-                            Id = new Guid("fc0cb468-85ba-48d5-b4ce-d52ea149a5e9"),
-                            Type = "Name",
+                            Id = new Guid("40707a5f-5bdd-44ef-83fc-0d86e6e237a4"),
+                            Type = "name",
                             UserId = new Guid("3dd54a32-688f-40fb-9f5e-666ff007b3c1"),
                             Value = "Bob Smith",
-                            Version = "94ba3859-5f0e-40ef-8233-a032650291d0"
+                            Version = "5f35faa9-f214-42ab-9e8c-5e94a5f2af75"
                         },
                         new
                         {
-                            Id = new Guid("c5c2ca1f-5106-492a-804d-994b4834b6ab"),
-                            Type = "GivenName",
+                            Id = new Guid("997b0cda-82a7-4f86-b3d0-2a81278fb115"),
+                            Type = "given_name",
                             UserId = new Guid("3dd54a32-688f-40fb-9f5e-666ff007b3c1"),
                             Value = "Bob",
-                            Version = "6d7e8da0-a6f5-45e5-b919-8022b3f5b25a"
+                            Version = "79706017-7e95-4bb8-952b-75ba5a85a24f"
                         },
                         new
                         {
-                            Id = new Guid("e397b3fd-03ad-45ea-937c-5ba507f38d6a"),
-                            Type = "FamilyName",
+                            Id = new Guid("3b548e2d-4a30-4080-8b9d-484daa841ba7"),
+                            Type = "family_name",
                             UserId = new Guid("3dd54a32-688f-40fb-9f5e-666ff007b3c1"),
                             Value = "Smith",
-                            Version = "1b8b1c42-b78e-46ea-abdd-aa2a48989872"
+                            Version = "ab6264dc-827b-4735-a6e5-52560f22b3b5"
                         },
                         new
                         {
-                            Id = new Guid("b4a3e4fd-0c8c-4714-89e5-bb75ea975427"),
-                            Type = "Email",
+                            Id = new Guid("af752807-b638-43fa-b461-128f14717514"),
+                            Type = "email",
                             UserId = new Guid("3dd54a32-688f-40fb-9f5e-666ff007b3c1"),
                             Value = "bsmith@gmail.com",
-                            Version = "6c1a4bc5-d656-4801-946f-44c7fb9ee6b4"
+                            Version = "fca11af4-b470-4047-96fe-ae563247823a"
                         },
                         new
                         {
-                            Id = new Guid("7d0b8faf-f38d-4f48-8591-c8f640e1be04"),
-                            Type = "Address",
+                            Id = new Guid("81162aac-971a-4963-b34f-b23ce4f08829"),
+                            Type = "address",
                             UserId = new Guid("3dd54a32-688f-40fb-9f5e-666ff007b3c1"),
                             Value = "3345 Cardross Rd.",
-                            Version = "c35cafe5-3960-4b3a-94b3-24444f441e0a"
+                            Version = "8cf9d7ea-e9a1-4c92-ae1b-6993b759b96f"
                         },
                         new
                         {
-                            Id = new Guid("79aaf2cd-514a-46f1-b628-e11e034ba921"),
-                            Type = "Role",
+                            Id = new Guid("54e8b9f8-518e-4f6c-bd17-3e7d27da0be3"),
+                            Type = "birthdate",
                             UserId = new Guid("3dd54a32-688f-40fb-9f5e-666ff007b3c1"),
-                            Value = "guest",
-                            Version = "16270b0e-a1e2-4bb0-824d-5e8da231921f"
+                            Value = "1987-02-23",
+                            Version = "e06279fa-6bcc-449f-87d2-7fe660144fae"
                         });
                 });
 

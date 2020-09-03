@@ -8,7 +8,7 @@ namespace Hmm.Dal.Data
     {
         DbSet<HmmNote> Notes { get; set; }
 
-        DbSet<User> Users { get; set; }
+        DbSet<Author> Authors { get; set; }
 
         DbSet<NoteRender> Renders { get; set; }
 

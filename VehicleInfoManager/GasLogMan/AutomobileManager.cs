@@ -18,7 +18,7 @@ namespace VehicleInfoManager.GasLogMan
         {
         }
 
-        public override IEnumerable<Automobile> GetEntities(User user = null)
+        public override IEnumerable<Automobile> GetEntities(Author user = null)
         {
             return GetEntitiesFromRawData(AppConstant.AutoMobileRecordSubject, user);
         }
@@ -29,7 +29,7 @@ namespace VehicleInfoManager.GasLogMan
             return car;
         }
 
-        public override Automobile Create(Automobile car, User author)
+        public override Automobile Create(Automobile car, Author author)
         {
             Guard.Against<ArgumentNullException>(car == null, nameof(car));
 
@@ -43,7 +43,7 @@ namespace VehicleInfoManager.GasLogMan
             return savedCar;
         }
 
-        public override Automobile Update(Automobile car, User author)
+        public override Automobile Update(Automobile car, Author author)
         {
             Guard.Against<ArgumentNullException>(car == null, nameof(car));
 

@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Hmm.IDP.Quickstart;
 using Hmm.IDP.Quickstart.Consent;
 using IdentityServer4.Configuration;
 using IdentityServer4.Events;
@@ -19,7 +18,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace IdentityServerHost.Quickstart.UI
+namespace Hmm.IDP.Quickstart.Device
 {
     [Authorize]
     [SecurityHeaders]

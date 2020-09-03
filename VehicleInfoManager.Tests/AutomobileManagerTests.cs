@@ -22,7 +22,7 @@ namespace VehicleInfoManager.Tests
         public void CanCreateAutoMobile()
         {
             // Arrange
-            var user = UserRepository.GetEntities().FirstOrDefault();
+            var author = AuthorRepository.GetEntities().FirstOrDefault();
             var car = new Automobile
             {
                 Brand = "AutoBack",
@@ -33,7 +33,7 @@ namespace VehicleInfoManager.Tests
             };
 
             // Act
-            var savedCar = _manager.Create(car, user);
+            var savedCar = _manager.Create(car, author);
 
             // Assert
             Assert.True(_manager.ProcessResult.Success);
@@ -45,13 +45,13 @@ namespace VehicleInfoManager.Tests
         public void CanUpdateAutoMobile()
         {
             // Arrange
-            var user = UserRepository.GetEntities().FirstOrDefault();
+            var author = AuthorRepository.GetEntities().FirstOrDefault();
             var car = SetupEnvironment().FirstOrDefault();
             Assert.NotNull(car);
 
             // Act
             car.Brand = "AutoBack1";
-            var savedCar = _manager.Update(car, user);
+            var savedCar = _manager.Update(car, author);
 
             // Assert
             Assert.True(_manager.ProcessResult.Success);
@@ -81,7 +81,7 @@ namespace VehicleInfoManager.Tests
 
         private IEnumerable<Automobile> SetupEnvironment()
         {
-            var user = UserRepository.GetEntities().FirstOrDefault();
+            var author = AuthorRepository.GetEntities().FirstOrDefault();
             var car = new Automobile
             {
                 Brand = "AutoBack",
@@ -90,7 +90,7 @@ namespace VehicleInfoManager.Tests
                 Year = "2018",
                 Pin = "1234",
             };
-            _manager.Create(car, user);
+            _manager.Create(car, author);
 
             return _manager.GetEntities(null).ToList();
         }

@@ -7,33 +7,20 @@ using System.Linq;
 
 namespace Hmm.Core.Manager.Validation
 {
-    public class UserValidator : ValidatorBase<User>
+    public class AuthorValidator : ValidatorBase<Author>
     {
-        private readonly IGuidRepository<User> _dataSource;
+        private readonly IGuidRepository<Author> _dataSource;
 
-        public UserValidator(IGuidRepository<User> userSource)
+        public AuthorValidator(IGuidRepository<Author> userSource)
         {
             Guard.Against<ArgumentNullException>(userSource == null, nameof(userSource));
             _dataSource = userSource;
 
-            RuleFor(u => u.FirstName).NotNull().Length(1, 100);
-            RuleFor(u => u.LastName).NotNull().Length(1, 100);
-            RuleFor(u => u.BirthDay).NotNull().Must(ValidBirthday).WithMessage("Invalid birthday");
             RuleFor(u => u.AccountName).NotNull().Length(1, 256).Must(UniqueAccountName).WithMessage("Duplicated account name");
-            RuleFor(u => u.Password).NotNull().Length(1, 128);
             RuleFor(u => u.Description).Length(1, 1000);
         }
 
-        private static bool ValidBirthday(DateTime birthday)
-        {
-            var result = birthday != DateTime.MaxValue &&
-                   birthday != DateTime.MinValue &&
-                   birthday <= DateTime.Now &&
-                   birthday.Date != DateTime.Now.Date;
-            return result;
-        }
-
-        private bool UniqueAccountName(User user, string accountName)
+        private bool UniqueAccountName(Author user, string accountName)
         {
             var savedUser = _dataSource.GetEntities().FirstOrDefault(e => e.Id == user.Id);
 

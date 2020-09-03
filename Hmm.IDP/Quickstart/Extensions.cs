@@ -1,7 +1,6 @@
 using System;
 using Hmm.IDP.Quickstart.Account;
 using IdentityServer4.Models;
-using IdentityServerHost.Quickstart.UI;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hmm.IDP.Quickstart

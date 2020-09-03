@@ -10,11 +10,11 @@ namespace Hmm.Contract.VehicleInfoManager
     {
         T GetEntityById(int id);
 
-        IEnumerable<T> GetEntities(User author);
+        IEnumerable<T> GetEntities(Author author);
 
-        T Create(T entity, User author);
+        T Create(T entity, Author author);
 
-        T Update(T entity, User author);
+        T Update(T entity, Author author);
 
         bool IsEntityOwner(int id, Guid authorId);
 

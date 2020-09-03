@@ -26,7 +26,7 @@ namespace Hmm.Utility.TestHelp
 {
     public class TestFixtureBase : IDisposable
     {
-        private List<User> _users;
+        private List<Author> _users;
         private List<NoteRender> _renders;
         private List<NoteCatalog> _catalogs;
         private List<HmmNote> _notes;
@@ -56,7 +56,7 @@ namespace Hmm.Utility.TestHelp
             }
         }
 
-        protected IGuidRepository<User> UserRepository { get; private set; }
+        protected IGuidRepository<Author> AuthorRepository { get; private set; }
 
         protected IVersionRepository<HmmNote> NoteRepository { get; private set; }
 
@@ -72,27 +72,17 @@ namespace Hmm.Utility.TestHelp
 
         protected void InsertSeedRecords(bool isSetupDiscount = false, bool isSetupAutomobile = false)
         {
-            var authors = new List<User>
+            var authors = new List<Author>
             {
-                new User
+                new Author
                 {
-                    FirstName = "Jack",
-                    LastName = "Fang",
                     AccountName = "jfang",
-                    BirthDay = new DateTime(1977, 05, 21),
-                    Password = "lucky1",
-                    Salt = "passwordSalt",
                     IsActivated = true,
                     Description = "testing user"
                 },
-                new User
+                new Author
                 {
-                    FirstName = "Amy",
-                    LastName = "Wang",
                     AccountName = "awang",
-                    BirthDay = new DateTime(1977, 05, 21),
-                    Password = "lucky1",
-                    Salt = "passwordSalt",
                     IsActivated = true,
                     Description = "testing user"
                 }
@@ -187,7 +177,7 @@ namespace Hmm.Utility.TestHelp
         }
 
         protected void SetupRecords(
-            IEnumerable<User> users,
+            IEnumerable<Author> users,
             IEnumerable<NoteRender> renders,
             IEnumerable<NoteCatalog> catalogs,
             IEnumerable<GasDiscount> discounts,
@@ -200,7 +190,7 @@ namespace Hmm.Utility.TestHelp
             // ReSharper disable PossibleNullReferenceException
             foreach (var user in users)
             {
-                UserRepository.Add(user);
+                AuthorRepository.Add(user);
             }
 
             foreach (var render in renders)
@@ -243,14 +233,14 @@ namespace Hmm.Utility.TestHelp
             var discountMan = new DiscountManager(NoteManager, LookupRepo, DateProvider);
             foreach (var discount in discounts)
             {
-                var user = LookupRepo.GetEntities<User>().OrderBy(u => u.Id).FirstOrDefault();
+                var user = LookupRepo.GetEntities<Author>().OrderBy(u => u.Id).FirstOrDefault();
                 discountMan.Create(discount, user);
             }
 
             var autoMan = new AutomobileManager(NoteManager, LookupRepo, DateProvider);
             foreach (var car in cars)
             {
-                var user = LookupRepo.GetEntities<User>().OrderBy(u => u.Id).FirstOrDefault();
+                var user = LookupRepo.GetEntities<Author>().OrderBy(u => u.Id).FirstOrDefault();
                 autoMan.Create(car, user);
             }
 
@@ -299,10 +289,10 @@ namespace Hmm.Utility.TestHelp
                     RenderRepository.Delete(render);
                 }
 
-                var users = LookupRepo.GetEntities<User>().ToList();
+                var users = LookupRepo.GetEntities<Author>().ToList();
                 foreach (var user in users)
                 {
-                    UserRepository.Delete(user);
+                    AuthorRepository.Delete(user);
                 }
 
                 if (_dbContext is DbContext newContext)
@@ -314,14 +304,14 @@ namespace Hmm.Utility.TestHelp
 
         private void SetMockEnvironment()
         {
-            _users = new List<User>();
+            _users = new List<Author>();
             _renders = new List<NoteRender>();
             _catalogs = new List<NoteCatalog>();
             _notes = new List<HmmNote>();
 
             // set up for entity look up
             var lookupMoc = new Mock<IEntityLookup>();
-            lookupMoc.Setup(lk => lk.GetEntity<User>(It.IsAny<Guid>())).Returns((Guid id) =>
+            lookupMoc.Setup(lk => lk.GetEntity<Author>(It.IsAny<Guid>())).Returns((Guid id) =>
             {
                 var recFound = _users.FirstOrDefault(c => c.Id == id);
                 return recFound;
@@ -349,18 +339,18 @@ namespace Hmm.Utility.TestHelp
             // set up unit of work
             // set up for user
             var dataContextMock = new Mock<IHmmDataContext>();
-            dataContextMock.Setup(u => u.Users.Add(It.IsAny<User>())).Returns((User user) =>
+            dataContextMock.Setup(u => u.Authors.Add(It.IsAny<Author>())).Returns((Author user) =>
                 {
                     user.Id = Guid.NewGuid();
                     _users.AddEntity(user);
                     return null;
                 }
             );
-            dataContextMock.Setup(u => u.Users.Remove(It.IsAny<User>())).Callback((User user) =>
+            dataContextMock.Setup(u => u.Authors.Remove(It.IsAny<Author>())).Callback((Author user) =>
             {
                 _users.Remove(user);
             });
-            dataContextMock.Setup(u => u.Users.Update(It.IsAny<User>())).Callback((User user) =>
+            dataContextMock.Setup(u => u.Authors.Update(It.IsAny<Author>())).Callback((Author user) =>
             {
                 var ordUser = _users.FirstOrDefault(c => c.Id == user.Id);
                 if (ordUser != null)
@@ -449,7 +439,7 @@ namespace Hmm.Utility.TestHelp
             var timeProviderMock = new Mock<IDateTimeProvider>();
 
             // setup user storage
-            UserRepository = new UserEfRepository(dataContextMock.Object, lookupMoc.Object);
+            AuthorRepository = new AuthorEfRepository(dataContextMock.Object, lookupMoc.Object);
 
             // set up render storage
             RenderRepository = new NoteRenderEfRepository(dataContextMock.Object, lookupMoc.Object, timeProviderMock.Object);
@@ -470,7 +460,7 @@ namespace Hmm.Utility.TestHelp
             _dbContext = new HmmDataContext(optBuilder.Options);
             LookupRepo = new EfEntityLookup(_dbContext);
             var dateProvider = new DateTimeAdapter();
-            UserRepository = new UserEfRepository(_dbContext, LookupRepo);
+            AuthorRepository = new AuthorEfRepository(_dbContext, LookupRepo);
             NoteRepository = new NoteEfRepository(_dbContext, LookupRepo, dateProvider);
             RenderRepository = new NoteRenderEfRepository(_dbContext, LookupRepo, dateProvider);
             CatalogRepository = new NoteCatalogEfRepository(_dbContext, LookupRepo, dateProvider);

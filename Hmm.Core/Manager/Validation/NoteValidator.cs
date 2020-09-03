@@ -23,7 +23,7 @@ namespace Hmm.Core.Manager.Validation
             RuleFor(n => n.Description).Length(1, 1000);
         }
 
-        private bool AuthorNotChanged(HmmNote note, User author)
+        private bool AuthorNotChanged(HmmNote note, Author author)
         {
             var savedNote = _dataRepo.GetEntities().FirstOrDefault(n => n.Id == note.Id);
 

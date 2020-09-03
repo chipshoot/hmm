@@ -31,10 +31,10 @@ namespace VehicleInfoManager.Tests
         {
             // Arrange
             const string comment = "This is a test gas log";
-            var user = UserRepository.GetEntities().FirstOrDefault();
+            var author = AuthorRepository.GetEntities().FirstOrDefault();
             var car = _carManager.GetEntities(null).FirstOrDefault();
             var discount = _discountManager.GetEntities(null).FirstOrDefault();
-            Assert.NotNull(user);
+            Assert.NotNull(author);
             var gasLog = new GasLog
             {
                 Car = car,
@@ -55,14 +55,14 @@ namespace VehicleInfoManager.Tests
             };
 
             // Act
-            var newGas = _manager.Create(gasLog, user);
+            var newGas = _manager.Create(gasLog, author);
 
             // Assert
             Assert.True(_manager.ProcessResult.Success);
             Assert.True(newGas.Id >= 1, "newGas.Id >= 1");
             Assert.NotNull(newGas.Car);
             Assert.NotNull(newGas.Discounts);
-            Assert.Equal(newGas.AuthorId, user.Id);
+            Assert.Equal(newGas.AuthorId, author.Id);
             Assert.Equal(newGas.Comment, comment);
             Assert.Equal(newGas.CurrentMeterReading, Dimension.FromKilometre(12000));
             Assert.Equal(newGas.Discounts.First().Amount, new Money(0.8));
@@ -80,10 +80,10 @@ namespace VehicleInfoManager.Tests
             var orgDistance = gas.Distance;
             var newDistance = Dimension.FromKilometre(distance);
             gas.Distance = newDistance;
-            var user = UserRepository.GetEntities().FirstOrDefault();
+            var author = AuthorRepository.GetEntities().FirstOrDefault();
 
             // Act
-            var updatedGasLog = _manager.Update(gas, user);
+            var updatedGasLog = _manager.Update(gas, author);
 
             // Assert
             Assert.True(_manager.ProcessResult.Success);
@@ -99,16 +99,16 @@ namespace VehicleInfoManager.Tests
             var gas = InsertSampleGasLog();
             Assert.NotNull(gas);
             gas.AuthorId = Guid.NewGuid();
-            var user = UserRepository.GetEntities().FirstOrDefault();
-            Assert.NotNull(user);
+            var author = AuthorRepository.GetEntities().FirstOrDefault();
+            Assert.NotNull(author);
 
             // Act
-            var updatedGasLog = _manager.Update(gas, user);
+            var updatedGasLog = _manager.Update(gas, author);
 
             // Assert
             Assert.True(_manager.ProcessResult.Success);
             Assert.NotNull(updatedGasLog);
-            Assert.Equal(user.Id, updatedGasLog.AuthorId);
+            Assert.Equal(author.Id, updatedGasLog.AuthorId);
         }
 
         [Fact]
@@ -133,7 +133,7 @@ namespace VehicleInfoManager.Tests
 
         private GasLog InsertSampleGasLog()
         {
-            var user = UserRepository.GetEntities().FirstOrDefault();
+            var author = AuthorRepository.GetEntities().FirstOrDefault();
             var car = _carManager.GetEntities(null).FirstOrDefault();
             var discount = _discountManager.GetEntities(null).FirstOrDefault();
             var gasLog = new GasLog
@@ -153,7 +153,7 @@ namespace VehicleInfoManager.Tests
                         }
             };
 
-            var newLog = _manager.Create(gasLog, user);
+            var newLog = _manager.Create(gasLog, author);
 
             return newLog;
         }

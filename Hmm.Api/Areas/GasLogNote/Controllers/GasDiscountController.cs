@@ -19,10 +19,10 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
     public class GasDiscountController : Controller
     {
         private readonly IAutoEntityManager<GasDiscount> _discountManager;
-        private readonly IUserManager _userManager;
+        private readonly IAuthorManager _userManager;
         private readonly IMapper _mapper;
 
-        public GasDiscountController(IAutoEntityManager<GasDiscount> discountManager, IMapper mapper, IUserManager userManager)
+        public GasDiscountController(IAutoEntityManager<GasDiscount> discountManager, IMapper mapper, IAuthorManager userManager)
         {
             Guard.Against<ArgumentNullException>(discountManager == null, nameof(discountManager));
             Guard.Against<ArgumentNullException>(mapper == null, nameof(mapper));

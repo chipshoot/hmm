@@ -13,34 +13,24 @@ namespace Hmm.Dal.Tests
 {
     public class NoteRepositoryTests : TestFixtureBase
     {
-        private readonly User _author;
+        private readonly Author _author;
         private readonly NoteCatalog _catalog;
 
         public NoteRepositoryTests()
         {
-            var authors = new List<User>
+            var authors = new List<Author>
             {
-                new User
+                new Author
                 {
-                    FirstName = "Jack",
-                    LastName = "Fang",
                     AccountName = "jfang",
-                    BirthDay = new DateTime(1977, 05, 21),
-                    Password = "lucky1",
-                    Salt = "passwordSalt",
                     IsActivated = true,
-                    Description = "testing user"
+                    Description = "testing author"
                 },
-                new User
+                new Author
                 {
-                    FirstName = "Amy",
-                    LastName = "Wang",
                     AccountName = "awang",
-                    BirthDay = new DateTime(1977, 05, 21),
-                    Password = "lucky1",
-                    Salt = "passwordSalt",
                     IsActivated = true,
-                    Description = "testing user"
+                    Description = "testing author"
                 }
             };
             var renders = new List<NoteRender>
@@ -80,7 +70,7 @@ namespace Hmm.Dal.Tests
 
             SetupRecords(authors, renders, catalogs, new List<GasDiscount>(), new List<Automobile>());
 
-            _author = UserRepository.GetEntities().FirstOrDefault();
+            _author = AuthorRepository.GetEntities().FirstOrDefault();
             _catalog = CatalogRepository.GetEntities().FirstOrDefault(cat => cat.IsDefault);
         }
 
@@ -122,15 +112,15 @@ namespace Hmm.Dal.Tests
         }
 
         [Theory]
-        [ClassData(typeof(UserTestData))]
-        public void CannotAddNoteWithNonExistAuthor(User user)
+        [ClassData(typeof(AuthorTestData))]
+        public void CannotAddNoteWithNonExistAuthor(Author author)
         {
             // Arrange - null author for note
             var xmldoc = new XmlDocument();
             xmldoc.LoadXml("<?xml version=\"1.0\" encoding=\"utf-16\"?><root><time>2017-08-01</time></root>");
             var note = new HmmNote
             {
-                Author = user,
+                Author = author,
                 Catalog = _catalog,
                 Description = "testing note",
                 CreateDate = DateTime.Now,
@@ -511,7 +501,7 @@ namespace Hmm.Dal.Tests
             note.Id = orgId;
         }
 
-        private class UserTestData : IEnumerable<object[]>
+        private class AuthorTestData : IEnumerable<object[]>
         {
             public IEnumerator<object[]> GetEnumerator()
             {
@@ -520,34 +510,24 @@ namespace Hmm.Dal.Tests
                 // Arrange - none exists author
                 yield return new object[]
                 {
-                    new User
+                    new Author
                     {
                         Id = Guid.NewGuid(),
-                        FirstName = "Amy",
-                        LastName = "Wang",
                         AccountName = "jfang",
-                        BirthDay = new DateTime(1977, 05, 21),
-                        Password = "lucky1",
-                        Salt = "passwordSalt",
                         IsActivated = true,
-                        Description = "testing user"
+                        Description = "testing author"
                     }
                 };
 
                 // Arrange - author with invalid author id
                 yield return new object[]
                 {
-                    new User
+                    new Author
                     {
                         Id = Guid.Empty,
-                        FirstName = "Amy",
-                        LastName = "Wang",
                         AccountName = "jfang",
-                        BirthDay = new DateTime(1977, 05, 21),
-                        Password = "lucky1",
-                        Salt = "passwordSalt",
                         IsActivated = true,
-                        Description = "testing user"
+                        Description = "testing author"
                     }
                 };
             }

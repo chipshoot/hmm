@@ -6,6 +6,8 @@
         {
             public const string Api = "ApiClient";
 
+            public const string ApiNoToken = "ApiClientNoToken";
+
             public const string Idp = "Idpclient";
         }
 

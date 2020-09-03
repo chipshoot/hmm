@@ -6,13 +6,15 @@ namespace Hmm.IDP.Services
 {
     public interface ILocalUserService
     {
-        Task<bool> ValidateClearTextCredentialsAsync(string username, string password);
+        Task<bool> ValidateCredentialsAsync(string username, string password);
 
         Task<IEnumerable<UserClaim>> GetUserClaimsBySubjectAsync(string subject);
 
         Task<User> GetUserByUserNameAsync(string username);
 
-        void AddUser(User userToAdd);
+        void AddUser(User userToAdd, string password);
+
+        Task<bool> ActivateUser(string securityCode);
 
         Task<bool> IsUserActive(string subject);
 

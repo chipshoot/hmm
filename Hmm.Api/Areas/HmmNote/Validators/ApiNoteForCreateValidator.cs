@@ -4,16 +4,15 @@ using System;
 
 namespace Hmm.Api.Areas.HmmNote.Validators
 {
-    public class ApiUserForCreateValidator : AbstractValidator<ApiUserForCreate>
+    public class ApiNoteForCreateValidator : AbstractValidator<ApiNoteForCreate>
     {
-        public ApiUserForCreateValidator()
+        public ApiNoteForCreateValidator()
         {
-            RuleFor(usr => usr.FirstName).NotEmpty().NotNull().Length(1, 100);
-            RuleFor(usr => usr.LastName).NotEmpty().NotNull().Length(1, 100);
-            RuleFor(usr => usr.FirstName).NotEmpty().NotNull().Length(1, 100);
-            RuleFor(usr => usr.BirthDay).LessThan(DateTime.Now);
-            RuleFor(usr => usr.AccountName).NotEmpty().NotNull().Length(1, 256);
-            RuleFor(usr => usr.Password).NotEmpty().NotNull().Length(1, 123);
+            RuleFor(note => note.Subject).NotEmpty().NotNull().Length(1, 1000);
+            RuleFor(note => note.Content).NotEmpty().NotNull();
+            RuleFor(note => note.Author).NotNull();
+            RuleFor(note => note.CreateDate).GreaterThan(DateTime.Now);
+            RuleFor(note => note.LastModifiedDate).GreaterThanOrEqualTo(note => note.CreateDate);
         }
     }
 }

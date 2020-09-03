@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Hmm.DomainEntity.Enumerations;
 using Hmm.DomainEntity.Misc;
 using Hmm.DomainEntity.User;
 using Hmm.DomainEntity.Vehicle;
@@ -6,6 +7,7 @@ using Hmm.DtoEntity.Api.GasLogNotes;
 using Hmm.DtoEntity.Api.HmmNote;
 using Hmm.Utility.Currency;
 using Hmm.Utility.MeasureUnit;
+using System;
 
 namespace Hmm.DtoEntity.Api.Profiles
 {
@@ -13,11 +15,13 @@ namespace Hmm.DtoEntity.Api.Profiles
     {
         public MappingProfile()
         {
-            CreateMap<ApiUser, User>();
-            CreateMap<User, ApiUser>();
-            CreateMap<ApiUserForCreate, User>();
-            CreateMap<ApiUserForUpdate, User>();
-            CreateMap<User, ApiUserForUpdate>();
+            CreateMap<ApiAuthor, Author>()
+                .ForMember(d => d.Role, opt => opt.MapFrom(src => Enum.Parse(typeof(AuthorRoleType), src.Role, true)));
+            CreateMap<Author, ApiAuthor>()
+                .ForMember(d => d.Role, opt => opt.MapFrom(src => src.Role.ToString().ToLower()));
+            CreateMap<ApiAuthorForCreate, Author>();
+            CreateMap<ApiAuthorForUpdate, Author>();
+            CreateMap<Author, ApiAuthorForUpdate>();
 
             CreateMap<ApiNoteRender, NoteRender>();
             CreateMap<NoteRender, ApiNoteRender>();
@@ -38,7 +42,7 @@ namespace Hmm.DtoEntity.Api.Profiles
                 .ForMember(d => d.DiscountId, opt => opt.MapFrom(s => s.Program.Id))
                 .ForMember(d => d.Amount, opt => opt.MapFrom(s => s.Amount.Amount));
             CreateMap<GasLog, ApiGasLog>()
-                .ForMember(d=>d.CarId, opt=>opt.MapFrom(s=>s.Car.Id))
+                .ForMember(d => d.CarId, opt => opt.MapFrom(s => s.Car.Id))
                 .ForMember(d => d.Distance, opt => opt.MapFrom(s => s.Distance.TotalKilometre))
                 .ForMember(d => d.CurrentMeterReading, opt => opt.MapFrom(s => s.CurrentMeterReading.TotalKilometre))
                 .ForMember(d => d.Gas, opt => opt.MapFrom(s => s.Gas.TotalLiter))
@@ -60,12 +64,11 @@ namespace Hmm.DtoEntity.Api.Profiles
                 .ForMember(d => d.Discounts, opt => opt.Ignore())
                 .ForMember(d => d.Car, opt => opt.Ignore());
             CreateMap<ApiGasLog, GasLog>()
-                .ForMember(d=>d.Car, opt=>opt.MapFrom((src=>new Automobile{Id = src.CarId})))
-                .ForMember(d=>d.Distance, opt=>opt.MapFrom((src=>Dimension.FromKilometre(src.Distance))))
-                .ForMember(d=>d.CurrentMeterReading, opt=>opt.MapFrom((src=>Dimension.FromKilometre(src.CurrentMeterReading))))
-                .ForMember(d=>d.Gas, opt=>opt.MapFrom((src=>Volume.FromLiter(src.Gas))))
-                .ForMember(d=>d.Price, opt=>opt.MapFrom((src=>new Money(src.Price))));
-
+                .ForMember(d => d.Car, opt => opt.MapFrom((src => new Automobile { Id = src.CarId })))
+                .ForMember(d => d.Distance, opt => opt.MapFrom((src => Dimension.FromKilometre(src.Distance))))
+                .ForMember(d => d.CurrentMeterReading, opt => opt.MapFrom((src => Dimension.FromKilometre(src.CurrentMeterReading))))
+                .ForMember(d => d.Gas, opt => opt.MapFrom((src => Volume.FromLiter(src.Gas))))
+                .ForMember(d => d.Price, opt => opt.MapFrom((src => new Money(src.Price))));
         }
     }
 }

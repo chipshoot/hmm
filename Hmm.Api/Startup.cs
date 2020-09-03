@@ -25,6 +25,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Net.Http.Headers;
+using System;
 using VehicleInfoManager.GasLogMan;
 
 namespace Hmm.Api
@@ -73,6 +75,12 @@ namespace Hmm.Api
                     };
                 });
 
+            services.AddHttpClient(HmmApiConstants.HttpClient.Idp, client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:5001/");
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
+            });
             services.AddHttpContextAccessor();
             services.AddScoped<IAuthorizationHandler, MustOwnGasLogHandler>();
             services.AddAuthorization(options =>
@@ -92,22 +100,30 @@ namespace Hmm.Api
                     options.ApiName = HmmConstants.HmmApiId;
                     options.LegacyAudienceValidation = true;
                 });
+            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            //    .AddJwtBearer(options =>
+            //    {
+            //        options.Authority = "https://localhost:5001";
+            //        options.Audience = HmmConstants.HmmApiId;
+            //        options.TokenValidationParameters.ValidateAudience = false;
+            //        options.TokenValidationParameters.ValidTypes = new[] { "at+jwt" };
+            //    });
             services.AddDbContext<HmmDataContext>(opt => opt.UseSqlServer(connectString));
             services.AddSingleton<IDateTimeProvider, DateTimeAdapter>();
             services.AddScoped<IVersionRepository<HmmNote>, NoteEfRepository>();
             services.AddScoped<IHmmDataContext, HmmDataContext>();
             services.AddScoped<IEntityLookup, EfEntityLookup>();
-            services.AddScoped<IGuidRepository<User>, UserEfRepository>();
+            services.AddScoped<IGuidRepository<Author>, AuthorEfRepository>();
             services.AddScoped<IRepository<NoteRender>, NoteRenderEfRepository>();
             services.AddScoped<IRepository<NoteCatalog>, NoteCatalogEfRepository>();
-            services.AddScoped<IUserManager, UserManager>();
+            services.AddScoped<IAuthorManager, AuthorManager>();
             services.AddScoped<IHmmNoteManager, HmmNoteManager>();
             services.AddScoped<INoteRenderManager, NoteRenderManager>();
             services.AddScoped<INoteCatalogManager, NoteCatalogManager>();
             services.AddScoped<IAutoEntityManager<GasLog>, GasLogManager>();
             services.AddScoped<IAutoEntityManager<Automobile>, AutomobileManager>();
             services.AddScoped<IAutoEntityManager<GasDiscount>, DiscountManager>();
-            services.AddScoped<UserValidator, UserValidator>();
+            services.AddScoped<AuthorValidator, AuthorValidator>();
             services.AddScoped<NoteValidator, NoteValidator>();
             services.AddScoped<NoteRenderValidator, NoteRenderValidator>();
             services.AddScoped<NoteCatalogValidator, NoteCatalogValidator>();

@@ -24,7 +24,7 @@ namespace VehicleInfoManager.Tests
         public void CanCreateDiscount()
         {
             // Arrange
-            var user = UserRepository.GetEntities().FirstOrDefault();
+            var author = AuthorRepository.GetEntities().FirstOrDefault();
             var discount = new GasDiscount
             {
                 Program = "Costco membership",
@@ -35,7 +35,7 @@ namespace VehicleInfoManager.Tests
             };
 
             // Act
-            var savedDisc = _manager.Create(discount, user);
+            var savedDisc = _manager.Create(discount, author);
 
             // Assert
             Assert.NotNull(savedDisc);
@@ -48,12 +48,12 @@ namespace VehicleInfoManager.Tests
             // Arrange
             var discounts = SetupEnvironment();
             var discount = discounts.OrderByDescending(d => d.Id).FirstOrDefault();
-            var user = UserRepository.GetEntities().FirstOrDefault();
+            var author = AuthorRepository.GetEntities().FirstOrDefault();
             Assert.NotNull(discount);
 
             // Act
             discount.Program = "Petro-Canada";
-            var savedDiscount = _manager.Update(discount, user);
+            var savedDiscount = _manager.Update(discount, author);
 
             // Assert
             Assert.True(_manager.ProcessResult.Success);
@@ -97,7 +97,7 @@ namespace VehicleInfoManager.Tests
         {
             var discounts = new List<GasDiscount>();
 
-            var user = UserRepository.GetEntities().FirstOrDefault();
+            var author = AuthorRepository.GetEntities().FirstOrDefault();
             var discount = new GasDiscount
             {
                 Program = "Costco membership",
@@ -106,7 +106,7 @@ namespace VehicleInfoManager.Tests
                 Comment = "Test Discount",
                 IsActive = true,
             };
-            var rec = _manager.Create(discount, user);
+            var rec = _manager.Create(discount, author);
             discounts.Add(rec);
 
             discount = new GasDiscount
@@ -118,7 +118,7 @@ namespace VehicleInfoManager.Tests
                 IsActive = true,
             };
 
-            rec = _manager.Create(discount, user);
+            rec = _manager.Create(discount, author);
             discounts.Add(rec);
 
             NoTrackingEntities();

@@ -13,7 +13,7 @@ namespace Hmm.Dal.Data
 
         public DbSet<HmmNote> Notes { get; set; }
 
-        public DbSet<User> Users { get; set; }
+        public DbSet<Author> Authors { get; set; }
 
         public DbSet<NoteRender> Renders { get; set; }
 
@@ -39,7 +39,7 @@ namespace Hmm.Dal.Data
                 .IsConcurrencyToken()
                 .ValueGeneratedOnAddOrUpdate();
 
-            modelBuilder.Entity<User>().ToTable("Users");
+            modelBuilder.Entity<Author>().ToTable("Authors");
             modelBuilder.Entity<NoteCatalog>().ToTable("NoteCatalogs");
             modelBuilder.Entity<NoteRender>().ToTable("NoteRenders");
         }

@@ -24,9 +24,9 @@ namespace Hmm.Dal.Queries
         public T GetEntity<T>(Guid id) where T : GuidEntity
         {
             T entity;
-            if (typeof(T) == typeof(User))
+            if (typeof(T) == typeof(Author))
             {
-                entity = _dataContext.Users.Find(id) as T;
+                entity = _dataContext.Authors.Find(id) as T;
             }
             else
             {
@@ -76,9 +76,9 @@ namespace Hmm.Dal.Queries
                 entities = _dataContext.Catalogs
                     .Include(c => c.Render).Cast<T>();
             }
-            else if (typeof(T) == typeof(User))
+            else if (typeof(T) == typeof(Author))
             {
-                entities = _dataContext.Users
+                entities = _dataContext.Authors
                     .Cast<T>();
             }
             else

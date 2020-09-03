@@ -1,8 +1,9 @@
 using AutoMapper;
+using Hmm.Contract;
 using Hmm.DtoEntity.Api;
 using Hmm.WebConsole.Infrastructure.HttpHandlers;
+using Hmm.WebConsole.Infrastructure.PostConfigurationOptions;
 using IdentityModel;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
@@ -10,11 +11,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.IdentityModel.Tokens.Jwt;
-using Hmm.Contract;
 
 namespace Hmm.WebConsole
 {
@@ -45,6 +46,13 @@ namespace Hmm.WebConsole
                 client.DefaultRequestHeaders.Clear();
                 client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
             }).AddHttpMessageHandler<BearerTokenHandler>();
+
+            services.AddHttpClient(HmmWebConsoleConstants.HttpClient.ApiNoToken, client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:44327/");
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
+            });
 
             services.AddHttpClient(HmmWebConsoleConstants.HttpClient.Idp, client =>
             {
@@ -83,7 +91,6 @@ namespace Hmm.WebConsole
                     options.Scope.Add("roles");
                     options.Scope.Add("offline_access");
                     options.Scope.Add(HmmConstants.HmmApiId);
-                    options.ClaimActions.MapUniqueJsonKey("role", "role");
                     options.SaveTokens = true;
                     options.ClientSecret = "secret";
                     options.GetClaimsFromUserInfoEndpoint = true;
@@ -93,6 +100,8 @@ namespace Hmm.WebConsole
                         RoleClaimType = JwtClaimTypes.Role
                     };
                 });
+            services
+                .AddSingleton<IPostConfigureOptions<OpenIdConnectOptions>, OpenIdConnectOptionsPostConfigureOptions>();
             services.AddAutoMapper(typeof(ApiEntity));
         }
 

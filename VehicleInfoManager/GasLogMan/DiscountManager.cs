@@ -20,7 +20,7 @@ namespace VehicleInfoManager.GasLogMan
         {
         }
 
-        public override IEnumerable<GasDiscount> GetEntities(User user)
+        public override IEnumerable<GasDiscount> GetEntities(Author user)
         {
             var discounts = GetEntitiesFromRawData(AppConstant.GasDiscountRecordSubject, user);
             return discounts;
@@ -31,7 +31,7 @@ namespace VehicleInfoManager.GasLogMan
             return GetEntities(null).FirstOrDefault(d => d.Id == id);
         }
 
-        public override GasDiscount Create(GasDiscount discount, User author)
+        public override GasDiscount Create(GasDiscount discount, Author author)
         {
             Guard.Against<ArgumentNullException>(discount == null, nameof(discount));
 
@@ -45,7 +45,7 @@ namespace VehicleInfoManager.GasLogMan
             return savedDiscount;
         }
 
-        public override GasDiscount Update(GasDiscount discount, User author)
+        public override GasDiscount Update(GasDiscount discount, Author author)
         {
             Guard.Against<ArgumentNullException>(discount == null, nameof(discount));
 

@@ -4,7 +4,7 @@
 
 using Hmm.IDP.Quickstart.Consent;
 
-namespace IdentityServerHost.Quickstart.UI
+namespace Hmm.IDP.Quickstart.Device
 {
     public class DeviceAuthorizationViewModel : ConsentViewModel
     {

@@ -11,7 +11,7 @@ namespace Hmm.DomainEntity.Misc
 
         public NoteCatalog Catalog { get; set; }
 
-        public User.User Author { get; set; }
+        public User.Author Author { get; set; }
 
         public DateTime CreateDate { get; set; }
 

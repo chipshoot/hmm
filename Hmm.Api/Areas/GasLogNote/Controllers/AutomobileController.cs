@@ -18,10 +18,10 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
     public class AutomobileController : Controller
     {
         private readonly IAutoEntityManager<Automobile> _automobileManager;
-        private readonly IUserManager _userManager;
+        private readonly IAuthorManager _userManager;
         private readonly IMapper _mapper;
 
-        public AutomobileController(IAutoEntityManager<Automobile> automobileManager, IMapper mapper, IUserManager userManager)
+        public AutomobileController(IAutoEntityManager<Automobile> automobileManager, IMapper mapper, IAuthorManager userManager)
         {
             Guard.Against<ArgumentNullException>(automobileManager == null, nameof(automobileManager));
             Guard.Against<ArgumentNullException>(mapper == null, nameof(mapper));
@@ -92,7 +92,7 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
                 return BadRequest(new ApiBadRequestResponse("Cannot find automobile"));
             }
             _mapper.Map(apiCar, curCar);
-            var newCar = _automobileManager.Update(curCar, new User());
+            var newCar = _automobileManager.Update(curCar, new Author());
             if (newCar == null)
             {
                 return BadRequest(new ApiBadRequestResponse("Cannot update automobile"));

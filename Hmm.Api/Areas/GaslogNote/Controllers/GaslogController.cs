@@ -27,9 +27,9 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
         private readonly IAutoEntityManager<Automobile> _autoManager;
         private readonly IAutoEntityManager<GasDiscount> _discountManager;
         private readonly IMapper _mapper;
-        private readonly IUserManager _userManager;
+        private readonly IAuthorManager _userManager;
 
-        public GasLogController(IAutoEntityManager<GasLog> gasLogManager, IMapper mapper, IUserManager userManager, IAutoEntityManager<Automobile> autoManager, IAutoEntityManager<GasDiscount> discountManager)
+        public GasLogController(IAutoEntityManager<GasLog> gasLogManager, IMapper mapper, IAuthorManager userManager, IAutoEntityManager<Automobile> autoManager, IAutoEntityManager<GasDiscount> discountManager)
         {
             Guard.Against<ArgumentNullException>(gasLogManager == null, nameof(gasLogManager));
             Guard.Against<ArgumentNullException>(mapper == null, nameof(mapper));
@@ -130,7 +130,7 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
                 }
                 gasLog.Discounts = discounts;
 
-                var savedGasLog = _gasLogManager.Create(gasLog, new User());
+                var savedGasLog = _gasLogManager.Create(gasLog, new Author());
                 if (savedGasLog == null)
                 {
                     return BadRequest(new ApiBadRequestResponse("Cannot add gas log"));
@@ -162,7 +162,7 @@ namespace Hmm.Api.Areas.GasLogNote.Controllers
             }
 
             _mapper.Map(apiGasLog, gasLog);
-            var newLog = _gasLogManager.Update(gasLog, new User());
+            var newLog = _gasLogManager.Update(gasLog, new Author());
             if (newLog == null)
             {
                 return BadRequest(new ApiBadRequestResponse($"Cannot update gas log with id {id}"));

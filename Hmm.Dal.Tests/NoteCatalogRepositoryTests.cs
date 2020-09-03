@@ -9,7 +9,7 @@ namespace Hmm.Dal.Tests
     public class NoteCatalogRepositoryTests : TestFixtureBase
     {
         private readonly NoteRender _render;
-        private readonly User _user;
+        private readonly Author _user;
 
         public NoteCatalogRepositoryTests()
         {
@@ -22,18 +22,13 @@ namespace Hmm.Dal.Tests
 
             _render = RenderRepository.Add(render);
 
-            var user = new User
+            var user = new Author
             {
-                FirstName = "Chaoyang",
-                LastName = "Fang",
                 AccountName = "fchy",
-                BirthDay = new DateTime(1967, 3, 13),
                 Description = "Testing User",
                 IsActivated = true,
-                Password = "1234",
-                Salt = "5678"
             };
-            _user = UserRepository.Add(user);
+            _user = AuthorRepository.Add(user);
         }
 
         [Fact]

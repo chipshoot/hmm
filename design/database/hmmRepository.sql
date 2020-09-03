@@ -1,19 +1,14 @@
-/****** Object:  Table [dbo].[Users]    Script Date: 03/05/2018 16:05:01 ******/
+/****** Object:  Table [dbo].[Authors]    Script Date: 03/05/2018 16:05:01 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [dbo].[Users](
+CREATE TABLE [dbo].[Authors](
 	[ID] [UNIQUEIDENTIFIER] DEFAULT NEWID() NOT NULL,
-	[FirstName] [nvarchar](100) NOT NULL,
-	[LastName] [nvarchar](100) NOT NULL,
-	[BirthDay] [datetime] NOT NULL,
 	[AccountName] [nvarchar](256) NOT NULL,
-	[Password] [nvarchar](128) NOT NULL,
-	[Salt] [nvarchar](128) NOT NULL,
-	[IsActivated] [bit] NOT NULL,
+    [Role] [int] NOT NULL,
 	[Description] [nvarchar](1000) NULL,
- CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_Authors] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC
 )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
@@ -21,17 +16,13 @@ CREATE TABLE [dbo].[Users](
 GO
 
 /****** Object:  Index [IDX_UniqueAccountName]    Script Date: 11/5/2018 3:15:56 PM ******/
-CREATE UNIQUE NONCLUSTERED INDEX [IDX_UniqueAccountName] ON [dbo].[Users]
+CREATE UNIQUE NONCLUSTERED INDEX [IDX_UniqueAccountName] ON [dbo].[Authors]
 (
 	[AccountName] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 GO
 
 /****** Object:  Table [dbo].[Tags]    Script Date: 03/05/2018 16:05:01 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
 CREATE TABLE [dbo].[Tags](
 	[ID] [int] IDENTITY(1,1) NOT NULL,
 	[Name] [nvarchar](200) NOT NULL,
@@ -43,11 +34,8 @@ CREATE TABLE [dbo].[Tags](
 )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+
 /****** Object:  Table [dbo].[NoteRenders]    Script Date: 03/05/2018 16:05:01 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
 CREATE TABLE [dbo].[NoteRenders](
 	[ID] [int] IDENTITY(1,1) NOT NULL,
 	[Name] [nvarchar](400) NOT NULL,
@@ -72,10 +60,6 @@ CREATE UNIQUE NONCLUSTERED INDEX [IDX_UniqueRenderName] ON [dbo].[NoteRenders]
 GO
 
 /****** Object:  Table [dbo].[NoteCatalogs]    Script Date: 03/05/2018 16:05:01 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
 CREATE TABLE [dbo].[NoteCatalogs](
 	[ID] [int] IDENTITY(1,1) NOT NULL,
 	[Name] [nvarchar](200) NOT NULL,
@@ -105,10 +89,6 @@ CREATE UNIQUE NONCLUSTERED INDEX [IDX_UniqueCatalogName] ON [dbo].[NoteCatalogs]
 GO
 
 /****** Object:  Table [dbo].[ContactInfoCatalogs]    Script Date: 03/05/2018 16:05:01 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
 CREATE TABLE [dbo].[ContactInfoCatalogs](
 	[ID] [int] IDENTITY(1,1) NOT NULL,
 	[Name] [nvarchar](200) NOT NULL,
@@ -119,11 +99,8 @@ CREATE TABLE [dbo].[ContactInfoCatalogs](
 )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+
 /****** Object:  Table [dbo].[Notes]    Script Date: 03/05/2018 16:05:01 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
 CREATE TABLE [dbo].[Notes](
 	[ID] [int] IDENTITY(1,1) NOT NULL,
 	[Subject] [nvarchar](1000) NOT NULL,
@@ -140,11 +117,8 @@ CREATE TABLE [dbo].[Notes](
 )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
+
 /****** Object:  Table [dbo].[Emails]    Script Date: 03/05/2018 16:05:01 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
 CREATE TABLE [dbo].[Emails](
 	[ID] [int] IDENTITY(1,1) NOT NULL,
 	[Email] [nvarchar](1000) NOT NULL,
@@ -159,11 +133,8 @@ CREATE TABLE [dbo].[Emails](
 )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+
 /****** Object:  Table [dbo].[Phones]    Script Date: 03/05/2018 16:05:01 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
 CREATE TABLE [dbo].[Phones](
 	[ID] [int] IDENTITY(1,1) NOT NULL,
 	[AreaCode] [int] NULL,
@@ -180,11 +151,8 @@ CREATE TABLE [dbo].[Phones](
 )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+
 /****** Object:  Table [dbo].[NoteTagRefs]    Script Date: 03/05/2018 16:05:01 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
 CREATE TABLE [dbo].[NoteTagRefs](
 	[ID] [int] IDENTITY(1,1) NOT NULL,
 	[Note] [int] NOT NULL,
@@ -201,11 +169,11 @@ REFERENCES [dbo].[ContactInfoCatalogs] ([ID])
 GO
 ALTER TABLE [dbo].[Emails] CHECK CONSTRAINT [FK_Emails_ContactInfoCatalogs]
 GO
-/****** Object:  ForeignKey [FK_Emails_Users]    Script Date: 03/05/2018 16:05:01 ******/
-ALTER TABLE [dbo].[Emails]  WITH CHECK ADD  CONSTRAINT [FK_Emails_Users] FOREIGN KEY([Owner])
-REFERENCES [dbo].[Users] ([ID])
+/****** Object:  ForeignKey [FK_Emails_Authors]    Script Date: 03/05/2018 16:05:01 ******/
+ALTER TABLE [dbo].[Emails]  WITH CHECK ADD  CONSTRAINT [FK_Emails_Authors] FOREIGN KEY([Owner])
+REFERENCES [dbo].[Authors] ([ID])
 GO
-ALTER TABLE [dbo].[Emails] CHECK CONSTRAINT [FK_Emails_Users]
+ALTER TABLE [dbo].[Emails] CHECK CONSTRAINT [FK_Emails_Authors]
 GO
 /****** Object:  ForeignKey [FK_Notes_NoteCatalogs]    Script Date: 03/05/2018 16:05:01 ******/
 ALTER TABLE [dbo].[Notes]  WITH CHECK ADD  CONSTRAINT [FK_Notes_NoteCatalogs] FOREIGN KEY([CatalogId])
@@ -213,11 +181,11 @@ REFERENCES [dbo].[NoteCatalogs] ([ID])
 GO
 ALTER TABLE [dbo].[Notes] CHECK CONSTRAINT [FK_Notes_NoteCatalogs]
 GO
-/****** Object:  ForeignKey [FK_Notes_Users]    Script Date: 03/05/2018 16:05:01 ******/
-ALTER TABLE [dbo].[Notes]  WITH CHECK ADD  CONSTRAINT [FK_Notes_Users] FOREIGN KEY([AuthorID])
-REFERENCES [dbo].[Users] ([ID])
+/****** Object:  ForeignKey [FK_Notes_Authors]    Script Date: 03/05/2018 16:05:01 ******/
+ALTER TABLE [dbo].[Notes]  WITH CHECK ADD  CONSTRAINT [FK_Notes_Authors] FOREIGN KEY([AuthorID])
+REFERENCES [dbo].[Authors] ([ID])
 GO
-ALTER TABLE [dbo].[Notes] CHECK CONSTRAINT [FK_Notes_Users]
+ALTER TABLE [dbo].[Notes] CHECK CONSTRAINT [FK_Notes_Authors]
 GO
 /****** Object:  ForeignKey [FK_NoteTagRefs_Notes]    Script Date: 03/05/2018 16:05:01 ******/
 ALTER TABLE [dbo].[NoteTagRefs]  WITH CHECK ADD  CONSTRAINT [FK_NoteTagRefs_Notes] FOREIGN KEY([Note])
@@ -237,9 +205,9 @@ REFERENCES [dbo].[ContactInfoCatalogs] ([ID])
 GO
 ALTER TABLE [dbo].[Phones] CHECK CONSTRAINT [FK_Phones_ContactInfoCatalogs]
 GO
-/****** Object:  ForeignKey [FK_Phones_Users]    Script Date: 03/05/2018 16:05:01 ******/
-ALTER TABLE [dbo].[Phones]  WITH CHECK ADD  CONSTRAINT [FK_Phones_Users] FOREIGN KEY([Owner])
-REFERENCES [dbo].[Users] ([ID])
+/****** Object:  ForeignKey [FK_Phones_Authors]    Script Date: 03/05/2018 16:05:01 ******/
+ALTER TABLE [dbo].[Phones]  WITH CHECK ADD  CONSTRAINT [FK_Phones_Authors] FOREIGN KEY([Owner])
+REFERENCES [dbo].[Authors] ([ID])
 GO
-ALTER TABLE [dbo].[Phones] CHECK CONSTRAINT [FK_Phones_Users]
+ALTER TABLE [dbo].[Phones] CHECK CONSTRAINT [FK_Phones_Authors]
 GO

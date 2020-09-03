@@ -14,7 +14,6 @@ using IdentityServer4.Models;
 using IdentityServer4.Services;
 using IdentityServer4.Stores;
 using IdentityServer4.Test;
-using IdentityServerHost.Quickstart.UI;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -110,7 +109,7 @@ namespace Hmm.IDP.Quickstart.Account
             if (ModelState.IsValid)
             {
                 // validate username/password against in-memory store
-                if (await _userService.ValidateClearTextCredentialsAsync(model.Username, model.Password))
+                if (await _userService.ValidateCredentialsAsync(model.Username, model.Password))
                 {
                     var user = await  _userService.GetUserByUserNameAsync(model.Username);
                     await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Subject, user.UserName, clientId: context?.Client.ClientId));

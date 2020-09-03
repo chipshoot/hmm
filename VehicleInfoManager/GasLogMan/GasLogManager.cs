@@ -33,7 +33,7 @@ namespace VehicleInfoManager.GasLogMan
             _discountManager = discountManager;
         }
 
-        public override IEnumerable<GasLog> GetEntities(User author)
+        public override IEnumerable<GasLog> GetEntities(Author author)
         {
             var logs = GetEntitiesFromRawData(AppConstant.GasLogRecordSubject, author).ToList();
             foreach (var log in logs)
@@ -48,7 +48,7 @@ namespace VehicleInfoManager.GasLogMan
             return GetEntities(null).FirstOrDefault(l => l.Id == id);
         }
 
-        public override GasLog Create(GasLog gasLog, User author)
+        public override GasLog Create(GasLog gasLog, Author author)
         {
             Guard.Against<ArgumentNullException>(gasLog == null, nameof(gasLog));
 
@@ -63,7 +63,7 @@ namespace VehicleInfoManager.GasLogMan
             return savedGasLog;
         }
 
-        public override GasLog Update(GasLog gasLog, User author)
+        public override GasLog Update(GasLog gasLog, Author author)
         {
             Guard.Against<ArgumentNullException>(gasLog == null, nameof(gasLog));
 

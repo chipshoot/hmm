@@ -10,12 +10,12 @@ using System.Linq.Expressions;
 
 namespace Hmm.Dal.DataRepository
 {
-    public class UserEfRepository : IGuidRepository<User>
+    public class AuthorEfRepository : IGuidRepository<Author>
     {
         private readonly IHmmDataContext _dataContext;
         private readonly IEntityLookup _lookupRepo;
 
-        public UserEfRepository(IHmmDataContext dataContext, IEntityLookup lookupRepo)
+        public AuthorEfRepository(IHmmDataContext dataContext, IEntityLookup lookupRepo)
         {
             Guard.Against<ArgumentNullException>(dataContext == null, nameof(dataContext));
             Guard.Against<ArgumentNullException>(lookupRepo == null, nameof(lookupRepo));
@@ -24,19 +24,19 @@ namespace Hmm.Dal.DataRepository
             _lookupRepo = lookupRepo;
         }
 
-        public IQueryable<User> GetEntities(Expression<Func<User, bool>> query = null)
+        public IQueryable<Author> GetEntities(Expression<Func<Author, bool>> query = null)
         {
-            return _lookupRepo.GetEntities<User>(query);
+            return _lookupRepo.GetEntities<Author>(query);
         }
 
-        public User Add(User entity)
+        public Author Add(Author entity)
         {
             Guard.Against<ArgumentNullException>(entity == null, nameof(entity));
 
             try
             {
                 // ReSharper disable once AssignNullToNotNullAttribute
-                _dataContext.Users.Add(entity);
+                _dataContext.Authors.Add(entity);
                 Flush();
                 return entity;
             }
@@ -47,7 +47,7 @@ namespace Hmm.Dal.DataRepository
             }
         }
 
-        public User Update(User entity)
+        public Author Update(Author entity)
         {
             Guard.Against<ArgumentNullException>(entity == null, nameof(entity));
 
@@ -57,14 +57,14 @@ namespace Hmm.Dal.DataRepository
                 if (entity.Id == Guid.Empty)
                 {
                     ProcessMessage.Success = false;
-                    ProcessMessage.AddErrorMessage($"Can not update user with id {entity.Id}");
+                    ProcessMessage.AddErrorMessage($"Can not update author with id {entity.Id}");
                     return null;
                 }
 
-                _dataContext.Users.Update(entity);
+                _dataContext.Authors.Update(entity);
                 Flush();
-                var updateUser = _lookupRepo.GetEntity<User>(entity.Id);
-                return updateUser;
+                var updateAuthor = _lookupRepo.GetEntity<Author>(entity.Id);
+                return updateAuthor;
             }
             catch (DataSourceException ex)
             {
@@ -73,14 +73,14 @@ namespace Hmm.Dal.DataRepository
             }
         }
 
-        public bool Delete(User entity)
+        public bool Delete(Author entity)
         {
             Guard.Against<ArgumentNullException>(entity == null, nameof(entity));
 
             try
             {
                 // ReSharper disable once AssignNullToNotNullAttribute
-                _dataContext.Users.Remove(entity);
+                _dataContext.Authors.Remove(entity);
                 Flush();
                 return true;
             }

@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Hmm.DtoEntity.Api.GasLogNotes;
+using Hmm.Infrastructure;
 using Hmm.Utility.Validation;
 using Hmm.WebConsole.ViewModels;
-using IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +11,6 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
@@ -41,25 +40,7 @@ namespace Hmm.WebConsole.Controllers
             // todo: remove this in production
             // try to get user address information from IDP's user info endpoint
             var idpClient = _httpClientFactory.CreateClient(HmmWebConsoleConstants.HttpClient.Idp);
-            var metaDataResponse = await idpClient.GetDiscoveryDocumentAsync();
-            if (metaDataResponse.IsError)
-            {
-                throw new Exception("Problem accessing the discover endpoint", metaDataResponse.Exception);
-            }
-
-            var accessToken = await HttpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken);
-            var userInfoResponse = await idpClient.GetUserInfoAsync(
-                new UserInfoRequest
-                {
-                    Address = metaDataResponse.UserInfoEndpoint,
-                    Token = accessToken
-                });
-            if (userInfoResponse.IsError)
-            {
-                throw new Exception("Problem accessing the user endpoint", userInfoResponse.Exception);
-            }
-
-            var addr = userInfoResponse.Claims.FirstOrDefault(c => c.Type == "address")?.Value;
+            var addr = await IdpUserProfileProvider.GetUserClaimAsync("address", HttpContext, idpClient);
 
             var httpClient = _httpClientFactory.CreateClient(HmmWebConsoleConstants.HttpClient.Api);
             var request = new HttpRequestMessage(
@@ -77,10 +58,10 @@ namespace Hmm.WebConsole.Controllers
                     return View(new GasLogIndexViewModel(gaslogs, addr, _mapper));
                 }
             }
-            else if (response.StatusCode==HttpStatusCode.Unauthorized || response.StatusCode==HttpStatusCode.Forbidden)
+
+            if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)
             {
                 return RedirectToAction("AccessDenied", "Authorization");
-
             }
 
             throw new Exception("Problem accessing the API");

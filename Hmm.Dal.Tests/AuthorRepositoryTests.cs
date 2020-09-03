@@ -12,20 +12,15 @@ namespace Hmm.Dal.Tests
         public void CanAddUserToDataSource()
         {
             // Arrange
-            var user = new User
+            var user = new Author
             {
-                FirstName = "Gas",
-                LastName = "Log",
                 AccountName = "glog",
-                BirthDay = new DateTime(2001, 10, 2),
-                Password = "Password1!",
-                Salt = "passwordSalt",
                 Description = "testing user",
                 IsActivated = true
             };
 
             // Act
-            var savedRec = UserRepository.Add(user);
+            var savedRec = AuthorRepository.Add(user);
 
             // Assert
             Assert.NotNull(savedRec);
@@ -37,61 +32,46 @@ namespace Hmm.Dal.Tests
         public void CanNotAddAlreadyExistedAccountNameToDataSource()
         {
             // Arrange
-            var userExists = new User
+            var userExists = new Author
             {
                 Id = Guid.NewGuid(),
-                FirstName = "Gas",
-                LastName = "Log",
                 AccountName = "glog",
-                BirthDay = new DateTime(2001, 10, 2),
-                Password = "Password1!",
-                Salt = "passwordSalt",
                 Description = "testing user",
                 IsActivated = true
             };
 
-            var user = new User
+            var user = new Author
             {
-                FirstName = "Gas2",
-                LastName = "Log2",
                 AccountName = "glog",
-                BirthDay = new DateTime(2001, 10, 2),
-                Password = "Password1!",
-                Salt = "passwordSalt",
                 Description = "testing user",
                 IsActivated = true
             };
 
             // Act
-            UserRepository.Add(userExists);
-            var savedUser = UserRepository.Add(user);
+            AuthorRepository.Add(userExists);
+            var savedUser = AuthorRepository.Add(user);
 
             // Assert
             Assert.Null(savedUser);
-            Assert.False(UserRepository.ProcessMessage.Success);
-            Assert.Single(UserRepository.ProcessMessage.MessageList);
+            Assert.False(AuthorRepository.ProcessMessage.Success);
+            Assert.Single(AuthorRepository.ProcessMessage.MessageList);
         }
 
         [Fact]
         public void CanDeleteUserFromDataSource()
         {
             // Arrange
-            var user = new User
+            var user = new Author
             {
-                FirstName = "Gas",
-                LastName = "Log",
                 AccountName = "glog",
-                BirthDay = new DateTime(2001, 10, 2),
-                Password = "Password1!",
-                Salt = "passwordSalt",
                 Description = "testing user",
                 IsActivated = true
             };
 
-            var savedUser = UserRepository.Add(user);
+            var savedUser = AuthorRepository.Add(user);
 
             // Act
-            var result = UserRepository.Delete(savedUser);
+            var result = AuthorRepository.Delete(savedUser);
 
             // Assert
             Assert.True(result);
@@ -101,40 +81,30 @@ namespace Hmm.Dal.Tests
         public void CannotDeleteNonExistsUserFromDataSource()
         {
             // Arrange
-            var user = new User
+            var user = new Author
             {
-                FirstName = "Gas",
-                LastName = "Log",
                 AccountName = "glog",
-                BirthDay = new DateTime(2001, 10, 2),
-                Password = "Password1!",
-                Salt = "passwordSalt",
                 Description = "testing user",
                 IsActivated = true
             };
 
-            UserRepository.Add(user);
+            AuthorRepository.Add(user);
 
-            var user2 = new User
+            var user2 = new Author
             {
                 Id = Guid.NewGuid(),
-                FirstName = "Gas2",
-                LastName = "Log2",
                 AccountName = "glog2",
-                BirthDay = new DateTime(2001, 10, 2),
-                Password = "Password1!",
-                Salt = "passwordSalt",
                 Description = "testing user",
                 IsActivated = true
             };
 
             // Act
-            var result = UserRepository.Delete(user2);
+            var result = AuthorRepository.Delete(user2);
 
             // Assert
             Assert.False(result);
-            Assert.False(UserRepository.ProcessMessage.Success);
-            Assert.Single(UserRepository.ProcessMessage.MessageList);
+            Assert.False(AuthorRepository.ProcessMessage.Success);
+            Assert.Single(AuthorRepository.ProcessMessage.MessageList);
         }
 
         [Fact]
@@ -160,18 +130,13 @@ namespace Hmm.Dal.Tests
             };
             var savedCatalog = CatalogRepository.Add(catalog);
 
-            var user = new User
+            var user = new Author
             {
-                FirstName = "Gas",
-                LastName = "Log",
                 AccountName = "glog",
-                BirthDay = new DateTime(2001, 10, 2),
-                Password = "Password1!",
-                Salt = "passwordSalt",
                 Description = "testing user",
                 IsActivated = true
             };
-            var savedUser = UserRepository.Add(user);
+            var savedUser = AuthorRepository.Add(user);
 
             var note = new HmmNote
             {
@@ -185,66 +150,32 @@ namespace Hmm.Dal.Tests
             NoteRepository.Add(note);
 
             // Act
-            var result = UserRepository.Delete(user);
+            var result = AuthorRepository.Delete(user);
 
             // Assert
             Assert.False(result, "Error: deleted user with note");
-            Assert.False(UserRepository.ProcessMessage.Success);
-            Assert.Single(UserRepository.ProcessMessage.MessageList);
+            Assert.False(AuthorRepository.ProcessMessage.Success);
+            Assert.Single(AuthorRepository.ProcessMessage.MessageList);
         }
 
         [Fact]
         public void CanUpdateUser()
         {
             // Arrange - update first name
-            var user = new User
+            var user = new Author
             {
-                FirstName = "Gas",
-                LastName = "Log",
                 AccountName = "glog",
-                BirthDay = new DateTime(2001, 10, 2),
-                Password = "Password1!",
-                Salt = "passwordSalt",
                 Description = "testing user",
                 IsActivated = true
             };
 
-            UserRepository.Add(user);
-            user.FirstName = "GasLog2";
-
-            // Act
-            var result = UserRepository.Update(user);
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.Equal("GasLog2", result.FirstName);
-
-            // Arrange - update last name
-            user.LastName = "new Last name";
-
-            // Act
-            result = UserRepository.Update(user);
-
-            // Arrange
-            Assert.NotNull(result);
-            Assert.Equal("new Last name", result.LastName);
-
-            // Arrange - update birth day
-            var newDay = new DateTime(2000, 5, 1);
-            user.BirthDay = newDay;
-
-            // Act
-            result = UserRepository.Update(user);
-
-            // Arrange
-            Assert.NotNull(result);
-            Assert.Equal(newDay, result.BirthDay);
+            AuthorRepository.Add(user);
 
             // Arrange - activate status
             user.IsActivated = false;
 
             // Act
-            result = UserRepository.Update(user);
+            var result = AuthorRepository.Update(user);
 
             // Arrange
             Assert.NotNull(result);
@@ -254,7 +185,7 @@ namespace Hmm.Dal.Tests
             user.Description = "new testing user";
 
             // Act
-            result = UserRepository.Update(user);
+            result = AuthorRepository.Update(user);
 
             // Assert
             Assert.NotNull(result);
@@ -265,80 +196,60 @@ namespace Hmm.Dal.Tests
         public void CannotUpdateForNonExistsUser()
         {
             // Arrange
-            var user = new User
+            var user = new Author
             {
-                FirstName = "Gas",
-                LastName = "Log",
                 AccountName = "glog",
-                BirthDay = new DateTime(2001, 10, 2),
-                Password = "Password1!",
-                Salt = "passwordSalt",
                 Description = "testing user",
                 IsActivated = true
             };
 
-            UserRepository.Add(user);
+            AuthorRepository.Add(user);
 
-            var user2 = new User
+            var user2 = new Author
             {
-                FirstName = "Gas2",
-                LastName = "Log2",
                 AccountName = "glog2",
-                BirthDay = new DateTime(2001, 10, 2),
-                Password = "Password1!",
-                Salt = "passwordSalt",
                 Description = "testing user",
                 IsActivated = true
             };
 
             // Act
-            var result = UserRepository.Update(user2);
+            var result = AuthorRepository.Update(user2);
 
             // Assert
             Assert.Null(result);
-            Assert.False(UserRepository.ProcessMessage.Success);
-            Assert.Single(UserRepository.ProcessMessage.MessageList);
+            Assert.False(AuthorRepository.ProcessMessage.Success);
+            Assert.Single(AuthorRepository.ProcessMessage.MessageList);
         }
 
         [Fact]
         public void CannotUpdateUserWithDuplicatedAccountName()
         {
             // Arrange
-            var user = new User
+            var user = new Author
             {
-                FirstName = "Gas",
-                LastName = "Log",
                 AccountName = "glog",
-                BirthDay = new DateTime(2001, 10, 2),
-                Password = "Password1!",
-                Salt = "passwordSalt",
                 Description = "testing user",
                 IsActivated = true
             };
-            UserRepository.Add(user);
+            AuthorRepository.Add(user);
 
-            var user2 = new User
+            var user2 = new Author
             {
-                FirstName = "Gas2",
-                LastName = "Log2",
                 AccountName = "glog2",
-                BirthDay = new DateTime(2001, 10, 2),
-                Password = "Password1!",
-                Salt = "passwordSalt",
                 Description = "testing user",
                 IsActivated = true
             };
-            UserRepository.Add(user2);
+            AuthorRepository.Add(user2);
 
             user.AccountName = user2.AccountName;
 
             // Act
-            var result = UserRepository.Update(user);
+            var result = AuthorRepository.Update(user);
 
             // Assert
             Assert.Null(result);
-            Assert.False(UserRepository.ProcessMessage.Success);
-            Assert.Single(UserRepository.ProcessMessage.MessageList);
+            Assert.False(AuthorRepository.ProcessMessage.Success);
+            Assert.Single(AuthorRepository.ProcessMessage.MessageList);
         }
     }
 }

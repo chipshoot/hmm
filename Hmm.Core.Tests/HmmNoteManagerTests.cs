@@ -15,12 +15,12 @@ namespace Hmm.Core.Tests
     {
         private const string Namespace = @"http://schema.hmm.com/2020";
         private readonly IHmmNoteManager _manager;
-        private readonly User _user;
+        private readonly Author _user;
 
         public HmmNoteManagerTests()
         {
             InsertSeedRecords();
-            _user = UserRepository.GetEntities().FirstOrDefault();
+            _user = AuthorRepository.GetEntities().FirstOrDefault();
             _manager = new HmmNoteManager(NoteRepository, new NoteValidator(NoteRepository));
         }
 
@@ -142,7 +142,7 @@ namespace Hmm.Core.Tests
             Assert.Equal("jfang", savedRec.Author.AccountName);
 
             // change the note render
-            var newUser = UserRepository.GetEntities().FirstOrDefault(u => u.AccountName != "jfang");
+            var newUser = AuthorRepository.GetEntities().FirstOrDefault(u => u.AccountName != "jfang");
             Assert.NotNull(newUser);
             note.Author = newUser;
 
