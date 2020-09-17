@@ -3,7 +3,6 @@ using System;
 using Hmm.IDP.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Hmm.IDP.Migrations.IdentityDb
@@ -15,46 +14,45 @@ namespace Hmm.IDP.Migrations.IdentityDb
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.7")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "3.1.8")
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("Hmm.IDP.Entities.User", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<byte[]>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("varbinary(16)");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(500)")
+                        .HasColumnType("varchar(500)")
                         .HasMaxLength(500);
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.Property<string>("Password")
-                        .HasColumnType("nvarchar(200)")
+                        .HasColumnType("varchar(200)")
                         .HasMaxLength(200);
 
                     b.Property<string>("SecurityCode")
-                        .HasColumnType("nvarchar(200)")
+                        .HasColumnType("varchar(200)")
                         .HasMaxLength(200);
 
                     b.Property<DateTime>("SecurityCodeExpirationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Subject")
                         .IsRequired()
-                        .HasColumnType("nvarchar(200)")
+                        .HasColumnType("varchar(200)")
                         .HasMaxLength(200);
 
                     b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(200)")
+                        .HasColumnType("varchar(200)")
                         .HasMaxLength(200);
 
                     b.Property<string>("Version")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -62,69 +60,69 @@ namespace Hmm.IDP.Migrations.IdentityDb
                         .IsUnique();
 
                     b.HasIndex("UserName")
-                        .IsUnique()
-                        .HasFilter("[UserName] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("Users");
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("08e54ef4-f64c-442b-bd4d-63df65bdfb55"),
+                            Id = new byte[] { 244, 78, 229, 8, 76, 246, 43, 68, 189, 77, 99, 223, 101, 189, 251, 85 },
                             Email = "fchy@yahoo.com",
                             IsActive = true,
                             Password = "AQAAAAEAACcQAAAAEG/4LGAH+5+zQRO3cPWA/um+2U/BiFudtLhUi29npPzYa1wCdbfOBb+WzoEwFlOMHg==",
                             SecurityCodeExpirationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Subject = "6E8FDCED-8857-46B9-BAD8-6DF2540FD07E",
                             UserName = "fchy",
-                            Version = "5d7d16eb-aed5-46dd-855e-88982b294512"
+                            Version = "f37bea81-91fb-4b13-9b89-d0173fdb96e6"
                         },
                         new
                         {
-                            Id = new Guid("303cac10-a6c6-4b46-846b-aa07a8d46393"),
+                            Id = new byte[] { 16, 172, 60, 48, 198, 166, 70, 75, 132, 107, 170, 7, 168, 212, 99, 147 },
                             Email = "ftt@yahoo.com",
                             IsActive = true,
                             Password = "AQAAAAEAACcQAAAAEG/4LGAH+5+zQRO3cPWA/um+2U/BiFudtLhUi29npPzYa1wCdbfOBb+WzoEwFlOMHg==",
                             SecurityCodeExpirationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Subject = "1501CAB6-CA3F-470F-AE5E-1A0B970D1707",
                             UserName = "fzt",
-                            Version = "9bb85164-452d-49e3-be80-a413148fdb49"
+                            Version = "90ae73ca-5157-4c45-9573-a589f155babd"
                         },
                         new
                         {
-                            Id = new Guid("3dd54a32-688f-40fb-9f5e-666ff007b3c1"),
+                            Id = new byte[] { 50, 74, 213, 61, 143, 104, 251, 64, 159, 94, 102, 111, 240, 7, 179, 193 },
                             Email = "bsmith@gmail.com",
                             IsActive = true,
                             Password = "AQAAAAEAACcQAAAAEG/4LGAH+5+zQRO3cPWA/um+2U/BiFudtLhUi29npPzYa1wCdbfOBb+WzoEwFlOMHg==",
                             SecurityCodeExpirationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Subject = "157BBC69-9989-4353-A4B9-02A205678562",
                             UserName = "bob",
-                            Version = "1d46e36b-e71e-4465-b4aa-0441120433af"
+                            Version = "36f77b12-04c4-4151-b0ba-44da88a986b5"
                         });
                 });
 
             modelBuilder.Entity("Hmm.IDP.Entities.UserClaim", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<byte[]>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("varbinary(16)");
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("nvarchar(250)")
+                        .HasColumnType("varchar(250)")
                         .HasMaxLength(250);
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<byte[]>("UserId")
+                        .IsRequired()
+                        .HasColumnType("varbinary(16)");
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnType("nvarchar(250)")
+                        .HasColumnType("varchar(250)")
                         .HasMaxLength(250);
 
                     b.Property<string>("Version")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -135,147 +133,147 @@ namespace Hmm.IDP.Migrations.IdentityDb
                     b.HasData(
                         new
                         {
-                            Id = new Guid("7234b25c-fb07-47ff-8581-9bfc67d76489"),
+                            Id = new byte[] { 48, 119, 1, 202, 211, 115, 174, 76, 186, 33, 51, 38, 126, 167, 126, 173 },
                             Type = "name",
-                            UserId = new Guid("08e54ef4-f64c-442b-bd4d-63df65bdfb55"),
+                            UserId = new byte[] { 244, 78, 229, 8, 76, 246, 43, 68, 189, 77, 99, 223, 101, 189, 251, 85 },
                             Value = "Chaoyang Fang",
-                            Version = "5548c177-c88b-4e26-9fb7-54fb853b2201"
+                            Version = "2cbb25ca-cde9-4190-825f-07c2024510f3"
                         },
                         new
                         {
-                            Id = new Guid("5371b746-dcae-4a7e-8fa4-17a35408b95a"),
+                            Id = new byte[] { 101, 223, 52, 251, 112, 20, 189, 66, 154, 48, 18, 38, 172, 222, 54, 142 },
                             Type = "given_name",
-                            UserId = new Guid("08e54ef4-f64c-442b-bd4d-63df65bdfb55"),
+                            UserId = new byte[] { 244, 78, 229, 8, 76, 246, 43, 68, 189, 77, 99, 223, 101, 189, 251, 85 },
                             Value = "Chaoyang",
-                            Version = "b8db009c-c7eb-4549-aa7b-c91cc466311c"
+                            Version = "50c7d2dc-667b-4e5f-acf9-576d42465c4e"
                         },
                         new
                         {
-                            Id = new Guid("e124c073-204a-4853-847a-fed4621ba76c"),
+                            Id = new byte[] { 219, 248, 128, 85, 72, 217, 79, 75, 183, 128, 55, 250, 179, 44, 21, 67 },
                             Type = "family_name",
-                            UserId = new Guid("08e54ef4-f64c-442b-bd4d-63df65bdfb55"),
+                            UserId = new byte[] { 244, 78, 229, 8, 76, 246, 43, 68, 189, 77, 99, 223, 101, 189, 251, 85 },
                             Value = "Fang",
-                            Version = "c77e2640-2375-42a4-83ab-54626ef2ee1a"
+                            Version = "9efa47eb-3ac8-4c54-8d56-e4f604acb6ec"
                         },
                         new
                         {
-                            Id = new Guid("037dd855-f36f-4f5e-99c8-eba2ad8cab49"),
+                            Id = new byte[] { 71, 195, 125, 204, 227, 255, 77, 70, 177, 62, 241, 212, 107, 173, 219, 89 },
                             Type = "email",
-                            UserId = new Guid("08e54ef4-f64c-442b-bd4d-63df65bdfb55"),
+                            UserId = new byte[] { 244, 78, 229, 8, 76, 246, 43, 68, 189, 77, 99, 223, 101, 189, 251, 85 },
                             Value = "fchy@yahoo.com",
-                            Version = "07b32373-06ab-4bf6-bbd2-c62189fb87e4"
+                            Version = "e97b5905-b881-404a-bb98-9ada4c5bb3ba"
                         },
                         new
                         {
-                            Id = new Guid("ba401388-6fa4-424b-a852-c7245ea8fe6a"),
+                            Id = new byte[] { 41, 45, 41, 253, 168, 158, 34, 78, 171, 171, 176, 194, 4, 83, 197, 179 },
                             Type = "address",
-                            UserId = new Guid("08e54ef4-f64c-442b-bd4d-63df65bdfb55"),
+                            UserId = new byte[] { 244, 78, 229, 8, 76, 246, 43, 68, 189, 77, 99, 223, 101, 189, 251, 85 },
                             Value = "1750 Bloor St.",
-                            Version = "1fbc972d-fac9-4a93-8569-7b1e7f47a6a2"
+                            Version = "4d80861f-4f36-441b-a07f-2763d174e832"
                         },
                         new
                         {
-                            Id = new Guid("94dc95c5-e787-4fd7-8f53-8fdb0a15a114"),
+                            Id = new byte[] { 13, 177, 108, 78, 44, 210, 153, 73, 170, 164, 143, 213, 144, 239, 145, 218 },
                             Type = "birthdate",
-                            UserId = new Guid("08e54ef4-f64c-442b-bd4d-63df65bdfb55"),
+                            UserId = new byte[] { 244, 78, 229, 8, 76, 246, 43, 68, 189, 77, 99, 223, 101, 189, 251, 85 },
                             Value = "1967-03-13",
-                            Version = "f251bcf8-f94d-4e4c-8247-f86fdac1cded"
+                            Version = "2125ab14-5982-4c19-95cc-7bb60ab0436e"
                         },
                         new
                         {
-                            Id = new Guid("fa01bf66-ff86-4268-8719-fdeb68359959"),
+                            Id = new byte[] { 119, 122, 124, 174, 38, 172, 220, 70, 177, 184, 140, 199, 209, 131, 253, 200 },
                             Type = "name",
-                            UserId = new Guid("303cac10-a6c6-4b46-846b-aa07a8d46393"),
+                            UserId = new byte[] { 16, 172, 60, 48, 198, 166, 70, 75, 132, 107, 170, 7, 168, 212, 99, 147 },
                             Value = "Zhitao Fang",
-                            Version = "43d293f6-1d53-45e3-a0d4-ad614f0e6629"
+                            Version = "53ea166c-6c77-4c9d-baa9-418b5cb05e12"
                         },
                         new
                         {
-                            Id = new Guid("f4e3eb06-a10e-4168-b64c-163ebc73a7ad"),
+                            Id = new byte[] { 78, 229, 192, 246, 151, 173, 113, 64, 142, 10, 170, 39, 185, 91, 16, 154 },
                             Type = "given_name",
-                            UserId = new Guid("303cac10-a6c6-4b46-846b-aa07a8d46393"),
+                            UserId = new byte[] { 16, 172, 60, 48, 198, 166, 70, 75, 132, 107, 170, 7, 168, 212, 99, 147 },
                             Value = "Zhitao",
-                            Version = "924a6c21-9e20-4248-b812-6470c3cfe135"
+                            Version = "e37ec180-87b6-41d5-932c-e352e9bd5f56"
                         },
                         new
                         {
-                            Id = new Guid("481dd248-152c-4b54-8b49-a9a14a26be9c"),
+                            Id = new byte[] { 233, 101, 146, 76, 43, 113, 242, 67, 148, 174, 210, 13, 124, 46, 46, 139 },
                             Type = "family_name",
-                            UserId = new Guid("303cac10-a6c6-4b46-846b-aa07a8d46393"),
+                            UserId = new byte[] { 16, 172, 60, 48, 198, 166, 70, 75, 132, 107, 170, 7, 168, 212, 99, 147 },
                             Value = "Fang",
-                            Version = "816719d2-5151-4d85-84cc-a1ce2143ce6b"
+                            Version = "0115e83c-28f2-49a1-adb7-ebacf07461b9"
                         },
                         new
                         {
-                            Id = new Guid("93363207-8c35-4caa-aaa7-21e602e88644"),
+                            Id = new byte[] { 206, 64, 110, 177, 61, 252, 130, 77, 140, 234, 221, 219, 5, 126, 37, 122 },
                             Type = "email",
-                            UserId = new Guid("303cac10-a6c6-4b46-846b-aa07a8d46393"),
+                            UserId = new byte[] { 16, 172, 60, 48, 198, 166, 70, 75, 132, 107, 170, 7, 168, 212, 99, 147 },
                             Value = "ftt@yahoo.com",
-                            Version = "501687b1-7e62-4357-9df1-c078c442a005"
+                            Version = "1eacd436-7e6f-4e01-9b3b-f1d4bbc16a34"
                         },
                         new
                         {
-                            Id = new Guid("5121d2ba-3b9a-4b2b-9279-103f5d196bb0"),
+                            Id = new byte[] { 158, 40, 17, 30, 58, 86, 247, 75, 138, 197, 96, 232, 90, 191, 42, 125 },
                             Type = "address",
-                            UserId = new Guid("303cac10-a6c6-4b46-846b-aa07a8d46393"),
+                            UserId = new byte[] { 16, 172, 60, 48, 198, 166, 70, 75, 132, 107, 170, 7, 168, 212, 99, 147 },
                             Value = "29 Spencer Ave.",
-                            Version = "01db59e1-ec93-4ad3-9a96-8d4c83bda987"
+                            Version = "1b57ef04-00c5-4b02-9bff-8869f5310184"
                         },
                         new
                         {
-                            Id = new Guid("b7328ceb-3247-46f8-b5d2-b1ca5314f0cb"),
+                            Id = new byte[] { 128, 62, 248, 20, 42, 181, 194, 64, 135, 149, 220, 56, 4, 232, 174, 248 },
                             Type = "birthdate",
-                            UserId = new Guid("303cac10-a6c6-4b46-846b-aa07a8d46393"),
+                            UserId = new byte[] { 16, 172, 60, 48, 198, 166, 70, 75, 132, 107, 170, 7, 168, 212, 99, 147 },
                             Value = "1999-09-30",
-                            Version = "a567ebd0-dbe3-42e6-9961-748de6d52490"
+                            Version = "a8685044-3dec-4c38-8634-26df92c6eba2"
                         },
                         new
                         {
-                            Id = new Guid("db4154eb-ed1d-4736-9436-b8a04a5b2416"),
+                            Id = new byte[] { 103, 35, 57, 127, 47, 160, 203, 76, 176, 138, 195, 235, 63, 43, 3, 101 },
                             Type = "name",
-                            UserId = new Guid("3dd54a32-688f-40fb-9f5e-666ff007b3c1"),
+                            UserId = new byte[] { 50, 74, 213, 61, 143, 104, 251, 64, 159, 94, 102, 111, 240, 7, 179, 193 },
                             Value = "Bob Smith",
-                            Version = "4521f411-c42e-47cb-880b-c3185242697c"
+                            Version = "eb433deb-73d0-4979-a2b9-a27662a4884c"
                         },
                         new
                         {
-                            Id = new Guid("41804eea-825d-44d9-a8ff-197399bc3c75"),
+                            Id = new byte[] { 135, 248, 63, 211, 76, 128, 177, 79, 149, 50, 212, 159, 122, 191, 152, 56 },
                             Type = "given_name",
-                            UserId = new Guid("3dd54a32-688f-40fb-9f5e-666ff007b3c1"),
+                            UserId = new byte[] { 50, 74, 213, 61, 143, 104, 251, 64, 159, 94, 102, 111, 240, 7, 179, 193 },
                             Value = "Bob",
-                            Version = "a6e95523-78f0-4f7d-8c0c-f0794116b947"
+                            Version = "f14c4924-b918-426d-818d-2452720adc1b"
                         },
                         new
                         {
-                            Id = new Guid("9ec9c181-25e7-4454-87ee-2acc47181568"),
+                            Id = new byte[] { 199, 230, 154, 243, 247, 159, 220, 64, 174, 167, 189, 6, 81, 67, 228, 124 },
                             Type = "family_name",
-                            UserId = new Guid("3dd54a32-688f-40fb-9f5e-666ff007b3c1"),
+                            UserId = new byte[] { 50, 74, 213, 61, 143, 104, 251, 64, 159, 94, 102, 111, 240, 7, 179, 193 },
                             Value = "Smith",
-                            Version = "9aedabff-282f-4463-aa03-51620904b58c"
+                            Version = "8538a826-9490-4f12-8cab-555767e829c1"
                         },
                         new
                         {
-                            Id = new Guid("21bb9ef8-21d8-4fdb-a565-144ee2ef48b5"),
+                            Id = new byte[] { 106, 239, 15, 105, 138, 133, 75, 69, 178, 148, 184, 5, 149, 182, 219, 14 },
                             Type = "email",
-                            UserId = new Guid("3dd54a32-688f-40fb-9f5e-666ff007b3c1"),
+                            UserId = new byte[] { 50, 74, 213, 61, 143, 104, 251, 64, 159, 94, 102, 111, 240, 7, 179, 193 },
                             Value = "bsmith@gmail.com",
-                            Version = "a196e86e-53c8-45e2-b05e-e61cac735815"
+                            Version = "871b3014-1297-4b3a-9166-4a367aabfa1c"
                         },
                         new
                         {
-                            Id = new Guid("5d351a40-47a2-4f19-a3ce-ceddea869810"),
+                            Id = new byte[] { 134, 213, 16, 97, 174, 74, 57, 68, 166, 179, 31, 200, 160, 79, 130, 194 },
                             Type = "address",
-                            UserId = new Guid("3dd54a32-688f-40fb-9f5e-666ff007b3c1"),
+                            UserId = new byte[] { 50, 74, 213, 61, 143, 104, 251, 64, 159, 94, 102, 111, 240, 7, 179, 193 },
                             Value = "3345 Cardross Rd.",
-                            Version = "71aa02d6-4e89-43d6-ba75-244cf17c6451"
+                            Version = "ed5311b8-b757-47de-ab2b-614e089bdb51"
                         },
                         new
                         {
-                            Id = new Guid("5bfe3870-8cbd-4961-8100-7f1bcd28316e"),
+                            Id = new byte[] { 184, 70, 107, 142, 235, 46, 0, 68, 173, 255, 143, 108, 48, 58, 84, 191 },
                             Type = "birthdate",
-                            UserId = new Guid("3dd54a32-688f-40fb-9f5e-666ff007b3c1"),
+                            UserId = new byte[] { 50, 74, 213, 61, 143, 104, 251, 64, 159, 94, 102, 111, 240, 7, 179, 193 },
                             Value = "1987-02-23",
-                            Version = "62d8b0ea-4785-4a2c-b624-1d831e0e1daa"
+                            Version = "56ddf4a6-d0f1-4120-8c99-c01d3482e790"
                         });
                 });
 
