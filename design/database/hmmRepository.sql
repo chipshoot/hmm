@@ -7,6 +7,7 @@ CREATE TABLE [dbo].[Authors](
 	[ID] [UNIQUEIDENTIFIER] DEFAULT NEWID() NOT NULL,
 	[AccountName] [nvarchar](256) NOT NULL,
     [Role] [int] NOT NULL,
+	[IsActivated] [bit] NOT NULL,
 	[Description] [nvarchar](1000) NULL,
  CONSTRAINT [PK_Authors] PRIMARY KEY CLUSTERED 
 (
@@ -59,12 +60,26 @@ CREATE UNIQUE NONCLUSTERED INDEX [IDX_UniqueRenderName] ON [dbo].[NoteRenders]
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 GO
 
+/****** Object:  Table [dbo].[Subsystems]    Script Date: 10/06/2020 16:05:01 ******/
+CREATE TABLE [dbo].[Subsystems](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](200) NOT NULL,
+	[IsDefault] BIT NOT NULL,
+	[Description] [nvarchar](1000) NULL,
+ CONSTRAINT [PK_Subsystems] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
 /****** Object:  Table [dbo].[NoteCatalogs]    Script Date: 03/05/2018 16:05:01 ******/
 CREATE TABLE [dbo].[NoteCatalogs](
 	[ID] [int] IDENTITY(1,1) NOT NULL,
 	[Name] [nvarchar](200) NOT NULL,
 	[Schema] [xml] NOT NULL,
 	[RenderID] [int] NOT NULL,
+	[SubsystemID] INT NULL,
 	[IsDefault] BIT NOT NULL,
 	[Description] [nvarchar](1000) NULL,
  CONSTRAINT [PK_NoteCatalogs] PRIMARY KEY CLUSTERED 
@@ -76,6 +91,10 @@ GO
 
 ALTER TABLE [dbo].[NoteCatalogs]  WITH CHECK ADD  CONSTRAINT [FK_NoteCatalogs_NoteRenders] FOREIGN KEY([RenderID])
 REFERENCES [dbo].[NoteRenders] ([ID])
+GO
+
+ALTER TABLE [dbo].[NoteCatalogs]  WITH CHECK ADD  CONSTRAINT [FK_NoteCatalogs_Subsystems] FOREIGN KEY([SubsystemID])
+REFERENCES [dbo].[Subsystems] ([ID])
 GO
 
 ALTER TABLE [dbo].[NoteCatalogs] ADD  CONSTRAINT [DF_NoteCatalogs_IsDefault]  DEFAULT ((0)) FOR [IsDefault]

@@ -17,6 +17,8 @@ namespace Hmm.Dal.Data
 
         public DbSet<NoteRender> Renders { get; set; }
 
+        public DbSet<Subsystem> Subsystems { get; set; }
+
         public DbSet<NoteCatalog> Catalogs { get; set; }
 
         public void Save()
@@ -38,9 +40,11 @@ namespace Hmm.Dal.Data
                 .HasColumnName("Ts")
                 .IsConcurrencyToken()
                 .ValueGeneratedOnAddOrUpdate();
-
             modelBuilder.Entity<Author>().ToTable("Authors");
-            modelBuilder.Entity<NoteCatalog>().ToTable("NoteCatalogs");
+            modelBuilder.Entity<Subsystem>().ToTable("Subsystems");
+            modelBuilder.Entity<NoteCatalog>().ToTable("NoteCatalogs")
+                .HasOne(c=>c.Subsystem)
+                .WithMany(s=>s.NoteCatalogs);
             modelBuilder.Entity<NoteRender>().ToTable("NoteRenders");
         }
     }

@@ -11,6 +11,10 @@
             public const string Idp = "Idpclient";
         }
 
+        public static class Urls
+        {
+            public const string GetSubsystems = "/api/subsystems";
+        }
         public static class Policy
         {
             public const string CanAddGasLog = "CanAddGasLog";

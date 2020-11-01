@@ -128,9 +128,15 @@ namespace Hmm.WebConsole
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    "Default",
-                    "{controller=Automobile}/{action=Index}/{id?}");
+                endpoints.MapControllerRoute("subsystem",
+                    "{section}/page{notepage:int}",
+                    new {Controller = "home", action = "Index"}
+                );
+                endpoints.MapControllerRoute("automobile",
+                    "automobile/{id?}",
+                    new {Controller = "Automobile", action = "Index"}
+                );
+                endpoints.MapDefaultControllerRoute();
             });
         }
     }

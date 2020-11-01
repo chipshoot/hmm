@@ -29,6 +29,7 @@ namespace Hmm.Utility.TestHelp
         private List<Author> _users;
         private List<NoteRender> _renders;
         private List<NoteCatalog> _catalogs;
+        private List<Subsystem> _systems;
         private List<HmmNote> _notes;
         private IHmmDataContext _dbContext;
         private readonly bool _isUsingMock;
@@ -64,6 +65,8 @@ namespace Hmm.Utility.TestHelp
 
         protected IRepository<NoteCatalog> CatalogRepository { get; private set; }
 
+        protected IRepository<Subsystem> SubsystemRepository { get; private set; }
+
         protected IRepository<NoteRender> RenderRepository { get; private set; }
 
         protected IEntityLookup LookupRepo { get; private set; }
@@ -72,6 +75,21 @@ namespace Hmm.Utility.TestHelp
 
         protected void InsertSeedRecords(bool isSetupDiscount = false, bool isSetupAutomobile = false)
         {
+            var systems = new List<Subsystem>
+            {
+                new Subsystem
+                {
+                    Name = "HmmNote",
+                    Description = "Default HMM note management"
+                },
+
+                new Subsystem
+                {
+                    Name = "Automobile",
+                    Description = "A Basic information manage system for the car"
+                }
+            };
+            
             var authors = new List<Author>
             {
                 new Author
@@ -110,6 +128,7 @@ namespace Hmm.Utility.TestHelp
                     Name = "DefaultNoteCatalog",
                     Schema = "DefaultSchema",
                     Render = renders[0],
+                    Subsystem = systems[0],
                     IsDefault = true,
                     Description = "Testing catalog"
                 },
@@ -117,6 +136,7 @@ namespace Hmm.Utility.TestHelp
                 {
                     Name = "GasLog",
                     Schema = "GasLogSchema",
+                    Subsystem = systems[1],
                     Render = renders[1],
                     Description = "Testing catalog"
                 },
@@ -124,6 +144,7 @@ namespace Hmm.Utility.TestHelp
                 {
                     Name = "Automobile",
                     Schema = "AutomobileSchema",
+                    Subsystem = systems[1],
                     Render = renders[0],
                     Description = "Testing automobile note"
                 },
@@ -131,6 +152,7 @@ namespace Hmm.Utility.TestHelp
                 {
                     Name = "GasDiscount",
                     Schema = "GasDiscount",
+                    Subsystem = systems[1],
                     Render = renders[0],
                     Description = "Testing discount note"
                 }
@@ -173,19 +195,21 @@ namespace Hmm.Utility.TestHelp
                 }
                 : new List<Automobile>();
 
-            SetupRecords(authors, renders, catalogs, discounts, cars);
+            SetupRecords(authors, renders, catalogs, systems, discounts, cars);
         }
 
         protected void SetupRecords(
             IEnumerable<Author> users,
             IEnumerable<NoteRender> renders,
             IEnumerable<NoteCatalog> catalogs,
+            IEnumerable<Subsystem> subsystems,
             IEnumerable<GasDiscount> discounts,
             IEnumerable<Automobile> cars)
         {
             Guard.Against<ArgumentNullException>(users == null, nameof(users));
-            Guard.Against<ArgumentNullException>(renders == null, nameof(users));
-            Guard.Against<ArgumentNullException>(catalogs == null, nameof(users));
+            Guard.Against<ArgumentNullException>(renders == null, nameof(renders));
+            Guard.Against<ArgumentNullException>(catalogs == null, nameof(catalogs));
+            Guard.Against<ArgumentNullException>(subsystems == null, nameof(subsystems));
 
             // ReSharper disable PossibleNullReferenceException
             foreach (var user in users)
@@ -196,6 +220,11 @@ namespace Hmm.Utility.TestHelp
             foreach (var render in renders)
             {
                 RenderRepository.Add(render);
+            }
+
+            foreach (var sys in subsystems)
+            {
+                SubsystemRepository.Add(sys);
             }
 
             foreach (var catalog in catalogs)
@@ -307,6 +336,7 @@ namespace Hmm.Utility.TestHelp
             _users = new List<Author>();
             _renders = new List<NoteRender>();
             _catalogs = new List<NoteCatalog>();
+            _systems = new List<Subsystem>();
             _notes = new List<HmmNote>();
 
             // set up for entity look up
@@ -314,6 +344,12 @@ namespace Hmm.Utility.TestHelp
             lookupMoc.Setup(lk => lk.GetEntity<Author>(It.IsAny<Guid>())).Returns((Guid id) =>
             {
                 var recFound = _users.FirstOrDefault(c => c.Id == id);
+                return recFound;
+            });
+
+            lookupMoc.Setup(sys => sys.GetEntity<Subsystem>(It.IsAny<int>())).Returns((int id) =>
+            {
+                var recFound = _systems.FirstOrDefault(s => s.Id == id);
                 return recFound;
             });
 
@@ -405,6 +441,29 @@ namespace Hmm.Utility.TestHelp
                 }
             });
 
+            // set up for subsystem
+            dataContextMock.Setup(u => u.Subsystems.Add(It.IsAny<Subsystem>())).Returns((Subsystem sys) =>
+                {
+                    sys.Id = _systems.GetNextId();
+                    _systems.AddEntity(sys);
+                    return null;
+                }
+            );
+            dataContextMock.Setup(u => u.Subsystems.Remove(It.IsAny<Subsystem>())).Callback((Subsystem sys) =>
+            {
+                _systems.Remove(sys);
+            });
+
+            dataContextMock.Setup(u => u.Subsystems.Update(It.IsAny<Subsystem>())).Callback((Subsystem sys) =>
+            {
+                var orgSys = _systems.FirstOrDefault(s => s.Id == sys.Id);
+                if (orgSys != null)
+                {
+                    _systems.Remove(orgSys);
+                    _systems.AddEntity(sys);
+                }
+            });
+
             // set up for note
             dataContextMock.Setup(u => u.Notes.Add(It.IsAny<HmmNote>()))
                 .Returns((HmmNote note) =>
@@ -447,6 +506,9 @@ namespace Hmm.Utility.TestHelp
             // set up for catalog storage
             CatalogRepository = new NoteCatalogEfRepository(dataContextMock.Object, lookupMoc.Object, timeProviderMock.Object);
 
+            // set up for subsystem storage
+            SubsystemRepository = new SubsystemEfRepository(dataContextMock.Object, lookupMoc.Object, timeProviderMock.Object);
+
             // set up for note storage
             NoteRepository = new NoteEfRepository(dataContextMock.Object, lookupMoc.Object, timeProviderMock.Object);
 
@@ -464,6 +526,7 @@ namespace Hmm.Utility.TestHelp
             NoteRepository = new NoteEfRepository(_dbContext, LookupRepo, dateProvider);
             RenderRepository = new NoteRenderEfRepository(_dbContext, LookupRepo, dateProvider);
             CatalogRepository = new NoteCatalogEfRepository(_dbContext, LookupRepo, dateProvider);
+            SubsystemRepository = new SubsystemEfRepository(_dbContext, LookupRepo, dateProvider);
             DateProvider = new DateTimeAdapter();
             //NoteManager = new HmmNoteEfRepository(NoteRepository, new NoteValidator(NoteRepository));
         }

@@ -1,34 +1,32 @@
 ﻿@model Hmm.WebConsole.ViewModels.GasLogIndexViewModel
 
-<div class="bottomMarginDefault"></div>
-
 <div class="container">
     <div>User Address : @Model.Address</div>
-    <table class="table">
-        <thead>
+    <table class="table table-striped">
+        <thead class="thead-light">
             <tr>
-                <th class="col-sm">ID</th>
-                <th class="col-sm">Distance</th>
-                <th class="col-sm">Gas</th>
-                <th class="col-sm">Price</th>
-                <th class="col-sm">Total</th>
-                <th class="col-sm">Meter Reading</th>
-                <th class="col-sm">LogDate</th>
-                <th class="col-sm">Comment</th>
+                <th scope="col">ID</th>
+                <th scope="col">Distance</th>
+                <th scope="col">Gas</th>
+                <th scope="col">Price</th>
+                <th scope="col">Total</th>
+                <th scope="col">Meter Reading</th>
+                <th scope="col">LogDate</th>
+                <th scope="col">Comment</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var log in Model.GasLogs)
             {
                 <tr>
-                    <td class="=col-sm"> @log.Id </td>
-                    <td class="=col-sm"> @log.Distance.Value </td>
-                    <td class="=col-sm"> @log.Gas.Value </td>
-                    <td class="=col-sm"> @log.Price.Amount</td>
-                    <td class="=col-sm"> @((decimal)log.Gas.Value * log.Price.Amount) </td>
-                    <td class="=col-sm"> @log.CurrentMeterReading.Value </td>
-                    <td class="=col-sm"> @log.CreateDate</td>
-                    <td class="=col-sm"> @log.Comment</td>
+                    <td> @log.Id </td>
+                    <td> @log.Distance.Value </td>
+                    <td> @log.Gas.Value </td>
+                    <td> @log.Price.Amount</td>
+                    <td> @((decimal)log.Gas.Value * log.Price.Amount) </td>
+                    <td> @log.CurrentMeterReading.Value </td>
+                    <td> @log.CreateDate</td>
+                    <td> @log.Comment</td>
                 </tr>
             }
         </tbody>

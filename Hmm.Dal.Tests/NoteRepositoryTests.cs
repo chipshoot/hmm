@@ -18,6 +18,21 @@ namespace Hmm.Dal.Tests
 
         public NoteRepositoryTests()
         {
+            var systems = new List<Subsystem>
+            {
+                new Subsystem
+                {
+                    Name = "HmmNote",
+                    Description = "HMM note management"
+                },
+
+                new Subsystem
+                {
+                    Name = "Automobile",
+                    Description = "Car information management"
+                }
+            };
+
             var authors = new List<Author>
             {
                 new Author
@@ -56,6 +71,7 @@ namespace Hmm.Dal.Tests
                     Name = "DefaultNoteCatalog",
                     Schema = "DefaultSchema",
                     Render = renders[0],
+                    Subsystem = systems[0],
                     IsDefault = true,
                     Description = "Testing catalog"
                 },
@@ -64,11 +80,12 @@ namespace Hmm.Dal.Tests
                     Name = "Gas Log",
                     Schema = "GasLogSchema",
                     Render = renders[1],
+                    Subsystem = systems[1],
                     Description = "Testing catalog"
                 }
             };
 
-            SetupRecords(authors, renders, catalogs, new List<GasDiscount>(), new List<Automobile>());
+            SetupRecords(authors, renders, catalogs, systems, new List<GasDiscount>(), new List<Automobile>());
 
             _author = AuthorRepository.GetEntities().FirstOrDefault();
             _catalog = CatalogRepository.GetEntities().FirstOrDefault(cat => cat.IsDefault);

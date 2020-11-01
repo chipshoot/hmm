@@ -24,39 +24,39 @@ namespace Hmm.IDP.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("AllowedAccessTokenSigningAlgorithms")
-                        .HasColumnType("varchar(100)")
+                        .HasColumnType("varchar(100) CHARACTER SET utf8mb4")
                         .HasMaxLength(100);
 
                     b.Property<DateTime>("Created")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("varchar(1000)")
+                        .HasColumnType("varchar(1000) CHARACTER SET utf8mb4")
                         .HasMaxLength(1000);
 
                     b.Property<string>("DisplayName")
-                        .HasColumnType("varchar(200)")
+                        .HasColumnType("varchar(200) CHARACTER SET utf8mb4")
                         .HasMaxLength(200);
 
                     b.Property<bool>("Enabled")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<DateTime?>("LastAccessed")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("varchar(200)")
+                        .HasColumnType("varchar(200) CHARACTER SET utf8mb4")
                         .HasMaxLength(200);
 
                     b.Property<bool>("NonEditable")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("ShowInDiscoveryDocument")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<DateTime?>("Updated")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
@@ -77,7 +77,7 @@ namespace Hmm.IDP.Migrations
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("varchar(200)")
+                        .HasColumnType("varchar(200) CHARACTER SET utf8mb4")
                         .HasMaxLength(200);
 
                     b.HasKey("Id");
@@ -98,12 +98,12 @@ namespace Hmm.IDP.Migrations
 
                     b.Property<string>("Key")
                         .IsRequired()
-                        .HasColumnType("varchar(250)")
+                        .HasColumnType("varchar(250) CHARACTER SET utf8mb4")
                         .HasMaxLength(250);
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnType("varchar(2000)")
+                        .HasColumnType("varchar(2000) CHARACTER SET utf8mb4")
                         .HasMaxLength(2000);
 
                     b.HasKey("Id");
@@ -124,7 +124,7 @@ namespace Hmm.IDP.Migrations
 
                     b.Property<string>("Scope")
                         .IsRequired()
-                        .HasColumnType("varchar(200)")
+                        .HasColumnType("varchar(200) CHARACTER SET utf8mb4")
                         .HasMaxLength(200);
 
                     b.HasKey("Id");
@@ -144,23 +144,23 @@ namespace Hmm.IDP.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Created")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("varchar(1000)")
+                        .HasColumnType("varchar(1000) CHARACTER SET utf8mb4")
                         .HasMaxLength(1000);
 
                     b.Property<DateTime?>("Expiration")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("varchar(250)")
+                        .HasColumnType("varchar(250) CHARACTER SET utf8mb4")
                         .HasMaxLength(250);
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnType("varchar(4000)")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4")
                         .HasMaxLength(4000);
 
                     b.HasKey("Id");
@@ -177,29 +177,29 @@ namespace Hmm.IDP.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .HasColumnType("varchar(1000)")
+                        .HasColumnType("varchar(1000) CHARACTER SET utf8mb4")
                         .HasMaxLength(1000);
 
                     b.Property<string>("DisplayName")
-                        .HasColumnType("varchar(200)")
+                        .HasColumnType("varchar(200) CHARACTER SET utf8mb4")
                         .HasMaxLength(200);
 
                     b.Property<bool>("Emphasize")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("Enabled")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("varchar(200)")
+                        .HasColumnType("varchar(200) CHARACTER SET utf8mb4")
                         .HasMaxLength(200);
 
                     b.Property<bool>("Required")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("ShowInDiscoveryDocument")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.HasKey("Id");
 
@@ -220,7 +220,7 @@ namespace Hmm.IDP.Migrations
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("varchar(200)")
+                        .HasColumnType("varchar(200) CHARACTER SET utf8mb4")
                         .HasMaxLength(200);
 
                     b.HasKey("Id");
@@ -238,7 +238,7 @@ namespace Hmm.IDP.Migrations
 
                     b.Property<string>("Key")
                         .IsRequired()
-                        .HasColumnType("varchar(250)")
+                        .HasColumnType("varchar(250) CHARACTER SET utf8mb4")
                         .HasMaxLength(250);
 
                     b.Property<int>("ScopeId")
@@ -246,7 +246,7 @@ namespace Hmm.IDP.Migrations
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnType("varchar(2000)")
+                        .HasColumnType("varchar(2000) CHARACTER SET utf8mb4")
                         .HasMaxLength(2000);
 
                     b.HasKey("Id");
@@ -272,103 +272,103 @@ namespace Hmm.IDP.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("AllowAccessTokensViaBrowser")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("AllowOfflineAccess")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("AllowPlainTextPkce")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("AllowRememberConsent")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("AllowedIdentityTokenSigningAlgorithms")
-                        .HasColumnType("varchar(100)")
+                        .HasColumnType("varchar(100) CHARACTER SET utf8mb4")
                         .HasMaxLength(100);
 
                     b.Property<bool>("AlwaysIncludeUserClaimsInIdToken")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("AlwaysSendClientClaims")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<int>("AuthorizationCodeLifetime")
                         .HasColumnType("int");
 
                     b.Property<bool>("BackChannelLogoutSessionRequired")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("BackChannelLogoutUri")
-                        .HasColumnType("varchar(2000)")
+                        .HasColumnType("varchar(2000) CHARACTER SET utf8mb4")
                         .HasMaxLength(2000);
 
                     b.Property<string>("ClientClaimsPrefix")
-                        .HasColumnType("varchar(200)")
+                        .HasColumnType("varchar(200) CHARACTER SET utf8mb4")
                         .HasMaxLength(200);
 
                     b.Property<string>("ClientId")
                         .IsRequired()
-                        .HasColumnType("varchar(200)")
+                        .HasColumnType("varchar(200) CHARACTER SET utf8mb4")
                         .HasMaxLength(200);
 
                     b.Property<string>("ClientName")
-                        .HasColumnType("varchar(200)")
+                        .HasColumnType("varchar(200) CHARACTER SET utf8mb4")
                         .HasMaxLength(200);
 
                     b.Property<string>("ClientUri")
-                        .HasColumnType("varchar(2000)")
+                        .HasColumnType("varchar(2000) CHARACTER SET utf8mb4")
                         .HasMaxLength(2000);
 
                     b.Property<int?>("ConsentLifetime")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Created")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("varchar(1000)")
+                        .HasColumnType("varchar(1000) CHARACTER SET utf8mb4")
                         .HasMaxLength(1000);
 
                     b.Property<int>("DeviceCodeLifetime")
                         .HasColumnType("int");
 
                     b.Property<bool>("EnableLocalLogin")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("Enabled")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("FrontChannelLogoutSessionRequired")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("FrontChannelLogoutUri")
-                        .HasColumnType("varchar(2000)")
+                        .HasColumnType("varchar(2000) CHARACTER SET utf8mb4")
                         .HasMaxLength(2000);
 
                     b.Property<int>("IdentityTokenLifetime")
                         .HasColumnType("int");
 
                     b.Property<bool>("IncludeJwtId")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<DateTime?>("LastAccessed")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("LogoUri")
-                        .HasColumnType("varchar(2000)")
+                        .HasColumnType("varchar(2000) CHARACTER SET utf8mb4")
                         .HasMaxLength(2000);
 
                     b.Property<bool>("NonEditable")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("PairWiseSubjectSalt")
-                        .HasColumnType("varchar(200)")
+                        .HasColumnType("varchar(200) CHARACTER SET utf8mb4")
                         .HasMaxLength(200);
 
                     b.Property<string>("ProtocolType")
                         .IsRequired()
-                        .HasColumnType("varchar(200)")
+                        .HasColumnType("varchar(200) CHARACTER SET utf8mb4")
                         .HasMaxLength(200);
 
                     b.Property<int>("RefreshTokenExpiration")
@@ -378,28 +378,28 @@ namespace Hmm.IDP.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("RequireClientSecret")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("RequireConsent")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("RequirePkce")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("RequireRequestObject")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<int>("SlidingRefreshTokenLifetime")
                         .HasColumnType("int");
 
                     b.Property<bool>("UpdateAccessTokenClaimsOnRefresh")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<DateTime?>("Updated")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("UserCodeType")
-                        .HasColumnType("varchar(100)")
+                        .HasColumnType("varchar(100) CHARACTER SET utf8mb4")
                         .HasMaxLength(100);
 
                     b.Property<int?>("UserSsoLifetime")
@@ -424,12 +424,12 @@ namespace Hmm.IDP.Migrations
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("varchar(250)")
+                        .HasColumnType("varchar(250) CHARACTER SET utf8mb4")
                         .HasMaxLength(250);
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnType("varchar(250)")
+                        .HasColumnType("varchar(250) CHARACTER SET utf8mb4")
                         .HasMaxLength(250);
 
                     b.HasKey("Id");
@@ -450,7 +450,7 @@ namespace Hmm.IDP.Migrations
 
                     b.Property<string>("Origin")
                         .IsRequired()
-                        .HasColumnType("varchar(150)")
+                        .HasColumnType("varchar(150) CHARACTER SET utf8mb4")
                         .HasMaxLength(150);
 
                     b.HasKey("Id");
@@ -471,7 +471,7 @@ namespace Hmm.IDP.Migrations
 
                     b.Property<string>("GrantType")
                         .IsRequired()
-                        .HasColumnType("varchar(250)")
+                        .HasColumnType("varchar(250) CHARACTER SET utf8mb4")
                         .HasMaxLength(250);
 
                     b.HasKey("Id");
@@ -492,7 +492,7 @@ namespace Hmm.IDP.Migrations
 
                     b.Property<string>("Provider")
                         .IsRequired()
-                        .HasColumnType("varchar(200)")
+                        .HasColumnType("varchar(200) CHARACTER SET utf8mb4")
                         .HasMaxLength(200);
 
                     b.HasKey("Id");
@@ -513,7 +513,7 @@ namespace Hmm.IDP.Migrations
 
                     b.Property<string>("PostLogoutRedirectUri")
                         .IsRequired()
-                        .HasColumnType("varchar(2000)")
+                        .HasColumnType("varchar(2000) CHARACTER SET utf8mb4")
                         .HasMaxLength(2000);
 
                     b.HasKey("Id");
@@ -534,12 +534,12 @@ namespace Hmm.IDP.Migrations
 
                     b.Property<string>("Key")
                         .IsRequired()
-                        .HasColumnType("varchar(250)")
+                        .HasColumnType("varchar(250) CHARACTER SET utf8mb4")
                         .HasMaxLength(250);
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnType("varchar(2000)")
+                        .HasColumnType("varchar(2000) CHARACTER SET utf8mb4")
                         .HasMaxLength(2000);
 
                     b.HasKey("Id");
@@ -560,7 +560,7 @@ namespace Hmm.IDP.Migrations
 
                     b.Property<string>("RedirectUri")
                         .IsRequired()
-                        .HasColumnType("varchar(2000)")
+                        .HasColumnType("varchar(2000) CHARACTER SET utf8mb4")
                         .HasMaxLength(2000);
 
                     b.HasKey("Id");
@@ -581,7 +581,7 @@ namespace Hmm.IDP.Migrations
 
                     b.Property<string>("Scope")
                         .IsRequired()
-                        .HasColumnType("varchar(200)")
+                        .HasColumnType("varchar(200) CHARACTER SET utf8mb4")
                         .HasMaxLength(200);
 
                     b.HasKey("Id");
@@ -601,23 +601,23 @@ namespace Hmm.IDP.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Created")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("varchar(2000)")
+                        .HasColumnType("varchar(2000) CHARACTER SET utf8mb4")
                         .HasMaxLength(2000);
 
                     b.Property<DateTime?>("Expiration")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("varchar(250)")
+                        .HasColumnType("varchar(250) CHARACTER SET utf8mb4")
                         .HasMaxLength(250);
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnType("varchar(4000)")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4")
                         .HasMaxLength(4000);
 
                     b.HasKey("Id");
@@ -634,38 +634,38 @@ namespace Hmm.IDP.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Created")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("varchar(1000)")
+                        .HasColumnType("varchar(1000) CHARACTER SET utf8mb4")
                         .HasMaxLength(1000);
 
                     b.Property<string>("DisplayName")
-                        .HasColumnType("varchar(200)")
+                        .HasColumnType("varchar(200) CHARACTER SET utf8mb4")
                         .HasMaxLength(200);
 
                     b.Property<bool>("Emphasize")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("Enabled")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("varchar(200)")
+                        .HasColumnType("varchar(200) CHARACTER SET utf8mb4")
                         .HasMaxLength(200);
 
                     b.Property<bool>("NonEditable")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("Required")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("ShowInDiscoveryDocument")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<DateTime?>("Updated")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
@@ -686,7 +686,7 @@ namespace Hmm.IDP.Migrations
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("varchar(200)")
+                        .HasColumnType("varchar(200) CHARACTER SET utf8mb4")
                         .HasMaxLength(200);
 
                     b.HasKey("Id");
@@ -707,12 +707,12 @@ namespace Hmm.IDP.Migrations
 
                     b.Property<string>("Key")
                         .IsRequired()
-                        .HasColumnType("varchar(250)")
+                        .HasColumnType("varchar(250) CHARACTER SET utf8mb4")
                         .HasMaxLength(250);
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnType("varchar(2000)")
+                        .HasColumnType("varchar(2000) CHARACTER SET utf8mb4")
                         .HasMaxLength(2000);
 
                     b.HasKey("Id");

@@ -81,6 +81,10 @@ namespace Hmm.Dal.Queries
                 entities = _dataContext.Authors
                     .Cast<T>();
             }
+            else if (typeof(T) == typeof(Subsystem))
+            {
+                entities = _dataContext.Subsystems.Cast<T>();
+            }
             else
             {
                 throw new DataSourceException($"{typeof(T)} is not support");

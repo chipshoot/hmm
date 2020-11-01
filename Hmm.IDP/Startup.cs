@@ -50,19 +50,19 @@ namespace Hmm.IDP
             builder.AddConfigurationStore(options =>
             {
                 options.ConfigureDbContext = bd =>
-                    bd.UseMySQL(connectString, opts => opts.MigrationsAssembly(migrationsAssembly));
+                    bd.UseMySql(connectString, opts => opts.MigrationsAssembly(migrationsAssembly));
             });
             builder.AddOperationalStore(options =>
             {
                 options.ConfigureDbContext = bd =>
-                    bd.UseMySQL(connectString, opts => opts.MigrationsAssembly(migrationsAssembly));
+                    bd.UseMySql(connectString, opts => opts.MigrationsAssembly(migrationsAssembly));
                 options.EnableTokenCleanup = true;
                 options.TokenCleanupInterval = 3600;
             });
 
             services.AddDbContext<IdentityDbContext>(options =>
             {
-                options.UseMySQL(connectString);
+                options.UseMySql(connectString);
             });
 
             builder.AddSigningCredential(LoadCertificateFromStore());

@@ -28,12 +28,14 @@ namespace Hmm.DtoEntity.Api.Profiles
             CreateMap<ApiNoteRenderForCreate, NoteRender>();
             CreateMap<ApiNoteRenderForUpdate, NoteRender>();
             CreateMap<NoteRender, ApiNoteRenderForUpdate>();
+            CreateMap<ApiSubsystem, Subsystem>();
 
             CreateMap<ApiNoteCatalog, NoteCatalog>();
             CreateMap<NoteCatalog, ApiNoteCatalog>();
             CreateMap<ApiNoteCatalogForCreate, NoteCatalog>();
             CreateMap<ApiNoteCatalogForUpdate, NoteCatalog>();
             CreateMap<NoteCatalog, ApiNoteCatalogForUpdate>();
+            CreateMap<Subsystem, ApiSubsystem>();
 
             // gas log: setup map from domain entity to DTO
             CreateMap<GasDiscount, ApiDiscount>()
