@@ -8,23 +8,15 @@
 </a>
 
 
-@foreach (var subsystem in Model.SubsystemTexts)
+@foreach (var subsystem in Model.Subsystems)
 {
 
     <div section-mode="@Model.SubsystemsInfo"
          section-action="Index" 
+         section-controller=@subsystem.Name
          section-classes-enabled="true"
          section-class="btn" 
-         section-class-normal="btn-outline-dark"
-         section-class-selected="btn-primary"
-         section-url-subsystem="@Model.CurrentSubsystem">@subsystem</div>
-    @*<a class="btn btn-block
-           @(subsystem == ViewBag.SelectedSubsystem
-               ? "btn-primary":"btn-outline-secondary")"
-           asp-action="Index"
-           asp-controller="Home"
-           asp-route-subsystem="@subsystem"
-           asp-route-notePage="1">
-            @subsystem
-        </a>*@
+         section-class-normal="btn-block btn-outline-secondary"
+         section-class-selected="btn-block btn-outline-primary"
+         section-url-subsystem="@subsystem.Description" ></div>
 }

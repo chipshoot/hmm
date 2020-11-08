@@ -31,6 +31,8 @@ namespace Hmm.WebConsole.Infrastructure.TagHelpers
 
         public SectionInfo SectionMode { get; set; }
 
+        public string SectionController { get; set; }
+
         public string SectionAction { get; set; }
 
         [HtmlAttributeName(DictionaryAttributePrefix = "section-url-")]
@@ -52,13 +54,13 @@ namespace Hmm.WebConsole.Infrastructure.TagHelpers
             {
                 var tag = new TagBuilder("a");
                 PageUrlValues["SectionPage"] = i;
-                tag.Attributes["href"] = urlHelper.Action(SectionAction, PageUrlValues);
+                tag.Attributes["href"] = urlHelper.Action(SectionAction, SectionController, PageUrlValues["SectionPage"]);
                 if (SectionClassesEnabled)
                 {
                     tag.AddCssClass(SectionClass);
                     tag.AddCssClass(i==SectionMode.CurrentSection? SectionClassSelected: SectionClassNormal);
                 }
-                tag.InnerHtml.Append(i.ToString());
+                tag.InnerHtml.Append(SectionController);
                 result.InnerHtml.AppendHtml(tag);
             }
 

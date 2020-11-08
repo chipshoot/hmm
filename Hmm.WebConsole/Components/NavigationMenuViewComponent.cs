@@ -13,7 +13,7 @@ namespace Hmm.WebConsole.Components
 {
     public class NavigationMenuViewComponent : ViewComponent
     {
-        private List<string> _subsystems;
+        private List<ApiSubsystem> _subsystems;
         private SectionInfo _subsystemInfo;
         private readonly IHttpClientFactory _httpClientFactory;
 
@@ -28,8 +28,7 @@ namespace Hmm.WebConsole.Components
             await SetupSubsystems();
             var viewMode = new NavigationComponentViewModel
             {
-                CurrentSubsystem = RouteData?.Values["controller"].ToString(),
-                SubsystemTexts = _subsystems,
+                Subsystems = _subsystems,
                 SubsystemsInfo = _subsystemInfo
             };
             return View(viewMode);
@@ -52,7 +51,7 @@ namespace Hmm.WebConsole.Components
             {
                 await using var responseStream = await response.Content.ReadAsStreamAsync();
                 var subsystems = await JsonSerializer.DeserializeAsync<List<ApiSubsystem>>(responseStream);
-                _subsystems = subsystems.Select(s => s.Name).ToList();
+                _subsystems = subsystems.ToList();
                 _subsystemInfo = new SectionInfo
                 {
                     ItemsPerSection = subsystems.Count,
